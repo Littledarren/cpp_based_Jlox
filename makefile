@@ -3,7 +3,7 @@ CFLAGS  = -Wall -O -I includes -g
 INCLUDEFLAGS = 
 LDFLAGS = 
 OBJS    = main.o Scanner.o Interpreter.o RecursiveDescentParser.o
-TARGETS = lox 
+TARGETS = lox.out
 
 vpath %.cpp src
 vpath %.h includes
@@ -13,7 +13,7 @@ vpath %.h includes
 
 all : $(TARGETS)
 
-lox: $(OBJS)
+$(TARGETS): $(OBJS)
 	    $(CC) -o $@ $^ $(LDFLAGS)
 
 %.o:%.cpp
