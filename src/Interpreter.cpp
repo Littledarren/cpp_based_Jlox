@@ -243,6 +243,16 @@ string VALUE_T::toString(VALUE_T &v)
     return os.str();
 }
 
+void Interpreter::interprete(vector<Stmt*> statements)
+{
+    try {
+        for (auto p : statements) {
+            execute(p);
+        }
+    } catch (const RuntimeError &e) {
+        runtimeError(e);
+    }
+}
 
 VALUE_T Interpreter::interprete(Expr *expr)
 {
@@ -266,6 +276,10 @@ VALUE_T Interpreter::interprete(Expr *expr)
 void* Interpreter::evaluate(Expr *expr)
 {
     return expr->accept(this);
+}
+void Interpreter::execute(Stmt * stmt)
+{
+    stmt->accept(this);
 }
 void* Interpreter::visitTernaryExpr(Ternary *expr) 
 {
@@ -353,6 +367,20 @@ void* Interpreter::visitLiteralExpr(Literal *expr)
     return new VALUE_T(*(expr->type), expr->value);
 }
 
+void * Interpreter::visitExpressionStmt(Expression *stmt) 
+{
+    evaluate(stmt->expr);
+    // EYE 
+    //may be i can delete stmt here.
+    //after execute it delete it.
+    return nullptr;
+}
+void * Interpreter::visitPrintStmt(Print *stmt) 
+{
+   VALUE_T value = interprete(stmt->expr);
+   std::cout<<VALUE_T::toString(value)<<endl;
+   return nullptr;
+}
 
 
 

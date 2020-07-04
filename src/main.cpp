@@ -83,17 +83,17 @@ static void run(const string &source)
     vector<Token*> tokens = lexer->scanTokens();
     Parser *parser = new RecursiveDescentParser(tokens);
 
-    Expr *expr = parser->parse();
-    if (expr != nullptr) {
-        AstPrinter *astP = new AstPrinter();
-        cout<<astP->print(expr)<<endl;
-        VALUE_T result = interpreter.interprete(expr);
-        cout<<VALUE_T::toString(result)<<endl;
-        delete astP;
+    vector<Stmt*> statements = parser->parse();
+    if (!statements.empty()) {
+//        AstPrinter *astP = new AstPrinter();
+//        cout<<astP->print(expr)<<endl;
+       // VALUE_T result = interpreter.interprete(expr);
+       // cout<<VALUE_T::toString(result)<<endl;
+       interpreter.interprete(statements);
+        //delete astP;
     }
     delete lexer;
     delete parser;
-    delete expr;
 }
 
 

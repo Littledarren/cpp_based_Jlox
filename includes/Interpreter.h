@@ -11,7 +11,11 @@
 #define _INTERPRETER_H_
 
 #include <initializer_list>
+#include <vector>
+using std::vector;
+
 #include "Expr.h"
+#include "Stmt.h"
 #include "TokenType.h"
 
 class RuntimeError : public std::runtime_error
@@ -79,17 +83,22 @@ struct VALUE_T
     void *literal = nullptr;
 };
 
-class Interpreter : public Expr::Visitor
+class Interpreter : public Expr::Visitor, public Stmt::Visitor
 {
     
 public:
+    void interprete(vector<Stmt*> statements);
+
     VALUE_T interprete(Expr *expr);
     void* evaluate(Expr *expr);
+    void execute(Stmt * stmt);
     virtual void* visitTernaryExpr(Ternary *expr) override;
     virtual void* visitBinaryExpr(Binary *expr) override;
     virtual void* visitUnaryExpr(Unary *expr) override;
     virtual void* visitGroupingExpr(Grouping *expr) override;
     virtual void* visitLiteralExpr(Literal *expr) override;
+    void * visitExpressionStmt(Expression *stmt) override;
+    void * visitPrintStmt(Print *stmt) override;
 };
 
 #endif

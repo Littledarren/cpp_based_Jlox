@@ -4,18 +4,38 @@
 
 vector<Stmt*> RecursiveDescentParser::parse() 
 {
+    vector<Stmt*> statements;
     try {
-        vector<Stmt*> statements;
         while (!isAtEnd()) {
             statements.push_back(statement());
         }
     } catch (const ParseError &pe) {
-        return nullptr;
+        return statements;
     } catch (char const * e) {
         cout<<e<<endl;
-        return nullptr;
+        return statements;
     }
     return statements;
+}
+Stmt* RecursiveDescentParser::statement()
+{
+    if (match({PRINT})) return printStatement();
+
+    return expressionStatement();
+}
+Stmt* RecursiveDescentParser::printStatement()
+{
+    Expr* value = expression();
+    consume(SEMICOLON, "Expect ';' after value");
+    return new Print(value);
+}
+
+Stmt* RecursiveDescentParser::expressionStatement()
+{
+
+    Expr* expr = expression();
+    consume(SEMICOLON, "Expect ';' after expression");
+    return new Expression(expr);
 }
 Expr* RecursiveDescentParser::expression()
 {

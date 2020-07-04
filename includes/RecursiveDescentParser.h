@@ -34,19 +34,10 @@ public:
     {}
     virtual vector<Stmt*> parse() override;
 private:
-    Stmt* statement()
-    {
-        if (match(PRINT)) return printStatement();
-
-        return expressionStatement();
-    }
+    Stmt* statement();
     Stmt* printStatement();
-    {
-        Expr* value = expression();
-        consume(SEMICOLON, "Expect ';' after value");
-        return new  program_invocation_short_name
-    }
     Stmt* expressionStatement();
+
     Expr* expression();
     Expr* commaExpression();
     Expr* ternaryExpression();
