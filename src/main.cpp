@@ -20,16 +20,21 @@
 #include "../includes/Token.h"
 #include "../includes/AstPrinter.h"
 #include "../includes/RecursiveDescentParser.h"
+#include "../includes/Interpreter.h"
 
 using namespace std;
 
 
 bool hadError = false; //has error ?
+bool hadRuntimeError = false;
 
 
 static void runFile(const char *path);
 static void runPrompt();
 static void run(const string &source);
+
+
+static Interpreter interpreter;
 
 int main(int argc, char *argv[])
 {
@@ -56,6 +61,7 @@ static void runFile(const char *path)
     run(cmd);
     is.close();
     if (hadError) exit(65);
+    if (hadRuntimeError) exit(70);
 }
 
 
@@ -80,14 +86,10 @@ static void run(const string &source)
     Expr *expr = parser->parse();
     if (expr != nullptr) {
         AstPrinter *astP = new AstPrinter();
-        Evaluator *evaluator = new Evaluator();
-        Calculator *calculator = new Calculator();
         cout<<astP->print(expr)<<endl;
-        cout<<evaluator->RPN(expr)<<endl;
-        cout<<calculator->eval(expr)<<endl;
+        VALUE_T result = interpreter.interprete(expr);
+        cout<<VALUE_T::toString(result)<<endl;
         delete astP;
-        delete evaluator;
-        delete calculator;
     }
     delete lexer;
     delete parser;

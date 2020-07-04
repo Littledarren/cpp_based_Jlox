@@ -16,6 +16,7 @@ using std::vector;
 #include "TokenType.h"
 #include "Token.h"
 #include "Expr.h"
+#include "Stmt.h"
 
 class Parser
 
@@ -24,7 +25,7 @@ public:
     Parser(vector<Token*> &tokens):tokens(tokens)
     {}
 
-    virtual Expr* parse()=0;
+    virtual vector<Stmt*> parse()=0;
     virtual ~Parser(){}
 
 

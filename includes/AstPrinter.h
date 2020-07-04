@@ -13,7 +13,7 @@
 #include <initializer_list>
 #include "Expr.h"
 //print AST
-class AstPrinter : public Visitor
+class AstPrinter : public Expr::Visitor
 {
 
 public:
@@ -69,7 +69,7 @@ private:
 };
 
 //show RPN 
-class Evaluator : public Visitor
+class Evaluator : public Expr::Visitor
 {
 public:
     string RPN(Expr *expr)
@@ -114,7 +114,7 @@ public:
     }
 };
 // caculate double value
-class Calculator : public Visitor
+class Calculator : public Expr::Visitor
 {
 
 public:

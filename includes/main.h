@@ -4,12 +4,14 @@
 
 using namespace std;
 extern bool hadError; //has error ?
+extern bool hadRuntimeError;
 
 #include "Token.h"
+#include "Interpreter.h"
 
 inline void report(int line, const string &where, const string &message)
 {
-    cout<<"[line "<<line<<"] Error "<<where<<" : "<<message<<endl;
+    cerr<<"[line "<<line<<"] Error "<<where<<" : "<<message<<endl;
     hadError = true;
 }
 inline void error(int line, const string &message) 
@@ -23,6 +25,13 @@ inline void error(const Token &token, const string &msg)
     } else {
         report(token.line, "at '" + token.lexeme +"'", msg);
     }
+}
+
+inline void runtimeError(const RuntimeError &e)
+{
+    cerr<<e.what()<<"\n[line " + getNameOfType(e.type) +"]";
+    hadRuntimeError = true;
+
 }
 
 

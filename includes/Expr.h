@@ -23,25 +23,24 @@ struct Grouping;
 struct Literal;
 struct Ternary;
 
-struct Visitor;
-
 struct Expr
 {
+    struct Visitor
+    {
+        virtual void* visitBinaryExpr(Binary *expr)=0;
+        virtual void* visitGroupingExpr(Grouping *expr)=0;
+        virtual void* visitLiteralExpr(Literal *expr)=0;
+        virtual void* visitUnaryExpr(Unary *expr)=0;
+        virtual void* visitTernaryExpr(Ternary *expr)=0;
+        virtual ~Visitor(){}
+
+    };
+
     virtual void* accept(Visitor *visitor) = 0;
     virtual ~Expr()
     {}
 };
 
-struct Visitor
-{
-    virtual void* visitBinaryExpr(Binary *expr)=0;
-    virtual void* visitGroupingExpr(Grouping *expr)=0;
-    virtual void* visitLiteralExpr(Literal *expr)=0;
-    virtual void* visitUnaryExpr(Unary *expr)=0;
-    virtual void* visitTernaryExpr(Ternary *expr)=0;
-    virtual ~Visitor(){}
-
-};
 struct Binary : public Expr
 {
     Binary(Expr *left, Token *op, Expr *right):left(left), op(op),right(right)

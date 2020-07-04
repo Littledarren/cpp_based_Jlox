@@ -2,7 +2,7 @@ CC      = g++
 CFLAGS  = -Wall -O -I includes -g
 INCLUDEFLAGS = 
 LDFLAGS = 
-OBJS    = main.o Scanner.o
+OBJS    = main.o Scanner.o Interpreter.o RecursiveDescentParser.o
 TARGETS = lox 
 
 vpath %.cpp src
@@ -10,7 +10,8 @@ vpath %.h includes
 
 
 .PHONY:all 
-	all : $(TARGETS)
+
+all : $(TARGETS)
 
 lox: $(OBJS)
 	    $(CC) -o $@ $^ $(LDFLAGS)
@@ -26,6 +27,6 @@ lox: $(OBJS)
 -include $(OBJS:.o=.d)
 
 .PHONY:clean 
-	clean:
-	    rm -f $(TARGETS) *.o *.d *.d.*
+clean:
+	rm -f $(TARGETS) *.o *.d *.d.*
 

@@ -147,6 +147,8 @@ inline string getNameOfType(const TokenType &type)
         case FOE:
             return "FOE";
             break;
+        case NUL:
+            return "NUL SYMBOL!!!";
         default:
             return "UNKOWN TYPE";
             break;
