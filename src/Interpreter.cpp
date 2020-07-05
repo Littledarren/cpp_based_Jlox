@@ -366,6 +366,11 @@ void* Interpreter::visitLiteralExpr(Literal *expr)
 {
     return new VALUE_T(*(expr->type), expr->value);
 }
+void * Interpreter::visitVariableExpr(Variable *expr) 
+{
+    //Enexpr->name->lexeme
+    return nullptr;
+}
 
 void * Interpreter::visitExpressionStmt(Expression *stmt) 
 {
@@ -380,6 +385,16 @@ void * Interpreter::visitPrintStmt(Print *stmt)
    VALUE_T value = interprete(stmt->expr);
    std::cout<<VALUE_T::toString(value)<<endl;
    return nullptr;
+}
+
+void * Interpreter::visitVarStmt(Var * stmt)
+{
+    VALUE_T * value = nullptr;
+    if (stmt->initializer != nullptr) {
+        value = (VALUE_T*)evaluate(stmt->initializer);
+    }
+    environment.define(stmt->name->lexeme, value);
+    return nullptr;
 }
 
 

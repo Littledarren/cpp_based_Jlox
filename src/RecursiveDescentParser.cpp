@@ -5,17 +5,30 @@
 vector<Stmt*> RecursiveDescentParser::parse() 
 {
     vector<Stmt*> statements;
-    try {
-        while (!isAtEnd()) {
-            statements.push_back(statement());
-        }
-    } catch (const ParseError &pe) {
-        return statements;
-    } catch (char const * e) {
-        cout<<e<<endl;
-        return statements;
+    while (!isAtEnd()) {
+        statements.push_back(declaration());
     }
     return statements;
+}
+Stmt* RecursiveDescentParser::declaration()
+{
+    try {
+        if (match({VAR})) return varDeclaration();
+        return statement();
+    } catch (const ParseError &e) {
+        synchronize();
+        return nullptr;
+    }
+}
+Stmt* RecursiveDescentParser::varDeclaration()
+{
+   Token * name = consume(IDENTIFIER, "Expect variable name");
+   Expr * initializer = nullptr;
+   if (match ({EQUAL})) {
+       initializer = expression();
+   }
+   consume(SEMICOLON, "Expect ';' after variable declaration");
+   return new Var(name, initializer);
 }
 Stmt* RecursiveDescentParser::statement()
 {
@@ -116,6 +129,10 @@ Expr* RecursiveDescentParser::primary()
         Expr *expr = expression();
         consume(RIGHT_PAREN, "Expect ')' after expression");
         return new Grouping(expr);
+    }
+    //变量使用
+    if (match({IDENTIFIER})) {
+        return new Variable(previous());
     }
     throw error(peek(), "Expect expression.");
 }

@@ -5,7 +5,9 @@ set cpo&vim
 inoremap <silent> <Plug>CocRefresh =coc#_complete()
 inoremap <silent> <SNR>16_AutoPairsReturn =AutoPairsReturn()
 inoremap <C-U> viw~ea
+snoremap <silent>  c
 nnoremap 	 :bn
+snoremap  "_c
 nnoremap <silent> ,b :LeaderfBuffer
 nnoremap <silent> ,f :LeaderfFile
 nmap ,qf <Plug>(coc-fix-current)
@@ -20,13 +22,21 @@ nnoremap <silent> , :WhichKey ','
 nmap <silent> [g <Plug>(coc-diagnostic-prev)
 nnoremap <silent> \<Space> :WhichKey '\ '
 nmap <silent> ]g <Plug>(coc-diagnostic-next)
-vmap gx <Plug>NetrwBrowseXVis
+xmap gx <Plug>NetrwBrowseXVis
 nmap gx <Plug>NetrwBrowseX
 nmap <silent> gr <Plug>(coc-references)
 nmap <silent> gi <Plug>(coc-implementation)
 nmap <silent> gy <Plug>(coc-type-definition)
 nmap <silent> gd <Plug>(coc-definition)
 onoremap p i(
+snoremap <C-R> "_c
+snoremap <silent> <C-H> c
+snoremap <silent> <Del> c
+snoremap <silent> <BS> c
+nnoremap <Plug>LeaderfGtagsDefinition :=leaderf#Gtags#startCmdline(0, 1, 'd')
+nnoremap <Plug>LeaderfGtagsReference :=leaderf#Gtags#startCmdline(0, 1, 'r')
+nnoremap <Plug>LeaderfGtagsSymbol :=leaderf#Gtags#startCmdline(0, 1, 's')
+nnoremap <Plug>LeaderfGtagsGrep :=leaderf#Gtags#startCmdline(0, 1, 'g')
 vnoremap <silent> <Plug>(coc-explorer-action-v->>) :call coc#rpc#request('doKeymap', ['explorer-action-v->>'])
 nnoremap <silent> <Plug>(coc-explorer-action-n->>) :call coc#rpc#request('doKeymap', ['explorer-action-n->>'])
 vnoremap <silent> <Plug>(coc-explorer-action-v-<<) :call coc#rpc#request('doKeymap', ['explorer-action-v-<<'])
@@ -136,13 +146,9 @@ vnoremap <silent> <Plug>LeaderfGtagsGrep :=leaderf#Gtags#startCmdline(2, 1, 
 vnoremap <silent> <Plug>LeaderfGtagsSymbol :=leaderf#Gtags#startCmdline(2, 1, 's')
 vnoremap <silent> <Plug>LeaderfGtagsReference :=leaderf#Gtags#startCmdline(2, 1, 'r')
 vnoremap <silent> <Plug>LeaderfGtagsDefinition :=leaderf#Gtags#startCmdline(2, 1, 'd')
-nnoremap <Plug>LeaderfGtagsGrep :=leaderf#Gtags#startCmdline(0, 1, 'g')
 onoremap <Plug>LeaderfGtagsGrep :=leaderf#Gtags#startCmdline(0, 1, 'g')
-nnoremap <Plug>LeaderfGtagsSymbol :=leaderf#Gtags#startCmdline(0, 1, 's')
 onoremap <Plug>LeaderfGtagsSymbol :=leaderf#Gtags#startCmdline(0, 1, 's')
-nnoremap <Plug>LeaderfGtagsReference :=leaderf#Gtags#startCmdline(0, 1, 'r')
 onoremap <Plug>LeaderfGtagsReference :=leaderf#Gtags#startCmdline(0, 1, 'r')
-nnoremap <Plug>LeaderfGtagsDefinition :=leaderf#Gtags#startCmdline(0, 1, 'd')
 onoremap <Plug>LeaderfGtagsDefinition :=leaderf#Gtags#startCmdline(0, 1, 'd')
 vnoremap <silent> <Plug>LeaderfRgBangVisualRegexBoundary :=leaderf#Rg#startCmdline(2, 1, 1, 1)
 vnoremap <silent> <Plug>LeaderfRgBangVisualRegexNoBoundary :=leaderf#Rg#startCmdline(2, 1, 1, 0)
@@ -251,6 +257,7 @@ set tabline=%!airline#extensions#tabline#get()
 set tabstop=4
 set updatetime=300
 set wildmenu
+set window=54
 set nowritebackup
 let s:so_save = &so | let s:siso_save = &siso | set so=0 siso=0
 let v:this_session=expand("<sfile>:p")
@@ -264,14 +271,11 @@ set shortmess=aoO
 argglobal
 %argdel
 $argadd /media/syncrack/数据/迅雷下载/学习资料/WorkPlace/cpp_based_Jlox-master/includes/Interpreter.h
-edit includes/Interpreter.h
+edit /media/syncrack/数据/迅雷下载/学习资料/WorkPlace/cpp_based_Jlox-master/src/Interpreter.cpp
 set splitbelow splitright
 wincmd _ | wincmd |
 vsplit
-wincmd _ | wincmd |
-vsplit
-2wincmd h
-wincmd w
+1wincmd h
 wincmd w
 set nosplitbelow
 set nosplitright
@@ -280,12 +284,9 @@ set winminheight=0
 set winheight=1
 set winminwidth=0
 set winwidth=1
-exe 'vert 1resize ' . ((&columns * 30 + 82) / 165)
-exe 'vert 2resize ' . ((&columns * 79 + 82) / 165)
-exe 'vert 3resize ' . ((&columns * 54 + 82) / 165)
+exe 'vert 1resize ' . ((&columns * 106 + 106) / 213)
+exe 'vert 2resize ' . ((&columns * 106 + 106) / 213)
 argglobal
-enew
-file \[coc-explorer]-1
 let s:cpo_save=&cpo
 set cpo&vim
 inoremap <buffer> <silent> <M-n> :call AutoPairsJump()a
@@ -302,22 +303,6 @@ inoremap <buffer> <silent> <M-]> =AutoPairsMoveCharacter(']')
 inoremap <buffer> <silent> <M-[> =AutoPairsMoveCharacter('[')
 inoremap <buffer> <silent> <M-)> =AutoPairsMoveCharacter(')')
 inoremap <buffer> <silent> <M-(> =AutoPairsMoveCharacter('(')
-nmap <buffer> 	 <Plug>(coc-explorer-action-n-[tab])
-vmap <buffer> 	 <Plug>(coc-explorer-action-v-[tab])
-nmap <buffer>  <Plug>(coc-explorer-action-n-[cr])
-vmap <buffer>  <Plug>(coc-explorer-action-v-[cr])
-nmap <buffer> * <Plug>(coc-explorer-action-n-*)
-vmap <buffer> * <Plug>(coc-explorer-action-v-*)
-nmap <buffer> . <Plug>(coc-explorer-action-n-.)
-vmap <buffer> . <Plug>(coc-explorer-action-v-.)
-nmap <buffer> << <Plug>(coc-explorer-action-n-<<)
-vmap <buffer> << <Plug>(coc-explorer-action-v-<<)
-nmap <buffer> >> <Plug>(coc-explorer-action-n->>)
-vmap <buffer> >> <Plug>(coc-explorer-action-v->>)
-nmap <buffer> ? <Plug>(coc-explorer-action-n-?)
-vmap <buffer> ? <Plug>(coc-explorer-action-v-?)
-nmap <buffer> A <Plug>(coc-explorer-action-n-A)
-vmap <buffer> A <Plug>(coc-explorer-action-v-A)
 inoremap <buffer> <silent> § =AutoPairsMoveCharacter('''')
 inoremap <buffer> <silent> ¢ =AutoPairsMoveCharacter('"')
 inoremap <buffer> <silent> © =AutoPairsMoveCharacter(')')
@@ -330,93 +315,6 @@ inoremap <buffer> <silent> ý =AutoPairsMoveCharacter('}')
 inoremap <buffer> <silent> û =AutoPairsMoveCharacter('{')
 inoremap <buffer> <silent> Ý =AutoPairsMoveCharacter(']')
 inoremap <buffer> <silent> Û =AutoPairsMoveCharacter('[')
-nmap <buffer> D <Plug>(coc-explorer-action-n-D)
-vmap <buffer> D <Plug>(coc-explorer-action-v-D)
-nmap <buffer> E <Plug>(coc-explorer-action-n-E)
-vmap <buffer> E <Plug>(coc-explorer-action-v-E)
-nmap <buffer> F <Plug>(coc-explorer-action-n-F)
-vmap <buffer> F <Plug>(coc-explorer-action-v-F)
-nmap <buffer> J <Plug>(coc-explorer-action-n-J)
-vmap <buffer> J <Plug>(coc-explorer-action-v-J)
-nmap <buffer> K <Plug>(coc-explorer-action-n-K)
-vmap <buffer> K <Plug>(coc-explorer-action-v-K)
-nmap <buffer> R <Plug>(coc-explorer-action-n-R)
-vmap <buffer> R <Plug>(coc-explorer-action-v-R)
-nmap <buffer> X <Plug>(coc-explorer-action-n-X)
-vmap <buffer> X <Plug>(coc-explorer-action-v-X)
-nmap <buffer> Y <Plug>(coc-explorer-action-n-Y)
-vmap <buffer> Y <Plug>(coc-explorer-action-v-Y)
-nmap <buffer> [d <Plug>(coc-explorer-action-n-[d)
-vmap <buffer> [d <Plug>(coc-explorer-action-v-[d)
-nmap <buffer> [c <Plug>(coc-explorer-action-n-[c)
-vmap <buffer> [c <Plug>(coc-explorer-action-v-[c)
-nmap <buffer> [m <Plug>(coc-explorer-action-n-[m)
-vmap <buffer> [m <Plug>(coc-explorer-action-v-[m)
-nmap <buffer> [i <Plug>(coc-explorer-action-n-[i)
-vmap <buffer> [i <Plug>(coc-explorer-action-v-[i)
-nmap <buffer> [[ <Plug>(coc-explorer-action-n-[[)
-vmap <buffer> [[ <Plug>(coc-explorer-action-v-[[)
-nmap <buffer> ]] <Plug>(coc-explorer-action-n-]])
-vmap <buffer> ]] <Plug>(coc-explorer-action-v-]])
-nmap <buffer> ]m <Plug>(coc-explorer-action-n-]m)
-vmap <buffer> ]m <Plug>(coc-explorer-action-v-]m)
-nmap <buffer> ]i <Plug>(coc-explorer-action-n-]i)
-vmap <buffer> ]i <Plug>(coc-explorer-action-v-]i)
-nmap <buffer> ]d <Plug>(coc-explorer-action-n-]d)
-vmap <buffer> ]d <Plug>(coc-explorer-action-v-]d)
-nmap <buffer> ]c <Plug>(coc-explorer-action-n-]c)
-vmap <buffer> ]c <Plug>(coc-explorer-action-v-]c)
-nmap <buffer> a <Plug>(coc-explorer-action-n-a)
-vmap <buffer> a <Plug>(coc-explorer-action-v-a)
-nmap <buffer> c <Plug>(coc-explorer-action-n-c)
-vmap <buffer> c <Plug>(coc-explorer-action-v-c)
-nmap <buffer> d <Plug>(coc-explorer-action-n-d)
-vmap <buffer> d <Plug>(coc-explorer-action-v-d)
-nmap <buffer> e <Plug>(coc-explorer-action-n-e)
-vmap <buffer> e <Plug>(coc-explorer-action-v-e)
-nmap <buffer> f <Plug>(coc-explorer-action-n-f)
-vmap <buffer> f <Plug>(coc-explorer-action-v-f)
-nmap <buffer> gs <Plug>(coc-explorer-action-n-gs)
-vmap <buffer> gs <Plug>(coc-explorer-action-v-gs)
-nmap <buffer> gp <Plug>(coc-explorer-action-n-gp)
-vmap <buffer> gp <Plug>(coc-explorer-action-v-gp)
-nmap <buffer> gl <Plug>(coc-explorer-action-n-gl)
-vmap <buffer> gl <Plug>(coc-explorer-action-v-gl)
-nmap <buffer> gk <Plug>(coc-explorer-action-n-gk)
-vmap <buffer> gk <Plug>(coc-explorer-action-v-gk)
-nmap <buffer> gj <Plug>(coc-explorer-action-n-gj)
-vmap <buffer> gj <Plug>(coc-explorer-action-v-gj)
-nmap <buffer> gh <Plug>(coc-explorer-action-n-gh)
-vmap <buffer> gh <Plug>(coc-explorer-action-v-gh)
-nmap <buffer> gf <Plug>(coc-explorer-action-n-gf)
-vmap <buffer> gf <Plug>(coc-explorer-action-v-gf)
-nmap <buffer> gd <Plug>(coc-explorer-action-n-gd)
-vmap <buffer> gd <Plug>(coc-explorer-action-v-gd)
-nmap <buffer> gb <Plug>(coc-explorer-action-n-gb)
-vmap <buffer> gb <Plug>(coc-explorer-action-v-gb)
-nmap <buffer> h <Plug>(coc-explorer-action-n-h)
-vmap <buffer> h <Plug>(coc-explorer-action-v-h)
-nmap <buffer> l <Plug>(coc-explorer-action-n-l)
-vmap <buffer> l <Plug>(coc-explorer-action-v-l)
-nmap <buffer> o <Plug>(coc-explorer-action-n-o)
-nmap <buffer> p <Plug>(coc-explorer-action-n-p)
-vmap <buffer> p <Plug>(coc-explorer-action-v-p)
-nmap <buffer> q <Plug>(coc-explorer-action-n-q)
-vmap <buffer> q <Plug>(coc-explorer-action-v-q)
-nmap <buffer> r <Plug>(coc-explorer-action-n-r)
-vmap <buffer> r <Plug>(coc-explorer-action-v-r)
-nmap <buffer> s <Plug>(coc-explorer-action-n-s)
-vmap <buffer> s <Plug>(coc-explorer-action-v-s)
-nmap <buffer> t <Plug>(coc-explorer-action-n-t)
-vmap <buffer> t <Plug>(coc-explorer-action-v-t)
-nmap <buffer> x <Plug>(coc-explorer-action-n-x)
-vmap <buffer> x <Plug>(coc-explorer-action-v-x)
-nmap <buffer> y <Plug>(coc-explorer-action-n-y)
-vmap <buffer> y <Plug>(coc-explorer-action-v-y)
-nmap <buffer> <BS> <Plug>(coc-explorer-action-n-[bs])
-vmap <buffer> <BS> <Plug>(coc-explorer-action-v-[bs])
-nmap <buffer> <2-LeftMouse> <Plug>(coc-explorer-action-n-[2-LeftMouse])
-vmap <buffer> <2-LeftMouse> <Plug>(coc-explorer-action-v-[2-LeftMouse])
 noremap <buffer> <silent> <M-n> :call AutoPairsJump()
 noremap <buffer> <silent> <M-p> :call AutoPairsToggle()
 inoremap <buffer> <silent>  =AutoPairsDelete()
@@ -442,15 +340,15 @@ setlocal balloonexpr=
 setlocal nobinary
 setlocal nobreakindent
 setlocal breakindentopt=
-setlocal bufhidden=hide
-setlocal nobuflisted
-setlocal buftype=nofile
+setlocal bufhidden=
+setlocal buflisted
+setlocal buftype=
 setlocal cindent
 setlocal cinkeys=0{,0},0),0],:,0#,!^F,o,O,e
 setlocal cinoptions=g0
 setlocal cinwords=if,else,while,do,for,switch
 setlocal colorcolumn=
-setlocal comments=s1:/*,mb:*,ex:*/,://,b:#,:%,:XCOMM,n:>,fb:-
+setlocal comments=sO:*\ -,mO:*\ \ ,exO:*/,s1:/*,mb:*,ex:*/,://
 setlocal commentstring=/*%s*/
 setlocal complete=.,w,b,u,t,i
 setlocal concealcursor=
@@ -460,7 +358,7 @@ setlocal nocopyindent
 setlocal cryptmethod=
 setlocal nocursorbind
 setlocal nocursorcolumn
-setlocal cursorline
+setlocal nocursorline
 setlocal cursorlineopt=both
 setlocal define=
 setlocal dictionary=
@@ -468,12 +366,12 @@ setlocal nodiff
 setlocal equalprg=
 setlocal errorformat=
 setlocal expandtab
-if &filetype != 'coc-explorer'
-setlocal filetype=coc-explorer
+if &filetype != 'cpp'
+setlocal filetype=cpp
 endif
 setlocal fixendofline
 setlocal foldcolumn=0
-setlocal nofoldenable
+setlocal foldenable
 setlocal foldexpr=0
 setlocal foldignore=#
 setlocal foldlevel=99
@@ -484,7 +382,7 @@ setlocal foldminlines=1
 setlocal foldnestmax=20
 setlocal foldtext=foldtext()
 setlocal formatexpr=
-setlocal formatoptions=tcq
+setlocal formatoptions=croql
 setlocal formatlistpat=^\\s*\\d\\+[\\]:.)}\\t\ ]\\s*
 setlocal formatprg=
 setlocal grepprg=
@@ -504,19 +402,19 @@ setlocal nolist
 setlocal makeencoding=
 setlocal makeprg=
 setlocal matchpairs=(:),{:},[:]
-setlocal nomodeline
-setlocal nomodifiable
+setlocal modeline
+setlocal modifiable
 setlocal nrformats=bin,octal,hex
 setlocal nonumber
 setlocal numberwidth=4
-setlocal omnifunc=
+setlocal omnifunc=ccomplete#Complete
 setlocal path=
 setlocal nopreserveindent
 setlocal nopreviewwindow
 setlocal quoteescape=\\
-setlocal readonly
+setlocal noreadonly
 set relativenumber
-setlocal norelativenumber
+setlocal relativenumber
 setlocal norightleft
 setlocal rightleftcmd=search
 setlocal noscrollbind
@@ -526,7 +424,7 @@ setlocal noshortname
 setlocal showbreak=
 setlocal sidescrolloff=-1
 set signcolumn=number
-setlocal signcolumn=no
+setlocal signcolumn=number
 setlocal nosmartindent
 setlocal softtabstop=4
 setlocal nospell
@@ -535,10 +433,10 @@ setlocal spellfile=
 setlocal spelllang=en
 setlocal statusline=%!airline#statusline(1)
 setlocal suffixesadd=
-setlocal noswapfile
+setlocal swapfile
 setlocal synmaxcol=3000
-if &syntax != 'coc-explorer'
-setlocal syntax=coc-explorer
+if &syntax != 'cpp'
+setlocal syntax=cpp
 endif
 setlocal tabstop=4
 setlocal tagcase=
@@ -555,12 +453,55 @@ setlocal varsofttabstop=
 setlocal vartabstop=
 setlocal wincolor=
 setlocal nowinfixheight
-setlocal winfixwidth
+setlocal nowinfixwidth
 set nowrap
 setlocal nowrap
 setlocal wrapmargin=0
+43
+normal! zo
+43
+normal! zc
+65
+normal! zc
+72
+normal! zo
+72
+normal! zc
+87
+normal! zo
+87
+normal! zc
+114
+normal! zc
+196
+normal! zo
+224
+normal! zo
+247
+normal! zo
+258
+normal! zo
+289
+normal! zo
+345
+normal! zo
+376
+normal! zo
+376
+normal! zc
+384
+normal! zc
+391
+normal! zo
+let s:l = 392 - ((33 * winheight(0) + 25) / 51)
+if s:l < 1 | let s:l = 1 | endif
+exe s:l
+normal! zt
+392
+normal! 023|
 wincmd w
 argglobal
+if bufexists("/media/syncrack/数据/迅雷下载/学习资料/WorkPlace/cpp_based_Jlox-master/includes/Interpreter.h") | buffer /media/syncrack/数据/迅雷下载/学习资料/WorkPlace/cpp_based_Jlox-master/includes/Interpreter.h | else | edit /media/syncrack/数据/迅雷下载/学习资料/WorkPlace/cpp_based_Jlox-master/includes/Interpreter.h | endif
 let s:cpo_save=&cpo
 set cpo&vim
 inoremap <buffer> <silent> <M-n> :call AutoPairsJump()a
@@ -731,197 +672,26 @@ setlocal nowinfixwidth
 set nowrap
 setlocal nowrap
 setlocal wrapmargin=0
-let s:l = 79 - ((44 * winheight(0) + 22) / 45)
+let s:l = 105 - ((44 * winheight(0) + 25) / 51)
 if s:l < 1 | let s:l = 1 | endif
 exe s:l
 normal! zt
-79
-normal! 0
+105
+normal! 012|
 wincmd w
-argglobal
-if bufexists("includes/Interpreter.h") | buffer includes/Interpreter.h | else | edit includes/Interpreter.h | endif
-let s:cpo_save=&cpo
-set cpo&vim
-inoremap <buffer> <silent> <M-n> :call AutoPairsJump()a
-inoremap <buffer> <silent> <expr> <M-p> AutoPairsToggle()
-inoremap <buffer> <silent> <M-b> =AutoPairsBackInsert()
-inoremap <buffer> <silent> <M-e> =AutoPairsFastWrap()
-inoremap <buffer> <silent> <C-H> =AutoPairsDelete()
-inoremap <buffer> <silent> <BS> =AutoPairsDelete()
-inoremap <buffer> <silent> <M-'> =AutoPairsMoveCharacter('''')
-inoremap <buffer> <silent> <M-"> =AutoPairsMoveCharacter('"')
-inoremap <buffer> <silent> <M-}> =AutoPairsMoveCharacter('}')
-inoremap <buffer> <silent> <M-{> =AutoPairsMoveCharacter('{')
-inoremap <buffer> <silent> <M-]> =AutoPairsMoveCharacter(']')
-inoremap <buffer> <silent> <M-[> =AutoPairsMoveCharacter('[')
-inoremap <buffer> <silent> <M-)> =AutoPairsMoveCharacter(')')
-inoremap <buffer> <silent> <M-(> =AutoPairsMoveCharacter('(')
-inoremap <buffer> <silent> § =AutoPairsMoveCharacter('''')
-inoremap <buffer> <silent> ¢ =AutoPairsMoveCharacter('"')
-inoremap <buffer> <silent> © =AutoPairsMoveCharacter(')')
-inoremap <buffer> <silent> ¨ =AutoPairsMoveCharacter('(')
-inoremap <buffer> <silent> î :call AutoPairsJump()a
-inoremap <buffer> <silent> <expr> ð AutoPairsToggle()
-inoremap <buffer> <silent> â =AutoPairsBackInsert()
-inoremap <buffer> <silent> å =AutoPairsFastWrap()
-inoremap <buffer> <silent> ý =AutoPairsMoveCharacter('}')
-inoremap <buffer> <silent> û =AutoPairsMoveCharacter('{')
-inoremap <buffer> <silent> Ý =AutoPairsMoveCharacter(']')
-inoremap <buffer> <silent> Û =AutoPairsMoveCharacter('[')
-noremap <buffer> <silent> <M-n> :call AutoPairsJump()
-noremap <buffer> <silent> <M-p> :call AutoPairsToggle()
-inoremap <buffer> <silent>  =AutoPairsDelete()
-inoremap <buffer> <silent>   =AutoPairsSpace()
-inoremap <buffer> <silent> " =AutoPairsInsert('"')
-inoremap <buffer> <silent> ' =AutoPairsInsert('''')
-inoremap <buffer> <silent> ( =AutoPairsInsert('(')
-inoremap <buffer> <silent> ) =AutoPairsInsert(')')
-noremap <buffer> <silent> î :call AutoPairsJump()
-noremap <buffer> <silent> ð :call AutoPairsToggle()
-inoremap <buffer> <silent> [ =AutoPairsInsert('[')
-inoremap <buffer> <silent> ] =AutoPairsInsert(']')
-inoremap <buffer> <silent> ` =AutoPairsInsert('`')
-inoremap <buffer> <silent> { =AutoPairsInsert('{')
-inoremap <buffer> <silent> } =AutoPairsInsert('}')
-let &cpo=s:cpo_save
-unlet s:cpo_save
-setlocal keymap=
-setlocal noarabic
-setlocal autoindent
-setlocal backupcopy=
-setlocal balloonexpr=
-setlocal nobinary
-setlocal nobreakindent
-setlocal breakindentopt=
-setlocal bufhidden=
-setlocal buflisted
-setlocal buftype=
-setlocal cindent
-setlocal cinkeys=0{,0},0),0],:,0#,!^F,o,O,e
-setlocal cinoptions=g0
-setlocal cinwords=if,else,while,do,for,switch
-setlocal colorcolumn=
-setlocal comments=sO:*\ -,mO:*\ \ ,exO:*/,s1:/*,mb:*,ex:*/,://
-setlocal commentstring=/*%s*/
-setlocal complete=.,w,b,u,t,i
-setlocal concealcursor=
-setlocal conceallevel=0
-setlocal completefunc=
-setlocal nocopyindent
-setlocal cryptmethod=
-setlocal nocursorbind
-setlocal nocursorcolumn
-setlocal nocursorline
-setlocal cursorlineopt=both
-setlocal define=
-setlocal dictionary=
-setlocal nodiff
-setlocal equalprg=
-setlocal errorformat=
-setlocal expandtab
-if &filetype != 'cpp'
-setlocal filetype=cpp
-endif
-setlocal fixendofline
-setlocal foldcolumn=0
-setlocal foldenable
-setlocal foldexpr=0
-setlocal foldignore=#
-setlocal foldlevel=99
-setlocal foldmarker={{{,}}}
-set foldmethod=syntax
-setlocal foldmethod=syntax
-setlocal foldminlines=1
-setlocal foldnestmax=20
-setlocal foldtext=foldtext()
-setlocal formatexpr=
-setlocal formatoptions=croql
-setlocal formatlistpat=^\\s*\\d\\+[\\]:.)}\\t\ ]\\s*
-setlocal formatprg=
-setlocal grepprg=
-setlocal iminsert=0
-setlocal imsearch=-1
-setlocal include=
-setlocal includeexpr=
-setlocal indentexpr=
-setlocal indentkeys=0{,0},0),0],:,0#,!^F,o,O,e
-setlocal noinfercase
-setlocal iskeyword=@,48-57,_,192-255
-setlocal keywordprg=
-setlocal nolinebreak
-setlocal nolisp
-setlocal lispwords=
-setlocal nolist
-setlocal makeencoding=
-setlocal makeprg=
-setlocal matchpairs=(:),{:},[:]
-setlocal modeline
-setlocal modifiable
-setlocal nrformats=bin,octal,hex
-setlocal nonumber
-setlocal numberwidth=4
-setlocal omnifunc=ccomplete#Complete
-setlocal path=
-setlocal nopreserveindent
-setlocal nopreviewwindow
-setlocal quoteescape=\\
-setlocal noreadonly
-set relativenumber
-setlocal relativenumber
-setlocal norightleft
-setlocal rightleftcmd=search
-setlocal noscrollbind
-setlocal scrolloff=-1
-setlocal shiftwidth=4
-setlocal noshortname
-setlocal showbreak=
-setlocal sidescrolloff=-1
-set signcolumn=number
-setlocal signcolumn=number
-setlocal nosmartindent
-setlocal softtabstop=4
-setlocal nospell
-setlocal spellcapcheck=[.?!]\\_[\\])'\"\	\ ]\\+
-setlocal spellfile=
-setlocal spelllang=en
-setlocal statusline=%!airline#statusline(3)
-setlocal suffixesadd=
-setlocal swapfile
-setlocal synmaxcol=3000
-if &syntax != 'cpp'
-setlocal syntax=cpp
-endif
-setlocal tabstop=4
-setlocal tagcase=
-setlocal tagfunc=
-setlocal tags=
-setlocal termwinkey=
-setlocal termwinscroll=10000
-setlocal termwinsize=
-setlocal textwidth=0
-setlocal thesaurus=
-setlocal noundofile
-setlocal undolevels=-123456
-setlocal varsofttabstop=
-setlocal vartabstop=
-setlocal wincolor=
-setlocal nowinfixheight
-setlocal nowinfixwidth
-set nowrap
-setlocal nowrap
-setlocal wrapmargin=0
-let s:l = 79 - ((44 * winheight(0) + 22) / 45)
-if s:l < 1 | let s:l = 1 | endif
-exe s:l
-normal! zt
-79
-normal! 0
-wincmd w
-exe 'vert 1resize ' . ((&columns * 30 + 82) / 165)
-exe 'vert 2resize ' . ((&columns * 79 + 82) / 165)
-exe 'vert 3resize ' . ((&columns * 54 + 82) / 165)
+exe 'vert 1resize ' . ((&columns * 106 + 106) / 213)
+exe 'vert 2resize ' . ((&columns * 106 + 106) / 213)
 tabnext 1
-badd +0 includes/Interpreter.h
+badd +97 /media/syncrack/数据/迅雷下载/学习资料/WorkPlace/cpp_based_Jlox-master/includes/Interpreter.h
+badd +180 /media/syncrack/数据/迅雷下载/学习资料/WorkPlace/cpp_based_Jlox-master/includes/Expr.h
+badd +26 /media/syncrack/数据/迅雷下载/学习资料/WorkPlace/cpp_based_Jlox-master/includes/Scanner.h
+badd +8 /media/syncrack/数据/迅雷下载/学习资料/WorkPlace/cpp_based_Jlox-master/src/RecursiveDescentParser.cpp
+badd +55 /media/syncrack/数据/迅雷下载/学习资料/WorkPlace/cpp_based_Jlox-master/includes/RecursiveDescentParser.h
+badd +52 /media/syncrack/数据/迅雷下载/学习资料/WorkPlace/cpp_based_Jlox-master/includes/AstPrinter.h
+badd +286 /media/syncrack/数据/迅雷下载/学习资料/WorkPlace/cpp_based_Jlox-master/src/Interpreter.cpp
+badd +30 /media/syncrack/数据/迅雷下载/学习资料/WorkPlace/cpp_based_Jlox-master/includes/Environment.h
+badd +18 /media/syncrack/数据/迅雷下载/学习资料/WorkPlace/cpp_based_Jlox-master/src/Environment.cpp
+badd +6 /media/syncrack/数据/迅雷下载/学习资料/WorkPlace/cpp_based_Jlox-master/makefile
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0
   silent exe 'bwipe ' . s:wipebuf
 endif
@@ -933,7 +703,6 @@ if file_readable(s:sx)
   exe "source " . fnameescape(s:sx)
 endif
 let &so = s:so_save | let &siso = s:siso_save
-nohlsearch
 doautoall SessionLoadPost
 unlet SessionLoad
 " vim: set ft=vim :

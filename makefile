@@ -2,7 +2,7 @@ CC      = g++
 CFLAGS  = -Wall -O -I includes -g
 INCLUDEFLAGS = 
 LDFLAGS = 
-OBJS    = main.o Scanner.o Interpreter.o RecursiveDescentParser.o
+OBJS    = main.o Scanner.o Interpreter.o RecursiveDescentParser.o Environment.o
 TARGETS = lox.out
 
 vpath %.cpp src

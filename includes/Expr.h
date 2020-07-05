@@ -22,6 +22,7 @@ struct Unary;
 struct Grouping;
 struct Literal;
 struct Ternary;
+struct Variable;
 
 struct Expr
 {
@@ -32,6 +33,8 @@ struct Expr
         virtual void* visitLiteralExpr(Literal *expr)=0;
         virtual void* visitUnaryExpr(Unary *expr)=0;
         virtual void* visitTernaryExpr(Ternary *expr)=0;
+        //负责处理变量
+        virtual void* visitVariableExpr(Variable *expr)=0;
         virtual ~Visitor(){}
 
     };
@@ -167,6 +170,16 @@ struct Unary : public Expr
     }
     Token *const op;
     Expr *const right;
+};
+struct Variable : public Expr
+{
+    Variable(Token * const &name):
+        name(name){}
+    void * accept(Visitor *visitor) override
+    {
+        return visitor->visitVariableExpr(this);
+    }
+    Token * name;
 };
 
 #endif

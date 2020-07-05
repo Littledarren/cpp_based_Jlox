@@ -16,6 +16,7 @@ public:
     }
     virtual ~Token()
     {
+        //will be freed by Lexer.
         switch(type) {
             case STRING:
                 delete (string*)literal;

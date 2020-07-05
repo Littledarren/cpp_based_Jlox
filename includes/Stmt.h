@@ -13,16 +13,38 @@
 #include "Expr.h"
 struct Expression;
 struct Print;
+struct Var;
 
 struct Stmt {
     struct Visitor
     {
         virtual void* visitExpressionStmt(Expression *stmt)=0;
         virtual void* visitPrintStmt(Print *stmt)=0;
+        virtual void* visitVarStmt(Var *stmt)=0;
+        virtual ~Visitor(){}
     };
 
     virtual void* accept(Visitor *visitor)=0;
     virtual ~Stmt(){}
+
+};
+
+struct Var : public Stmt
+{
+
+    Var(Token * const &name, Expr * const &initializer):
+        name(name), initializer(initializer){}
+    ~Var()
+    {
+        //name will be freed by Lexer.
+        delete initializer;
+    }
+    void * accept(Visitor *visitor) override
+    {
+        return visitor->visitVarStmt(this);
+    }
+    Token * name;
+    Expr * initializer;
 
 };
 

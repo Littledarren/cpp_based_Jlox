@@ -34,6 +34,12 @@ public:
     {}
     virtual vector<Stmt*> parse() override;
 private:
+    //声明，后面会包括函数声明，类声明
+    //现在只有变量定义
+    Stmt* declaration();
+    //用来解析变量定义
+    Stmt* varDeclaration();
+    //语句，即可执行的语句.
     Stmt* statement();
     Stmt* printStatement();
     Stmt* expressionStatement();
