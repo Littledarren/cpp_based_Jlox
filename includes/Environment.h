@@ -14,17 +14,24 @@
 #include <string>
 using std::string;
 
-#include "Interpreter.h"
+#include "../includes/Value.h"
+class Token;
 
 class Environment
 {
     public:
         Environment(){}
+        ~Environment() {
+            for (const std::pair<string, Value*> &pair : values) {
+                delete pair.second;
+            }
+        }
 
-        void define(const string &name, VALUE_T * value);
-        VALUE_T * get(Token * const  &name);
+        void define(const string &name, Value *value);
+        Value * get(Token *name);
+        void assign(Token *name, Value *value);
     private:
-        std::map<string, VALUE_T*> values;
+        std::map<string, Value*> values;
 
 };
 

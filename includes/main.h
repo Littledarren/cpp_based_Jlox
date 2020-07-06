@@ -7,7 +7,7 @@ extern bool hadError; //has error ?
 extern bool hadRuntimeError;
 
 #include "Token.h"
-#include "Interpreter.h"
+#include "RuntimeError.h"
 
 inline void report(int line, const string &where, const string &message)
 {

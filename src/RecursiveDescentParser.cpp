@@ -52,7 +52,27 @@ Stmt* RecursiveDescentParser::expressionStatement()
 }
 Expr* RecursiveDescentParser::expression()
 {
-    return commaExpression();
+    return assignment();
+}
+Expr* RecursiveDescentParser::assignment()
+{
+    //because
+    //lvalue can be something like bar.foo.x
+    //so we can not tell a lvalue until we found a =
+    Expr *expr = equality();
+
+    if (match({EQUAL})) {
+        Token *equals = previous();
+        Expr *value = assignment();
+        //bad manner. though it works.
+        if (typeid(*expr) == typeid(Variable)) {
+            Token *name = dynamic_cast<Variable*>(expr)->name;
+            return new Assign(name, value);
+        }
+
+        error(equals, "Invalid assignment target");
+    }
+    return expr;
 }
 Expr* RecursiveDescentParser::commaExpression()
 {

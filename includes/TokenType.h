@@ -1,5 +1,16 @@
-#ifndef TOKENTYPE_H
-#define TOKENTYPE_H
+/*================================================================
+*    
+*   
+*   FileName: TokenType.h
+*   Author: DarrenHuang
+*   Create Time: 2020/07/06  09:20(星期一)
+*   Description:
+*
+================================================================*/
+#ifndef _TOKENTYPE_H_
+#define _TOKENTYPE_H_
+
+
 
 #include <string>
 enum TokenType

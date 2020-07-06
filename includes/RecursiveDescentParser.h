@@ -45,6 +45,8 @@ private:
     Stmt* expressionStatement();
 
     Expr* expression();
+
+    Expr* assignment();
     Expr* commaExpression();
     Expr* ternaryExpression();
     Expr* equality();

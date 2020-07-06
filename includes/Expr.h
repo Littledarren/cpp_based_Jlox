@@ -12,11 +12,11 @@
 #define _EXPR_H_
 
 #include <iostream>
-#include "TokenType.h"
 #include "Token.h"
 
 using std::string;
 
+struct Assign;
 struct Binary;
 struct Unary;
 struct Grouping;
@@ -28,6 +28,7 @@ struct Expr
 {
     struct Visitor
     {
+        virtual void* visitAssignExpr(Assign *expr)=0;
         virtual void* visitBinaryExpr(Binary *expr)=0;
         virtual void* visitGroupingExpr(Grouping *expr)=0;
         virtual void* visitLiteralExpr(Literal *expr)=0;
@@ -42,6 +43,24 @@ struct Expr
     virtual void* accept(Visitor *visitor) = 0;
     virtual ~Expr()
     {}
+};
+
+struct Assign : public Expr
+{
+
+    Assign(Token* name, Expr* value ):name(name), value(value){ }
+    void * accept(Visitor *visitor) override 
+    {
+        return visitor->visitAssignExpr(this);
+    }
+
+    ~Assign()
+    {
+        delete value;
+    }
+
+    Token* name;
+    Expr* value;
 };
 
 struct Binary : public Expr

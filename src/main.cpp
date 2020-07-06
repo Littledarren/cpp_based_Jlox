@@ -84,7 +84,8 @@ static void run(const string &source)
     Parser *parser = new RecursiveDescentParser(tokens);
 
     vector<Stmt*> statements = parser->parse();
-    if (!statements.empty()) {
+    if (!hadError) {
+        cout<<"执行中"<<endl;
 //        AstPrinter *astP = new AstPrinter();
 //        cout<<astP->print(expr)<<endl;
        // VALUE_T result = interpreter.interprete(expr);
