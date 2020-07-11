@@ -26,11 +26,13 @@ class Interpreter : public Expr::Visitor, public Stmt::Visitor
 {
     
 public:
+    Interpreter():environment(new Environment()){}
     void interprete(vector<Stmt*> statements);
 
     Value interprete(Expr *expr);
     void* evaluate(Expr *expr);
     void execute(Stmt * stmt);
+    void executeBlock(vector<Stmt*> stmts, Environment *environment);
     void * visitAssignExpr(Assign *expr) override;
     virtual void* visitTernaryExpr(Ternary *expr) override;
     virtual void* visitBinaryExpr(Binary *expr) override;
@@ -42,12 +44,15 @@ public:
     void * visitExpressionStmt(Expression *stmt) override;
     void * visitPrintStmt(Print *stmt) override;
     void * visitVarStmt(Var *stmt) override;
+    void * visitBlockStmt(Block *stmt) override;
+    //additional funcs for debug
+    void printEnvironment();
 private:
     //check operant type
     void static checkStringOrNumber(TokenType op, const Value &l, const Value &r);
     void static chechNumber(TokenType op, const Value &v);
     void static chechNumber(TokenType op, const Value &l, const  Value &r);
-    Environment environment;
+    Environment *environment;
 
 };
 

@@ -10,10 +10,15 @@
 #ifndef _STMT_H_
 #define _STMT_H_
 
+#include <vector>
+using std::vector;
+
 #include "Expr.h"
+
 struct Expression;
 struct Print;
 struct Var;
+struct Block;
 
 struct Stmt {
     struct Visitor
@@ -21,6 +26,7 @@ struct Stmt {
         virtual void* visitExpressionStmt(Expression *stmt)=0;
         virtual void* visitPrintStmt(Print *stmt)=0;
         virtual void* visitVarStmt(Var *stmt)=0;
+        virtual void* visitBlockStmt(Block *stmt)=0;
         virtual ~Visitor(){}
     };
 
@@ -80,6 +86,23 @@ struct Print : public Stmt
     }
 
     Expr* const expr;
+};
+
+struct Block : public Stmt
+{
+    Block(const vector<Stmt*> &statements) :
+        statements(statements){}
+    virtual ~Block()
+    {
+        for (auto p : statements)
+            delete p;
+    }
+    void * accept(Visitor *visitor) override
+    {
+        return visitor->visitBlockStmt(this);
+    }
+
+    vector<Stmt*> statements;
 };
 
 

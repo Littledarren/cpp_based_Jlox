@@ -44,6 +44,20 @@ void Interpreter::execute(Stmt * stmt)
 {
     stmt->accept(this);
 }
+void Interpreter::executeBlock(vector<Stmt*> stmts, Environment *environment)
+{
+    Environment *previous = this->environment;
+    try {
+        this->environment = environment;
+        for (Stmt *statement : stmts) {
+            execute(statement);
+        }
+    } catch (const exception &e) {
+        cout<<e.what()<<endl;
+    }
+    delete this->environment;
+    this->environment = previous;
+}
 void* Interpreter::visitTernaryExpr(Ternary *expr) 
 {
     return nullptr;
@@ -132,7 +146,7 @@ void* Interpreter::visitLiteralExpr(Literal *expr)
 void * Interpreter::visitVariableExpr(Variable *expr) 
 {
     //Enexpr->name->lexeme
-    return new Value(*environment.get(expr->name));
+    return new Value(*environment->get(expr->name));
 }
 
 void * Interpreter::visitExpressionStmt(Expression *stmt) 
@@ -150,21 +164,38 @@ void * Interpreter::visitPrintStmt(Print *stmt)
    return nullptr;
 }
 
-void * Interpreter::visitVarStmt(Var * stmt)
+void* Interpreter::visitVarStmt(Var *stmt)
 {
     Value * value = nullptr;
     if (stmt->initializer != nullptr) {
         value = (Value*)evaluate(stmt->initializer);
     }
-    environment.define(stmt->name->lexeme, value);
+    this->environment->define(stmt->name->lexeme, value);
     return nullptr;
 }
 
 void* Interpreter::visitAssignExpr(Assign *expr)
 {
     Value *value = (Value*)evaluate(expr->value);
-    environment.assign(expr->name, value);
+    environment->assign(expr->name, value);
     return new Value(*value);
+}
+
+void* Interpreter::visitBlockStmt(Block *stmt)
+{
+    executeBlock(stmt->statements, new Environment(environment));
+    return nullptr;
+}
+
+void Interpreter::printEnvironment()
+{
+    Environment *temp = this->environment;
+    int scopeCount = 0;
+    while (temp != nullptr) {
+        cout<<"SCOPE:"<<scopeCount<<endl;
+        temp->print();
+        temp = temp->enclosing;
+    }
 }
 
 void Interpreter::checkStringOrNumber(TokenType op, const Value &l, const Value &r)

@@ -33,6 +33,7 @@ Stmt* RecursiveDescentParser::varDeclaration()
 Stmt* RecursiveDescentParser::statement()
 {
     if (match({PRINT})) return printStatement();
+    if (match({LEFT_BRACE})) return new Block(block());
 
     return expressionStatement();
 }
@@ -49,6 +50,17 @@ Stmt* RecursiveDescentParser::expressionStatement()
     Expr* expr = expression();
     consume(SEMICOLON, "Expect ';' after expression");
     return new Expression(expr);
+}
+
+vector<Stmt*> RecursiveDescentParser::block()
+{
+    vector<Stmt*> statements;
+    while (!check(RIGHT_BRACE) && !isAtEnd()) {
+        statements.push_back(declaration());
+    }
+    consume(RIGHT_BRACE, "Expect '}' after block");
+    return statements;
+
 }
 Expr* RecursiveDescentParser::expression()
 {

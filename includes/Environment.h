@@ -20,7 +20,8 @@ class Token;
 class Environment
 {
     public:
-        Environment(){}
+        Environment(Environment *enclosing = nullptr) : 
+            enclosing(enclosing){}
         ~Environment() {
             for (const std::pair<string, Value*> &pair : values) {
                 delete pair.second;
@@ -30,6 +31,10 @@ class Environment
         void define(const string &name, Value *value);
         Value * get(Token *name);
         void assign(Token *name, Value *value);
+        Environment *enclosing;
+
+        //const std::map<string, Value*>& getValues() const;
+        void print() const;
     private:
         std::map<string, Value*> values;
 

@@ -1,5 +1,5 @@
 CC      = g++ 
-CFLAGS  = -Wall -O -I includes -g
+CFLAGS  = -Wall -O -I includes -g -std=c++11
 INCLUDEFLAGS = 
 LDFLAGS = 
 OBJS    = main.o Scanner.o Interpreter.o RecursiveDescentParser.o Environment.o Value.o

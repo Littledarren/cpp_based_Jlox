@@ -85,11 +85,8 @@ static void run(const string &source)
 
     vector<Stmt*> statements = parser->parse();
     if (!hadError) {
-        cout<<"执行中"<<endl;
 //        AstPrinter *astP = new AstPrinter();
 //        cout<<astP->print(expr)<<endl;
-       // VALUE_T result = interpreter.interprete(expr);
-       // cout<<VALUE_T::toString(result)<<endl;
        interpreter.interprete(statements);
         //delete astP;
     }
