@@ -27,6 +27,9 @@ class Interpreter : public Expr::Visitor, public Stmt::Visitor
     
 public:
     Interpreter():environment(new Environment()){}
+    ~Interpreter() {
+        delete environment;
+    }
     void interprete(vector<Stmt*> statements);
 
     Value interprete(Expr *expr);

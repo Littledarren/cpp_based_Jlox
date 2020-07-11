@@ -48,8 +48,10 @@ Stmt* RecursiveDescentParser::expressionStatement()
 {
 
     Expr* expr = expression();
-    consume(SEMICOLON, "Expect ';' after expression");
-    return new Expression(expr);
+    if (match({SEMICOLON}))
+        return new Expression(expr);
+    else 
+        return new Print(expr);
 }
 
 vector<Stmt*> RecursiveDescentParser::block()
