@@ -25,6 +25,8 @@ struct Value
     Value(const Value& v);
     Value& operator=(const Value &v);
 
+    operator bool();
+
     ~Value()
     {
         freeLiteral();

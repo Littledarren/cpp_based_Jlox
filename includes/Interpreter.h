@@ -36,19 +36,20 @@ public:
     void* evaluate(Expr *expr);
     void execute(Stmt * stmt);
     void executeBlock(vector<Stmt*> stmts, Environment *environment);
-    void * visitAssignExpr(Assign *expr) override;
+    void* visitAssignExpr(Assign *expr) override;
     virtual void* visitTernaryExpr(Ternary *expr) override;
     virtual void* visitBinaryExpr(Binary *expr) override;
     virtual void* visitUnaryExpr(Unary *expr) override;
     virtual void* visitGroupingExpr(Grouping *expr) override;
     virtual void* visitLiteralExpr(Literal *expr) override;
-    virtual void * visitVariableExpr(Variable *expr) override;
+    virtual void* visitVariableExpr(Variable *expr) override;
 
-    void * visitExpressionStmt(Expression *stmt) override;
-    void * visitPrintStmt(Print *stmt) override;
-    void * visitVarStmt(Var *stmt) override;
-    void * visitBlockStmt(Block *stmt) override;
-    //additional funcs for debug
+    void* visitExpressionStmt(Expression *stmt) override;
+    void* visitPrintStmt(Print *stmt) override;
+    void* visitVarStmt(Var *stmt) override;
+    void* visitBlockStmt(Block *stmt) override;
+    void* visitIfStmt(If *stmt) override;
+    //aditional funcs for debug
     void printEnvironment();
 private:
     //check operant type

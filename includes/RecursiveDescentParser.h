@@ -41,6 +41,7 @@ private:
     Stmt* varDeclaration();
     //语句，即可执行的语句.
     Stmt* statement();
+    Stmt* ifStatement();
     Stmt* printStatement();
     Stmt* expressionStatement();
     vector<Stmt*> block();

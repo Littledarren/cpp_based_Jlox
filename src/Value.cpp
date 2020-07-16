@@ -37,6 +37,11 @@ Value::Value(const Value& v)
             break;
     }           
 }
+
+Value::operator bool()
+{
+   return (!!*this ).type == TRUE;
+}
 Value& Value::operator=(const Value &v)
 {
     //赋值方法

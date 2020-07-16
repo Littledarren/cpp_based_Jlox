@@ -187,6 +187,17 @@ void* Interpreter::visitBlockStmt(Block *stmt)
     return nullptr;
 }
 
+void* Interpreter::visitIfStmt(If *stmt)
+{
+
+    Value *value = (Value*)evaluate(stmt->condition);
+    if ((bool)*value) {
+        execute(stmt->thenBranch);
+    } else {
+        execute(stmt->elseBranch);
+    } return nullptr;
+}
+
 void Interpreter::printEnvironment()
 {
     Environment *temp = this->environment;

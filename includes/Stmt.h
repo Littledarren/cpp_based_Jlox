@@ -19,6 +19,7 @@ struct Expression;
 struct Print;
 struct Var;
 struct Block;
+struct If;
 
 struct Stmt {
     struct Visitor
@@ -27,6 +28,7 @@ struct Stmt {
         virtual void* visitPrintStmt(Print *stmt)=0;
         virtual void* visitVarStmt(Var *stmt)=0;
         virtual void* visitBlockStmt(Block *stmt)=0;
+        virtual void* visitIfStmt(If *stmt)=0;
         virtual ~Visitor(){}
     };
 
@@ -105,6 +107,24 @@ struct Block : public Stmt
     vector<Stmt*> statements;
 };
 
+struct If : public Stmt
+{
+   If(Expr *condition, Stmt *thenBranch, Stmt *elseBranch):
+       condition(condition), thenBranch(thenBranch), elseBranch(elseBranch){}
+   void * accept(Visitor *visitor) override
+   {
+       return visitor->visitIfStmt(this);
+   }
+   virtual ~If()
+   {
+        delete condition;
+        delete thenBranch;
+        delete elseBranch;
+   }
+   Expr *condition;
+   Stmt *thenBranch;
+   Stmt *elseBranch;
+};
 
 
 #endif
