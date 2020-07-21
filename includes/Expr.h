@@ -124,7 +124,7 @@ struct Grouping : public Expr
 //sscanf lives forever!!!!!!!!
 struct Literal: public Expr
 {
-    Literal(TokenType *type, void *value):type(type), value(value)
+    Literal(TokenType type, void *value=nullptr):type(type), value(value)
     {}
     string getStr()
     {
@@ -138,7 +138,7 @@ struct Literal: public Expr
     //because some returned pointer will not be hold by Literal
     string* getValStr()
     {
-        switch(*type)
+        switch(type)
         {
             case STRING:
                 return new string(*(string*)value);
@@ -165,14 +165,13 @@ struct Literal: public Expr
 
     virtual ~Literal()
     {
-        delete type;
         //value wille be freed by Token
     }
     void* accept(Visitor *visitor) override
     {
         return visitor->visitLiteralExpr(this);
     }
-    TokenType *const type;
+    TokenType type;
     void *const value;
 };
 

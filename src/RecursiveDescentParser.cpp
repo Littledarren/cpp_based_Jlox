@@ -36,6 +36,7 @@ Stmt* RecursiveDescentParser::statement()
     if (match({LEFT_BRACE})) return new Block(block());
     if (match({IF})) return ifStatement(); 
     if (match({WHILE})) return whileStatement();
+    if (match({FOR})) return forStatement();
 
     return expressionStatement();
 }
@@ -60,6 +61,45 @@ Stmt* RecursiveDescentParser::ifStatement()
     }
 
     return new If(condition, thenBranch, elseBranch);
+}
+
+Stmt* RecursiveDescentParser::forStatement()
+{
+   consume(LEFT_PAREN, "Expect a '(' after for");
+
+   //1.
+   Stmt *initializer;
+   if (match({SEMICOLON})) {
+       initializer = nullptr;
+   } else if (match({VAR})) {
+       initializer = varDeclaration();
+   } else {
+       initializer = expressionStatement();
+   }
+   //2.
+   Expr *condition = nullptr;
+   if (!check(SEMICOLON)) {
+       condition = expression();
+   }
+   consume(SEMICOLON, "Expect ';' after loop condition");
+   //3.
+   Expr *increment = nullptr;
+   if (!check(RIGHT_PAREN)) {
+       increment = expression();
+   }
+   consume(RIGHT_PAREN, "Expect ')' after for clauses");
+
+   Stmt *body = statement();
+   if (increment != nullptr) {
+       body = new Block({body, new Expression(increment)});
+   }
+   if (condition == nullptr) 
+       condition = new Literal(TRUE);
+
+   body = new While(condition, body);
+   if (initializer != nullptr)
+       body = new Block({initializer, body});
+   return body;
 }
 Stmt* RecursiveDescentParser::printStatement()
 {
@@ -201,7 +241,7 @@ Expr* RecursiveDescentParser::unary()
 Expr* RecursiveDescentParser::primary()
 {
     if (match({FALSE, TRUE, NIL, STRING, NUMBER})) {
-        return new Literal(new TokenType(previous()->type), previous()->literal);
+        return new Literal(previous()->type, previous()->literal);
     }
     if (match({LEFT_PAREN})) {
         Expr *expr = expression();

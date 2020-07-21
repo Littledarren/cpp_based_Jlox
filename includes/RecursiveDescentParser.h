@@ -43,6 +43,7 @@ private:
     Stmt* statement();
     Stmt* ifStatement();
     Stmt* whileStatement();
+    Stmt* forStatement();
     Stmt* printStatement();
     Stmt* expressionStatement();
     vector<Stmt*> block();

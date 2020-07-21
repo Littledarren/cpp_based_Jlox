@@ -142,7 +142,7 @@ void* Interpreter::visitGroupingExpr(Grouping *expr)
 }
 void* Interpreter::visitLiteralExpr(Literal *expr) 
 {
-    return new Value(*(expr->type), expr->value);
+    return new Value((expr->type), expr->value);
 }
 void * Interpreter::visitVariableExpr(Variable *expr) 
 {
