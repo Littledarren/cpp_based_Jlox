@@ -43,6 +43,7 @@ public:
     virtual void* visitGroupingExpr(Grouping *expr) override;
     virtual void* visitLiteralExpr(Literal *expr) override;
     virtual void* visitVariableExpr(Variable *expr) override;
+    virtual void * visitLogicalExpr(Logical *expr) override;
 
     void* visitExpressionStmt(Expression *stmt) override;
     void* visitPrintStmt(Print *stmt) override;

@@ -23,6 +23,7 @@ struct Grouping;
 struct Literal;
 struct Ternary;
 struct Variable;
+struct Logical;
 
 struct Expr
 {
@@ -34,6 +35,7 @@ struct Expr
         virtual void* visitLiteralExpr(Literal *expr)=0;
         virtual void* visitUnaryExpr(Unary *expr)=0;
         virtual void* visitTernaryExpr(Ternary *expr)=0;
+        virtual void* visitLogicalExpr(Logical *expr)=0;
         //负责处理变量
         virtual void* visitVariableExpr(Variable *expr)=0;
         virtual ~Visitor(){}
@@ -201,4 +203,22 @@ struct Variable : public Expr
     Token * name;
 };
 
+struct Logical : public Expr 
+{
+    Logical(Expr *left, Token *op, Expr *right):
+        left(left), op(op), right(right){}
+    void * accept(Visitor *visitor) override
+    {
+        return visitor->visitLogicalExpr(this);
+    }
+    ~Logical()
+    {
+        delete left;
+        delete right;
+    }
+
+    Expr *left;
+    Token *op;
+    Expr *right;
+};
 #endif

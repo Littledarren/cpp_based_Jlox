@@ -88,7 +88,7 @@ Expr* RecursiveDescentParser::assignment()
     //because
     //lvalue can be something like bar.foo.x
     //so we can not tell a lvalue until we found a =
-    Expr *expr = equality();
+    Expr *expr = logicalOr();
 
     if (match({EQUAL})) {
         Token *equals = previous();
@@ -100,6 +100,26 @@ Expr* RecursiveDescentParser::assignment()
         }
 
         error(equals, "Invalid assignment target");
+    }
+    return expr;
+}
+Expr* RecursiveDescentParser::logicalOr()
+{
+    Expr *expr = logicalAnd();
+    while (match({OR})) {
+        Token *op = previous();
+        Expr *right = logicalAnd();
+        expr = new Logical(expr, op, right);
+    }
+    return expr;
+}
+Expr* RecursiveDescentParser::logicalAnd()
+{
+    Expr *expr = equality();
+    while (match({AND})) {
+        Token *op = previous();
+        Expr *right = equality();
+        expr = new Logical(expr, op, right);
     }
     return expr;
 }

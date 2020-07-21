@@ -181,6 +181,18 @@ void* Interpreter::visitAssignExpr(Assign *expr)
     return new Value(*value);
 }
 
+void* Interpreter::visitLogicalExpr(Logical *expr)
+{
+    Value *left = static_cast<Value*>(evaluate(expr->left));
+    if (expr->op->type == AND) {
+        if ((bool)!*left) return left;
+    } else {
+        if ((bool)*left) return left;
+    }
+    delete left;
+    return evaluate(expr->right);
+}
+
 void* Interpreter::visitBlockStmt(Block *stmt)
 {
     executeBlock(stmt->statements, new Environment(environment));

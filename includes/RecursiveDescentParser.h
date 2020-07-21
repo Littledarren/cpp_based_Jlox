@@ -49,6 +49,9 @@ private:
     Expr* expression();
 
     Expr* assignment();
+    Expr* logicalOr();
+    Expr* logicalAnd();
+
     Expr* commaExpression();
     Expr* ternaryExpression();
     Expr* equality();
