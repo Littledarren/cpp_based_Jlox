@@ -67,7 +67,7 @@ Value& Value::operator=(const Value &v)
 Value Value::operator-() const
 {
     Value result(*this);
-    *(double*)result.literal = *(double*)result.literal;
+    *(double*)result.literal = -*(double*)result.literal;
     return result;
 }
 //for BANG

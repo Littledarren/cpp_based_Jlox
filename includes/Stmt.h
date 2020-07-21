@@ -20,6 +20,7 @@ struct Print;
 struct Var;
 struct Block;
 struct If;
+struct While;
 
 struct Stmt {
     struct Visitor
@@ -29,6 +30,7 @@ struct Stmt {
         virtual void* visitVarStmt(Var *stmt)=0;
         virtual void* visitBlockStmt(Block *stmt)=0;
         virtual void* visitIfStmt(If *stmt)=0;
+        virtual void* visitWhileStmt(While *stmt)=0;
         virtual ~Visitor(){}
     };
 
@@ -126,5 +128,22 @@ struct If : public Stmt
    Stmt *elseBranch;
 };
 
+struct While : public Stmt
+{
+    While(Expr *condition, Stmt *body):
+        condition(condition), body(body){}
+    virtual ~While()
+    {
+        delete condition;
+        delete body;
+    }
+    void * accept(Visitor *visitor) override
+    {
+        return visitor->visitWhileStmt(this);
+    }
+
+    Expr *condition;
+    Stmt *body;
+};
 
 #endif

@@ -40,9 +40,10 @@ void* Interpreter::evaluate(Expr *expr)
 {
     return expr->accept(this);
 }
-void Interpreter::execute(Stmt * stmt)
+void Interpreter::execute(Stmt *stmt)
 {
-    stmt->accept(this);
+    if (stmt != nullptr)
+        stmt->accept(this);
 }
 void Interpreter::executeBlock(vector<Stmt*> stmts, Environment *environment)
 {
@@ -221,6 +222,13 @@ void Interpreter::printEnvironment()
     }
 }
 
+void* Interpreter::visitWhileStmt(While *stmt) 
+{
+    while ((bool)*static_cast<Value*>(evaluate(stmt->condition))) {
+        execute(stmt->body);
+    }
+    return nullptr;
+}
 void Interpreter::checkStringOrNumber(TokenType op, const Value &l, const Value &r)
 {
     if (l.type == NUMBER && r.type == NUMBER) return;

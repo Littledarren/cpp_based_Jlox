@@ -50,6 +50,7 @@ public:
     void* visitVarStmt(Var *stmt) override;
     void* visitBlockStmt(Block *stmt) override;
     void* visitIfStmt(If *stmt) override;
+    void* visitWhileStmt(While *stmt) override;
     //aditional funcs for debug
     void printEnvironment();
 private:
