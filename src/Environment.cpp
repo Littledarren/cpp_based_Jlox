@@ -8,27 +8,25 @@
 using std::endl;
 using std::cout;
 
-void Environment::define(const string &name, Value *value)
+void Environment::define(const string &name, const Object *value)
 {
-    if (value == nullptr) value = new Value(NIL);
     if (values.count(name) != 0) {
         delete values.at(name);
-
         values.at(name) = value;
     } else {
-        values.insert(std::pair<string, Value*>(name, value));
+        values.insert(std::pair<const string, const Object*>(name, value));
     }
 }
-Value * Environment::get(Token *name)
+const Object* Environment::get(const Token *name)
 {
 
     if (values.count(name->lexeme) != 0) {
         return values.at(name->lexeme);
     }
     if (enclosing != nullptr) return enclosing->get(name);
-    throw RuntimeError(name->type, (string("Undefined variable") + name->lexeme).c_str());
+    throw RuntimeError(name, string("Undefined variable") + name->lexeme);
 }
-void Environment::assign(Token *name, Value *value)
+void Environment::assign(const Token *name, const Object *value)
 {
 
     if (values.count(name->lexeme) != 0) {
@@ -38,15 +36,16 @@ void Environment::assign(Token *name, Value *value)
     if (enclosing != nullptr) {
         enclosing->assign(name, value);
         return;
-    }    throw RuntimeError(name->type, (string("Undefined variable") + name->lexeme).c_str());
+    }
+    throw RuntimeError(name, string("Undefined variable") + name->lexeme);
 }
-//const std::map<string, Value*>& Environment::getValues() const
+//const std::map<string, Object*>& Environment::getObjects() const
 //{
 //    return this->values;
 //}
 void Environment::print() const
 {
     for (auto kv : values) {
-        cout<<kv.first<<"\t:\t"<<Value::toString(*kv.second)<<endl;
+        cout<<kv.first<<"\t:\t"<<Object::toString(kv.second)<<endl;
     }
 }

@@ -1,12 +1,12 @@
 /*================================================================
-*    
-*   
-*   FileName: RecursiveDescentParser.h
-*   Author: DarrenHuang
-*   Create Time: 2020/06/19  11:00(Friday)
-*   Description:
-*
-================================================================*/
+ *    
+ *   
+ *   FileName: RecursiveDescentParser.h
+ *   Author: DarrenHuang
+ *   Create Time: 2020/06/19  11:00(Friday)
+ *   Description:
+ *
+ ================================================================*/
 #ifndef _RECURSIVEDESCENTPARSER_H_
 #define _RECURSIVEDESCENTPARSER_H_
 
@@ -30,7 +30,7 @@ class RecursiveDescentParser : public Parser
 {
 public:
 
-    RecursiveDescentParser(vector<Token*> &tokens) : Parser(tokens)
+    RecursiveDescentParser(const vector<const Token*>& tokens) : Parser(tokens)
     {}
     virtual vector<Stmt*> parse() override;
 private:
@@ -61,10 +61,12 @@ private:
     Expr* addition();
     Expr* multiplication();
     Expr* unary();
+    Expr* call();
+    Expr* finishCall(Expr *callee_test);
     Expr* primary();
 
-    Token* consume(TokenType type,const string &message);
-    ParseError error(Token *token, const string &message);
+    const Token* consume(TokenType type,const string &message);
+    ParseError error(const Token *token, const string &message);
     void synchronize();
 
     bool match(std::initializer_list<TokenType> types)
@@ -84,7 +86,7 @@ private:
         if (isAtEnd()) return false;
         return peek()->type == t;
     }
-    Token* advance()
+    const Token* advance()
     {
         if (!isAtEnd()) current++;
         return previous();
@@ -95,11 +97,11 @@ private:
         return peek()->type == FOE;
     }
 
-    Token* peek() const
+    const Token* peek() const
     {
         return tokens.at(current);
     }
-    Token* previous() const
+    const Token* previous() const
     {
         return tokens.at(current-1);
     }

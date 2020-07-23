@@ -11,6 +11,7 @@
 #define _SCANNER_H_
 
 #include "Lexer.h"
+#include "Token.h"
 #include "main.h"
 
 #include <sstream>
@@ -24,7 +25,7 @@ public:
     {
 
     }
-    virtual vector<Token*> scanTokens() override;
+    virtual const vector<const Token*>& scanTokens() override;
 private:
     bool isAtEnd();
     void scanToken();
@@ -39,7 +40,7 @@ private:
     bool match(char expected);
     char advance();
     void addToken(TokenType type);
-    void addToken(TokenType type, void *literal);
+    void addToken(TokenType type,const Object* literal);
     //new feature! after..c++11?
     int start = 0;
     int current = 0;

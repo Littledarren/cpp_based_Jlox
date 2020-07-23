@@ -14,37 +14,27 @@
 
 
 #include "TokenType.h"
+#include "Value.h"
 
-class Token 
+struct Token 
 {
 public:
-    Token(TokenType type, const string &lexeme, void * literal, int line):
+    Token(TokenType type, const string &lexeme,const Object *literal, int line):
         type(type), lexeme(lexeme), literal(literal), line(line)
     {
     };
-    operator string()
+    operator string() const
     {
         return getNameOfType(type) + " " + lexeme + " ";
     }
     virtual ~Token()
     {
-        //will be freed by Lexer.
-        switch(type) {
-            case STRING:
-                delete (string*)literal;
-                break;
-            case NUMBER:
-                delete (double*)literal;
-                break;
-            default:
-                //nothing to do with literal
-                break;
-        }
+        delete literal;
     }
 //private:
     const TokenType type;
     const string lexeme;
-    void * const literal;
+    const Object* const literal;
     const int line;
 };
 

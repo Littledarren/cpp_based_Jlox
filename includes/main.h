@@ -29,7 +29,7 @@ inline void error(const Token &token, const string &msg)
 
 inline void runtimeError(const RuntimeError &e)
 {
-    cerr<<e.what()<<"\n[line " + getNameOfType(e.type) +"]";
+    cerr<<e.what()<<"\n[line "<<  e.token->line <<"]";
     hadRuntimeError = true;
 
 }

@@ -14,14 +14,14 @@ class RuntimeError : public std::runtime_error
 #include <stdexcept>
 using std::runtime_error;
 
-#include "TokenType.h"
+#include "Token.h"
 
 class RuntimeError : public runtime_error
 {
 public:
-    RuntimeError(TokenType type, const char *str) : runtime_error(str), type(type)
+    RuntimeError(const Token *token, const string &str) : runtime_error(str), token(token)
     {}
     
-    const TokenType type;
+    const Token *token;
 };
 #endif

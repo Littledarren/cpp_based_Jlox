@@ -22,7 +22,7 @@ Stmt* RecursiveDescentParser::declaration()
 }
 Stmt* RecursiveDescentParser::varDeclaration()
 {
-   Token * name = consume(IDENTIFIER, "Expect variable name");
+   const Token* name = consume(IDENTIFIER, "Expect variable name");
    Expr * initializer = nullptr;
    if (match ({EQUAL})) {
        initializer = expression();
@@ -94,7 +94,7 @@ Stmt* RecursiveDescentParser::forStatement()
        body = new Block({body, new Expression(increment)});
    }
    if (condition == nullptr) 
-       condition = new Literal(TRUE);
+       condition = new Literal(new Bool(true));
 
    body = new While(condition, body);
    if (initializer != nullptr)
@@ -140,11 +140,11 @@ Expr* RecursiveDescentParser::assignment()
     Expr *expr = logicalOr();
 
     if (match({EQUAL})) {
-        Token *equals = previous();
+        const Token* equals = previous();
         Expr *value = assignment();
         //bad manner. though it works.
         if (typeid(*expr) == typeid(Variable)) {
-            Token *name = dynamic_cast<Variable*>(expr)->name;
+            const Token* name = dynamic_cast<Variable*>(expr)->name;
             return new Assign(name, value);
         }
 
@@ -156,7 +156,7 @@ Expr* RecursiveDescentParser::logicalOr()
 {
     Expr *expr = logicalAnd();
     while (match({OR})) {
-        Token *op = previous();
+        const Token* op = previous();
         Expr *right = logicalAnd();
         expr = new Logical(expr, op, right);
     }
@@ -166,7 +166,7 @@ Expr* RecursiveDescentParser::logicalAnd()
 {
     Expr *expr = equality();
     while (match({AND})) {
-        Token *op = previous();
+        const Token* op = previous();
         Expr *right = equality();
         expr = new Logical(expr, op, right);
     }
@@ -176,7 +176,7 @@ Expr* RecursiveDescentParser::commaExpression()
 {
     Expr *expr = equality();
     while (match({COMMA})) {
-        Token *op = previous();
+        const Token* op = previous();
         Expr *right = equality();
         expr = new Binary(expr, op, right);
     }
@@ -192,7 +192,7 @@ Expr* RecursiveDescentParser::equality()
 {
     Expr *expr = comparison();
     while (match({BANG_EQUAL, EQUAL_EQUAL})) {
-        Token *op = previous();
+        const Token* op = previous();
         Expr *right = comparison();
         expr = new Binary(expr, op, right);
     }
@@ -202,7 +202,7 @@ Expr* RecursiveDescentParser::comparison()
 {
     Expr *expr = addition();
     while (match({GREATER, GREATER_EQUAL, LESS_EQUAL, LESS})) {
-        Token *op = previous();
+        const Token* op = previous();
         Expr *right = addition();
         expr = new Binary(expr, op, right);
     }
@@ -213,7 +213,7 @@ Expr* RecursiveDescentParser::addition()
     Expr *expr = multiplication();
 
     while (match({MINUS, PLUS})) {
-        Token *op = previous();
+        const Token* op = previous();
         Expr *right = multiplication();
         expr = new Binary(expr, op, right);
     }
@@ -223,7 +223,7 @@ Expr* RecursiveDescentParser::multiplication()
 {
     Expr *expr = unary();
     while (match({STAR, SLASH})) {
-        Token *op = previous();
+        const Token* op = previous();
         Expr *right = unary();
         expr = new Binary(expr, op, right);
     }
@@ -232,17 +232,48 @@ Expr* RecursiveDescentParser::multiplication()
 Expr* RecursiveDescentParser::unary()
 {
     if (match({BANG, MINUS})) {
-        Token *op = previous();
+        const Token* op = previous();
         Expr *right = unary();
         return new Unary(op, right);
     }
-    return primary();
+    return call();
+}
+Expr* RecursiveDescentParser::call()
+{
+   Expr *expr = primary(); 
+
+   while (true) {
+       if (match({LEFT_PAREN})) {
+           expr = finishCall(expr);
+       } else {
+           break;
+       }
+   }
+
+   return expr;
+}
+Expr* RecursiveDescentParser::finishCall(Expr *callee)
+{
+    vector<Expr*> arguments;
+    if (!check(RIGHT_PAREN)) {
+        do {
+            if (arguments.size() >= 255) {
+                error(peek(), "can not have more than 255 arguments");
+            }
+            arguments.push_back(expression());
+        } while (match({COMMA}));
+    }
+    const Token* paren = consume(RIGHT_PAREN, "Expect ')' after arguments");
+    return new Call(callee, paren, arguments);
 }
 Expr* RecursiveDescentParser::primary()
 {
-    if (match({FALSE, TRUE, NIL, STRING, NUMBER})) {
-        return new Literal(previous()->type, previous()->literal);
-    }
+    if (match({FALSE, TRUE}))
+        return new Literal(new Bool(previous()->type == TRUE));
+    if (match({NIL}))
+        return new Literal(nullptr);
+    if (match({STRING, NUMBER}))
+        return new Literal(previous()->literal);
     if (match({LEFT_PAREN})) {
         Expr *expr = expression();
         consume(RIGHT_PAREN, "Expect ')' after expression");
@@ -254,19 +285,19 @@ Expr* RecursiveDescentParser::primary()
     }
     throw error(peek(), "Expect expression.");
 }
-Token* RecursiveDescentParser::consume(TokenType type,const string &message)
+const Token* RecursiveDescentParser::consume(TokenType type,const string &message)
 {
     if (check(type))  return advance();
     throw error(peek(), message);
 }
-ParseError RecursiveDescentParser::error(Token *token, const string &message)
+ParseError RecursiveDescentParser::error(const Token *token, const string &message)
 {
     ::error(*token, message);
     return ParseError(message);
 }
 void RecursiveDescentParser::synchronize()
 {
-    //consume the token that makes error.
+    //consume the const Token that makes error.
     advance();
 
     while (!isAtEnd()) {

@@ -1,5 +1,3 @@
-
-
 #include "../includes/Interpreter.h"
 #include "../includes/main.h"
 
@@ -17,30 +15,27 @@ void Interpreter::interprete(vector<Stmt*> statements)
     }
 }
 
-Value Interpreter::interprete(Expr *expr)
+const Object* Interpreter::interprete(const Expr *expr)
 {
     try {
-        Value *temp = (Value*)evaluate(expr);
-        //because i define deep copy 
-        //so this is allowed;
-        Value result(*temp);
-        delete temp;
-        //because defined deep copy so allowed
-        return result;
+        return evaluate(expr);
     } catch (const char *str) {
         std::cout<<str<<std::endl;
     } catch (const RuntimeError &e) {
         runtimeError(e);
     }
-    return Value();
+    return nullptr;
 }
 
 
-void* Interpreter::evaluate(Expr *expr)
+const Object* Interpreter::evaluate(const Expr *expr)
 {
-    return expr->accept(this);
+    if (expr != nullptr)
+        return expr->accept(this);
+    else 
+        return nullptr;
 }
-void Interpreter::execute(Stmt *stmt)
+void Interpreter::execute(const Stmt *stmt)
 {
     if (stmt != nullptr)
         stmt->accept(this);
@@ -50,7 +45,7 @@ void Interpreter::executeBlock(vector<Stmt*> stmts, Environment *environment)
     Environment *previous = this->environment;
     try {
         this->environment = environment;
-        for (Stmt *statement : stmts) {
+        for (const Stmt* statement : stmts) {
             execute(statement);
         }
     } catch (const exception &e) {
@@ -59,76 +54,90 @@ void Interpreter::executeBlock(vector<Stmt*> stmts, Environment *environment)
     delete this->environment;
     this->environment = previous;
 }
-void* Interpreter::visitTernaryExpr(Ternary *expr) 
+const Object* Interpreter::visitTernaryExpr(const Ternary *expr) 
 {
     return nullptr;
 }
-void* Interpreter::visitBinaryExpr(Binary *expr) 
+const Object* Interpreter::visitBinaryExpr(const Binary *expr) 
 {
     //this will creat a new ..
-    Value *left = (Value*)evaluate(expr->left);
-    Value *right = (Value*)evaluate(expr->right);
-    Value *result = new Value;
+    const Object &left = *evaluate(expr->left);
+    const Object &right = *evaluate(expr->right);
+
+
+    bool is_string = typeid(left) == typeid(String);
+
+    const Object *result = nullptr;
     switch(expr->op->type)
     {
         case PLUS:
-            checkStringOrNumber(PLUS, *left, *right);
-            *result =  *left + *right;
+            checkStringOrNumber(expr->op, left, right);
+            if (is_string) {
+                if (typeid(right) == typeid(Number))
+                    result = new String(dynamic_cast<const String&>(left) + dynamic_cast<const Number&>(right));
+                else if (typeid(right) == typeid(Bool))
+                    result = new String(dynamic_cast<const String&>(left) + dynamic_cast<const Bool&>(right));
+                else
+                    result = new String((const string)dynamic_cast<const String&>(left) + (const string)dynamic_cast<const String&>(right));
+
+            } else
+                result = new Number(dynamic_cast<const Number&>(left) + dynamic_cast<const Number&>(right));
             break;
         case MINUS:
-            chechNumber(MINUS, *left, *right);
-            *result = *left - *right;
+            chechNumber(expr->op, left, right);
+            result = new Number(dynamic_cast<const Number&>(left) - dynamic_cast<const Number&>(right));
             break;
         case STAR:
-            chechNumber(MINUS, *left, *right);
-            *result =  *left * *right;
+            chechNumber(expr->op, left, right);
+            result = new Number(dynamic_cast<const Number&>(left) * dynamic_cast<const Number&>(right));
             break;
         case SLASH:
-            chechNumber(MINUS, *left, *right);
-            *result = *left / *right;
+            chechNumber(expr->op, left, right);
+            result = new Number(dynamic_cast<const Number&>(left) / dynamic_cast<const Number&>(right));
             break;
         case COMMA:
-            *result = *right;
+            delete &left;
+            return &right;
             break;
         case GREATER:
-            chechNumber(MINUS, *left, *right);
-            *result = *left > *right;
+            chechNumber(expr->op, left, right);
+            result = new Bool(dynamic_cast<const Number&>(left) > dynamic_cast<const Number&>(right));
             break;
         case GREATER_EQUAL:
-            chechNumber(MINUS, *left, *right);
-            *result = *left >= *right;
+            chechNumber(expr->op, left, right);
+            result = new Bool(dynamic_cast<const Number&>(left) >= dynamic_cast<const Number&>(right));
             break;
         case LESS:
-            chechNumber(MINUS, *left, *right);
-            *result = *left < *right;
+            chechNumber(expr->op, left, right);
+            result = new Bool(dynamic_cast<const Number&>(left) < dynamic_cast<const Number&>(right));
             break;
         case LESS_EQUAL:
-            chechNumber(MINUS, *left, *right);
-            *result = *left <= *right;
+            chechNumber(expr->op, left, right);
+            result = new Bool(dynamic_cast<const Number&>(left) <= dynamic_cast<const Number&>(right));
             break;
         case EQUAL_EQUAL:
-            *result = *left == *right;
+            result = new Bool(left == right);
             break;
         case BANG_EQUAL:
-            *result = *left != *right;
+            result = new Bool(!(left == right));
             break;
         default:
             throw string("ERROR UNKONE OP") + expr->op->lexeme;
     }
-    delete left;
-    delete right;
+    delete &left;
+    delete &right;
     return result;
 }
-void* Interpreter::visitUnaryExpr(Unary *expr) 
+const Object* Interpreter::visitUnaryExpr(const Unary *expr) 
 {
-    Value *temp = (Value*)evaluate(expr->right);
-    Value *result = nullptr;
+    const Object* temp = evaluate(expr->right);
+    const Object* result = nullptr;
     switch(expr->op->type) {
         case MINUS:
-            result = new Value(-*temp);
+            result = new Number(-dynamic_cast<const Number&>(*temp));
             break;
         case BANG:
-            result = new Value(!*temp);
+            result = new Bool(!dynamic_cast<const Bool&>(*temp));
             break;
         default:
             throw std::runtime_error("r u kidding me with a wrong unary op?");
@@ -136,79 +145,53 @@ void* Interpreter::visitUnaryExpr(Unary *expr)
     delete temp;
     return result;
 }
-void* Interpreter::visitGroupingExpr(Grouping *expr) 
+const Object* Interpreter::visitGroupingExpr(const Grouping *expr) 
 {
     return evaluate(expr->expr);
 }
-void* Interpreter::visitLiteralExpr(Literal *expr) 
+const Object* Interpreter::visitLiteralExpr(const Literal *expr) 
 {
-    return new Value((expr->type), expr->value);
+    //默认拷贝。
+    //所有的字面量都是临时常量
+    return Object::clone(expr->value);
 }
-void * Interpreter::visitVariableExpr(Variable *expr) 
+const Object*  Interpreter::visitVariableExpr(const Variable *expr) 
 {
-    //Enexpr->name->lexeme
-    return new Value(*environment->get(expr->name));
+    return Object::clone(environment->get(expr->name));
 }
 
-void * Interpreter::visitExpressionStmt(Expression *stmt) 
+void  Interpreter::visitExpressionStmt(const Expression *stmt) 
 {
     evaluate(stmt->expr);
-    // EYE 
-    //may be i can delete stmt here.
-    //after execute it delete it.
-    return nullptr;
 }
-void * Interpreter::visitPrintStmt(Print *stmt) 
+void  Interpreter::visitPrintStmt(const Print *stmt) 
 {
-   Value value = interprete(stmt->expr);
-   std::cout<<Value::toString(value)<<endl;
-   return nullptr;
+   const Object* value = interprete(stmt->expr);
+   std::cout<<Object::toString(value)<<endl;
 }
 
-void* Interpreter::visitVarStmt(Var *stmt)
+void Interpreter::visitVarStmt(const Var *stmt)
 {
-    Value * value = nullptr;
+    const Object* value = nullptr;
     if (stmt->initializer != nullptr) {
-        value = (Value*)evaluate(stmt->initializer);
+        value = evaluate(stmt->initializer);
     }
     this->environment->define(stmt->name->lexeme, value);
-    return nullptr;
 }
-
-void* Interpreter::visitAssignExpr(Assign *expr)
-{
-    Value *value = (Value*)evaluate(expr->value);
-    environment->assign(expr->name, value);
-    return new Value(*value);
-}
-
-void* Interpreter::visitLogicalExpr(Logical *expr)
-{
-    Value *left = static_cast<Value*>(evaluate(expr->left));
-    if (expr->op->type == AND) {
-        if ((bool)!*left) return left;
-    } else {
-        if ((bool)*left) return left;
-    }
-    delete left;
-    return evaluate(expr->right);
-}
-
-void* Interpreter::visitBlockStmt(Block *stmt)
+void Interpreter::visitBlockStmt(const Block *stmt)
 {
     executeBlock(stmt->statements, new Environment(environment));
-    return nullptr;
 }
 
-void* Interpreter::visitIfStmt(If *stmt)
+void Interpreter::visitIfStmt(const If *stmt)
 {
 
-    Value *value = (Value*)evaluate(stmt->condition);
-    if ((bool)*value) {
+    const Bool* value = dynamic_cast<const Bool*>(evaluate(stmt->condition));
+    if (*value) {
         execute(stmt->thenBranch);
     } else {
         execute(stmt->elseBranch);
-    } return nullptr;
+    } 
 }
 
 void Interpreter::printEnvironment()
@@ -222,24 +205,69 @@ void Interpreter::printEnvironment()
     }
 }
 
-void* Interpreter::visitWhileStmt(While *stmt) 
+void Interpreter::visitWhileStmt(const While *stmt) 
 {
-    while ((bool)*static_cast<Value*>(evaluate(stmt->condition))) {
+    while (*dynamic_cast<const Bool*>(evaluate(stmt->condition))) {
         execute(stmt->body);
     }
+}
+
+const Object* Interpreter::visitAssignExpr(const Assign *expr)
+{
+    const Object* value = evaluate(expr->value);
+    environment->assign(expr->name, value);
+    return Object::clone(value);
+}
+
+const Object* Interpreter::visitLogicalExpr(const Logical *expr)
+{
+    const Bool *left = dynamic_cast<const Bool*>(evaluate(expr->left));
+    if (expr->op->type == AND) {
+        if (!*left) return left;
+    } else {
+        if (*left) return left;
+    }
+    delete left;
+    return evaluate(expr->right);
+}
+
+const Object* Interpreter::visitCallExpr(const Call *expr)
+{
+    const Object* callee = (evaluate(expr->callee));
+
+    vector<const Object*> arguments;
+    for (auto p : expr->arguments) {
+        arguments.push_back(evaluate(p));
+    }
+
+    const Callable* function = dynamic_cast<const Callable*>(callee);
+    if (function == nullptr) {
+        throw RuntimeError(expr->paren, "can only call functions and classes");
+    }
+    if (arguments.size() != function->arity()) {
+        ostringstream oss;
+        oss<<"Expected "<<function->arity() + "arguments but got"<<
+            arguments.size()<<".";
+        throw RuntimeError(expr->paren, oss.str());
+    }
+
+    //return new Object((*callee)(arguments));
     return nullptr;
 }
-void Interpreter::checkStringOrNumber(TokenType op, const Value &l, const Value &r)
+
+void Interpreter::checkStringOrNumber(const Token *op, const Object &l, const Object &r)
 {
-    if (l.type == NUMBER && r.type == NUMBER) return;
-    if (l.type == STRING && r.type == STRING) return;
+    if (typeid(l) == typeid(const Number) && typeid(r) == typeid(const Number)) return;
+    if (typeid(l) == typeid(const String)) return;
+    throw RuntimeError(op, "operands should be numbers or strings ");
+}
+void Interpreter::chechNumber(const Token *op, const Object &v)
+{
+    if (typeid(v) == typeid(const Number)) return;
+    throw RuntimeError(op, "Operand must be a number");
+}
+void Interpreter::chechNumber(const Token *op, const Object &l, const  Object &r)
+{
+    if (typeid(l) == typeid(const Number) && typeid(r) == typeid(const Number)) return;
     throw RuntimeError(op, "operands should be numbers");
-}
-void Interpreter::chechNumber(TokenType op, const Value &v)
-{
-    if (v.type != NUMBER) throw RuntimeError(op, "Operand must be a number");
-}
-void Interpreter::chechNumber(TokenType op, const Value &l, const  Value &r)
-{
-    if (l.type != NUMBER || r.type != NUMBER) throw RuntimeError(op, "operands should be numbers");
 }

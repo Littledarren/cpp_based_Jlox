@@ -25,16 +25,16 @@ struct While;
 struct Stmt {
     struct Visitor
     {
-        virtual void* visitExpressionStmt(Expression *stmt)=0;
-        virtual void* visitPrintStmt(Print *stmt)=0;
-        virtual void* visitVarStmt(Var *stmt)=0;
-        virtual void* visitBlockStmt(Block *stmt)=0;
-        virtual void* visitIfStmt(If *stmt)=0;
-        virtual void* visitWhileStmt(While *stmt)=0;
+        virtual void visitExpressionStmt(const Expression *stmt)=0;
+        virtual void visitPrintStmt(const Print *stmt)= 0;
+        virtual void visitVarStmt(const Var *stmt)=0;
+        virtual void visitBlockStmt(const Block *stmt)=0;
+        virtual void visitIfStmt(const If *stmt)=0;
+        virtual void visitWhileStmt(const While *stmt)=0;
         virtual ~Visitor(){}
     };
 
-    virtual void* accept(Visitor *visitor)=0;
+    virtual void accept(Visitor *visitor)const=0;
     virtual ~Stmt(){}
 
 };
@@ -42,54 +42,54 @@ struct Stmt {
 struct Var : public Stmt
 {
 
-    Var(Token * const &name, Expr * const &initializer):
+    Var(const Token* name, const Expr* initializer):
         name(name), initializer(initializer){}
     ~Var()
     {
         //name will be freed by Lexer.
         delete initializer;
     }
-    void * accept(Visitor *visitor) override
+    void accept(Visitor *visitor)const override
     {
-        return visitor->visitVarStmt(this);
+        visitor->visitVarStmt(this);
     }
-    Token * name;
-    Expr * initializer;
+    const Token* name;
+    const Expr* initializer;
 
 };
 
 
 struct Expression : public Stmt
 {
-    Expression(Expr *expr) : expr(expr){}
+    Expression(const Expr* expr) : expr(expr){}
     virtual ~Expression()
     {
         delete expr;
     };
 
 
-    void * accept(Visitor *visitor) override
+    void accept(Visitor *visitor) const override
     {
-        return visitor->visitExpressionStmt(this);
+        visitor->visitExpressionStmt(this);
     }
 
-    Expr* const expr;
+    const Expr* expr;
 };
 
 struct Print : public Stmt
 {
-    Print(Expr *expr) : expr(expr){}
+    Print(const Expr* expr) : expr(expr){}
     virtual ~Print()
     {
         delete expr;
     };
 
-    void * accept(Visitor *visitor) override
+    void accept(Visitor *visitor) const override
     {
-        return visitor->visitPrintStmt(this);
+        visitor->visitPrintStmt(this);
     }
 
-    Expr* const expr;
+    const Expr* expr;
 };
 
 struct Block : public Stmt
@@ -101,9 +101,9 @@ struct Block : public Stmt
         for (auto p : statements)
             delete p;
     }
-    void * accept(Visitor *visitor) override
+    void accept(Visitor *visitor) const override
     {
-        return visitor->visitBlockStmt(this);
+        visitor->visitBlockStmt(this);
     }
 
     vector<Stmt*> statements;
@@ -111,11 +111,11 @@ struct Block : public Stmt
 
 struct If : public Stmt
 {
-   If(Expr *condition, Stmt *thenBranch, Stmt *elseBranch):
+   If(const Expr* condition, const Stmt* thenBranch, const Stmt* elseBranch):
        condition(condition), thenBranch(thenBranch), elseBranch(elseBranch){}
-   void * accept(Visitor *visitor) override
+   void accept(Visitor *visitor) const override
    {
-       return visitor->visitIfStmt(this);
+       visitor->visitIfStmt(this);
    }
    virtual ~If()
    {
@@ -123,27 +123,27 @@ struct If : public Stmt
         delete thenBranch;
         delete elseBranch;
    }
-   Expr *condition;
-   Stmt *thenBranch;
-   Stmt *elseBranch;
+   const Expr *condition;
+   const Stmt *thenBranch;
+   const Stmt *elseBranch;
 };
 
 struct While : public Stmt
 {
-    While(Expr *condition, Stmt *body):
+    While(const Expr* condition, const Stmt* body):
         condition(condition), body(body){}
     virtual ~While()
     {
         delete condition;
         delete body;
     }
-    void * accept(Visitor *visitor) override
+    void accept(Visitor *visitor) const override
     {
-        return visitor->visitWhileStmt(this);
+       visitor->visitWhileStmt(this);
     }
 
-    Expr *condition;
-    Stmt *body;
+    const Expr *condition;
+    const Stmt *body;
 };
 
 #endif

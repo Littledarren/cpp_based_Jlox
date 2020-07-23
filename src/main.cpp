@@ -18,7 +18,6 @@
 #include "../includes/Lexer.h"
 #include "../includes/Scanner.h"
 #include "../includes/Token.h"
-#include "../includes/AstPrinter.h"
 #include "../includes/RecursiveDescentParser.h"
 #include "../includes/Interpreter.h"
 
@@ -79,19 +78,20 @@ static void runPrompt()
 static void run(const string &source)
 {
     //abstract!!!!!!!!!
+    //1.词法
     Lexer *lexer = new Scanner(source);
-    vector<Token*> tokens = lexer->scanTokens();
+    const vector<const Token*>& tokens = lexer->scanTokens();
+    //2.句法
     Parser *parser = new RecursiveDescentParser(tokens);
-
     vector<Stmt*> statements = parser->parse();
+
     if (!hadError) {
-//        AstPrinter *astP = new AstPrinter();
-//        cout<<astP->print(expr)<<endl;
+        //3/.语义
        interpreter.interprete(statements);
         //delete astP;
     }
-    delete lexer;
     delete parser;
+    delete lexer;
 }
 
 

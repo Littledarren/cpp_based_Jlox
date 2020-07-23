@@ -20,15 +20,14 @@ std::map<string, TokenType> Scanner::keywords = {
                         {"while", WHILE},
 };
 
-vector<Token*> Scanner::scanTokens() 
+const vector<const Token*>& Scanner::scanTokens() 
 {
     while (!isAtEnd()) {
         start = current;
         scanToken();
     }
     tokens.push_back(new Token(TokenType::FOE, "", nullptr, line));
-
-
+    
     return tokens;
 }
 bool Scanner::isAtEnd()
@@ -120,11 +119,11 @@ void Scanner::takeNumber()
         advance();
         while (isDigit(peek())) advance();
     }
-    double *val = new double;
+    double val; 
     std::istringstream is(source.substr(start, current-start));
-    is>>*val;
+    is>>val;
 
-    addToken(NUMBER, val);
+    addToken(NUMBER, new Number(val));
 }
 char Scanner::peekNext()
 {
@@ -145,8 +144,8 @@ void Scanner::takeString()
     //take the "
     advance();
 
-    string *value = new string(source.substr(start+1, current - 1 - start - 1));
-    addToken(STRING, value);
+    string value = source.substr(start+1, current - 1 - start - 1);
+    addToken(STRING, new String(value));
 }
 char Scanner::peek() 
 {
@@ -171,7 +170,7 @@ void Scanner::addToken(TokenType type)
 {
     addToken(type, nullptr);
 }
-void Scanner::addToken(TokenType type, void *literal)
+void Scanner::addToken(TokenType type, const Object* literal)
 {
     string text = source.substr(start, current-start);
     tokens.push_back(new Token(type, text, literal, line));

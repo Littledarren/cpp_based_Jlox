@@ -12,9 +12,11 @@
 #define _EXPR_H_
 
 #include <iostream>
+#include <vector>
 #include "Token.h"
 
 using std::string;
+using std::vector;
 
 struct Assign;
 struct Binary;
@@ -24,25 +26,25 @@ struct Literal;
 struct Ternary;
 struct Variable;
 struct Logical;
+struct Call;
 
 struct Expr
 {
     struct Visitor
     {
-        virtual void* visitAssignExpr(Assign *expr)=0;
-        virtual void* visitBinaryExpr(Binary *expr)=0;
-        virtual void* visitGroupingExpr(Grouping *expr)=0;
-        virtual void* visitLiteralExpr(Literal *expr)=0;
-        virtual void* visitUnaryExpr(Unary *expr)=0;
-        virtual void* visitTernaryExpr(Ternary *expr)=0;
-        virtual void* visitLogicalExpr(Logical *expr)=0;
-        //负责处理变量
-        virtual void* visitVariableExpr(Variable *expr)=0;
+        virtual const Object* visitAssignExpr(const Assign *expr)=0;
+        virtual const Object* visitBinaryExpr(const Binary *expr)=0;
+        virtual const Object* visitGroupingExpr(const Grouping *expr)=0;
+        virtual const Object* visitLiteralExpr(const Literal *expr)=0;
+        virtual const Object* visitUnaryExpr(const Unary *expr)=0;
+        virtual const Object* visitTernaryExpr(const Ternary *expr)=0;
+        virtual const Object* visitLogicalExpr(const Logical *expr)=0;
+        virtual const Object* visitVariableExpr(const Variable *expr)=0;
+        virtual const Object* visitCallExpr(const Call *expr)=0;
         virtual ~Visitor(){}
-
     };
 
-    virtual void* accept(Visitor *visitor) = 0;
+    virtual const Object* accept(Visitor *visitor)const = 0;
     virtual ~Expr()
     {}
 };
@@ -50,8 +52,8 @@ struct Expr
 struct Assign : public Expr
 {
 
-    Assign(Token* name, Expr* value ):name(name), value(value){ }
-    void * accept(Visitor *visitor) override 
+    Assign(const Token* name, const Expr* value ):name(name), value(value){ }
+    const Object* accept(Visitor *visitor) const override 
     {
         return visitor->visitAssignExpr(this);
     }
@@ -61,33 +63,33 @@ struct Assign : public Expr
         delete value;
     }
 
-    Token* name;
-    Expr* value;
+    const Token* name;
+    const Expr* value;
 };
 
 struct Binary : public Expr
 {
-    Binary(Expr *left, Token *op, Expr *right):left(left), op(op),right(right)
+    Binary(const Expr *left, const Token *op, const Expr *right):left(left), op(op),right(right)
     {}
     virtual ~Binary()
     {
         delete left;
-        //token will be freed by Lexer 
+        //const Token will be freed by Lexer 
         // delete op;
         delete right;
     }
-    void* accept(Visitor *visitor) override
+    const Object* accept(Visitor *visitor) const override
     {
         return visitor->visitBinaryExpr(this);
     }
-    Expr *const left;
-    Token *const op;
-    Expr *const right;
+    const Expr* left;
+    const Token* op;
+    const Expr* right;
 };
 
 struct Ternary : public Expr 
 {
-    Ternary (Expr *condition, Expr *if_yes, Expr *if_no):
+    Ternary (const Expr *condition, const Expr *if_yes, const Expr *if_no):
         condition(condition), if_yes(if_yes), if_no(if_no)
     {}
     virtual ~Ternary()
@@ -96,117 +98,83 @@ struct Ternary : public Expr
         delete if_yes;
         delete if_no;
     }
-    void* accept(Visitor *visitor) override
+    const Object* accept(Visitor *visitor) const override
     {
         return visitor->visitTernaryExpr(this);
     }
-    Expr *const condition;
-    Expr *const if_yes;
-    Expr *const if_no;
+    const Expr* condition;
+    const Expr* if_yes;
+    const Expr* if_no;
 };
 
 struct Grouping : public Expr
 {
-    Grouping(Expr *expr):expr(expr)
+    Grouping(const Expr *expr):expr(expr)
     {}
     virtual ~Grouping()
     {
         delete expr;
     }
-    void* accept(Visitor *visitor) override
+    const Object* accept(Visitor *visitor) const override
     {
         return visitor->visitGroupingExpr(this);
     }
-    Expr *const expr;
+    const Expr* expr;
 };
 
 #include <cstdio>
 //sscanf lives forever!!!!!!!!
 struct Literal: public Expr
 {
-    Literal(TokenType type, void *value=nullptr):type(type), value(value)
+    Literal(const Object* value=nullptr):value(value)
     {}
     string getStr()
     {
-        return *(string*)value;
+        if (value == nullptr) return "NULLLLLLLL pointer ERROR";
+        return value->toString();
     }
-    double getDouble()
-    {
-        return *(double*)value;
-    }
-    //result should be deleted by caller
-    //because some returned pointer will not be hold by Literal
-    string* getValStr()
-    {
-        switch(type)
-        {
-            case STRING:
-                return new string(*(string*)value);
-                break;
-            case NUMBER:
-                {
-
-                    char buf[256];
-                    double val = *(double*)value;
-                    sprintf(buf, "%f", val);
-                    return new string(buf);
-                    break;
-                }
-            case TRUE:
-                return new string("true");
-                break;
-            case FALSE:
-                return new string("false");
-                break;
-            default:
-                throw "RUNTIME ERROR WHEN DELETING ";
-        }
-    }
-
     virtual ~Literal()
     {
-        //value wille be freed by Token
     }
-    void* accept(Visitor *visitor) override
+    const Object* accept(Visitor *visitor) const override
     {
         return visitor->visitLiteralExpr(this);
     }
-    TokenType type;
-    void *const value;
+    const Object *value;
 };
 
 struct Unary : public Expr
 {
-    Unary(Token *op, Expr *right) : op(op), right(right)
+    Unary(const Token *op, const Expr *right) : op(op), right(right)
     {}
     virtual ~Unary()
     {
         //delete op;
         delete right;
     }
-    void* accept(Visitor *visitor) override
+    const Object* accept(Visitor *visitor) const override
     {
         return visitor->visitUnaryExpr(this);
     }
-    Token *const op;
-    Expr *const right;
+    const Token* op;
+    const Expr* right;
 };
 struct Variable : public Expr
 {
-    Variable(Token * const &name):
+    Variable(const Token* name):
         name(name){}
-    void * accept(Visitor *visitor) override
+    const Object* accept(Visitor *visitor) const override
     {
         return visitor->visitVariableExpr(this);
     }
-    Token * name;
+    const Token * name;
 };
 
 struct Logical : public Expr 
 {
-    Logical(Expr *left, Token *op, Expr *right):
+    Logical(const Expr* left, const Token* op, const Expr* right):
         left(left), op(op), right(right){}
-    void * accept(Visitor *visitor) override
+    const Object* accept(Visitor *visitor) const override
     {
         return visitor->visitLogicalExpr(this);
     }
@@ -216,8 +184,27 @@ struct Logical : public Expr
         delete right;
     }
 
-    Expr *left;
-    Token *op;
-    Expr *right;
+    const Expr *left;
+    const Token *op;
+    const Expr *right;
+};
+
+struct Call : public Expr
+{
+    Call(const Expr *callee, const Token *paren, const vector<Expr*> &arguments):
+        callee(callee), paren(paren), arguments(arguments){}
+    ~Call()
+    {
+        delete callee;
+        for (auto &p : arguments) 
+            delete p;
+    }
+    const Object* accept(Visitor *visitor) const override
+    {
+        return visitor->visitCallExpr(this);
+    }
+    const Expr *callee;
+    const Token *paren;
+    vector<Expr*> arguments;
 };
 #endif

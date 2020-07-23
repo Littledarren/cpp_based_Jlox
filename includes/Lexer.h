@@ -8,9 +8,9 @@ using std::vector;
 class Lexer
 {
 public:
-    virtual vector<Token*> scanTokens()=0;
+    virtual const vector<const Token*>& scanTokens()=0;
     Lexer(const string &source):
-        source(source), tokens()
+        source(source)
     {
     };
     virtual ~Lexer()
@@ -22,7 +22,7 @@ public:
     };
 protected:
     const string source;
-    vector<Token*> tokens;
+    vector<const Token*> tokens;
 };
 
 #endif

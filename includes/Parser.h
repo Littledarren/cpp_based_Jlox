@@ -22,15 +22,14 @@ class Parser
 
 {
 public:
-    Parser(vector<Token*> &tokens):tokens(tokens)
+    Parser(const vector<const Token*> &tokens):tokens(tokens)
     {}
 
     virtual vector<Stmt*> parse()=0;
     virtual ~Parser(){}
 
-
 protected:
-   vector<Token*> &tokens;
+   const vector<const Token*> &tokens;
 
 };
 
