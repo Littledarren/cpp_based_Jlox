@@ -1,12 +1,12 @@
 /*================================================================
-*    
-*   
-*   FileName: Stmt.h
-*   Author: DarrenHuang
-*   Create Time: 2020/07/04  09:30(星期六)
-*   Description:
-*
-================================================================*/
+ *    
+ *   
+ *   FileName: Stmt.h
+ *   Author: DarrenHuang
+ *   Create Time: 2020/07/04  09:30(星期六)
+ *   Description:
+ *
+ ================================================================*/
 #ifndef _STMT_H_
 #define _STMT_H_
 
@@ -42,30 +42,21 @@ struct Stmt {
 struct Var : public Stmt
 {
 
-    Var(const Token* name, const Expr* initializer):
+    Var(shared_ptr<const Token> name, shared_ptr<const Expr> initializer):
         name(name), initializer(initializer){}
-    ~Var()
-    {
-        //name will be freed by Lexer.
-        delete initializer;
-    }
     void accept(Visitor *visitor)const override
     {
         visitor->visitVarStmt(this);
     }
-    const Token* name;
-    const Expr* initializer;
+    shared_ptr<const Token> name;
+    shared_ptr<const Expr> initializer;
 
 };
 
 
 struct Expression : public Stmt
 {
-    Expression(const Expr* expr) : expr(expr){}
-    virtual ~Expression()
-    {
-        delete expr;
-    };
+    Expression(shared_ptr<const Expr> expr) : expr(expr){}
 
 
     void accept(Visitor *visitor) const override
@@ -73,77 +64,57 @@ struct Expression : public Stmt
         visitor->visitExpressionStmt(this);
     }
 
-    const Expr* expr;
+    shared_ptr<const Expr> expr;
 };
 
 struct Print : public Stmt
 {
-    Print(const Expr* expr) : expr(expr){}
-    virtual ~Print()
-    {
-        delete expr;
-    };
+    Print(shared_ptr<const Expr> expr) : expr(expr){}
 
     void accept(Visitor *visitor) const override
     {
         visitor->visitPrintStmt(this);
     }
 
-    const Expr* expr;
+    shared_ptr<const Expr> expr;
 };
 
 struct Block : public Stmt
 {
-    Block(const vector<Stmt*> &statements) :
+    Block(const vector<shared_ptr<Stmt>> &statements) :
         statements(statements){}
-    virtual ~Block()
-    {
-        for (auto p : statements)
-            delete p;
-    }
     void accept(Visitor *visitor) const override
     {
         visitor->visitBlockStmt(this);
     }
 
-    vector<Stmt*> statements;
+    vector<shared_ptr<Stmt>> statements;
 };
 
 struct If : public Stmt
 {
-   If(const Expr* condition, const Stmt* thenBranch, const Stmt* elseBranch):
-       condition(condition), thenBranch(thenBranch), elseBranch(elseBranch){}
-   void accept(Visitor *visitor) const override
-   {
-       visitor->visitIfStmt(this);
-   }
-   virtual ~If()
-   {
-        delete condition;
-        delete thenBranch;
-        delete elseBranch;
-   }
-   const Expr *condition;
-   const Stmt *thenBranch;
-   const Stmt *elseBranch;
+    If(shared_ptr<const Expr> condition, shared_ptr<const Stmt> thenBranch, shared_ptr<const Stmt> elseBranch):
+        condition(condition), thenBranch(thenBranch), elseBranch(elseBranch){}
+    void accept(Visitor *visitor) const override
+    {
+        visitor->visitIfStmt(this);
+    }
+    shared_ptr<const Expr>condition;
+    shared_ptr<const Stmt> thenBranch;
+    shared_ptr<const Stmt> elseBranch;
 };
 
 struct While : public Stmt
 {
-    While(const Expr* condition, const Stmt* body):
+    While(shared_ptr<const Expr> condition, shared_ptr<const Stmt> body):
         condition(condition), body(body){}
-    virtual ~While()
-    {
-        delete condition;
-        delete body;
-    }
     void accept(Visitor *visitor) const override
     {
-       visitor->visitWhileStmt(this);
+        visitor->visitWhileStmt(this);
     }
 
-    const Expr *condition;
-    const Stmt *body;
+    shared_ptr<const Expr>condition;
+    shared_ptr<const Stmt>body;
 };
 
 #endif

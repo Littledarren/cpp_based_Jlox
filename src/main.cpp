@@ -5,24 +5,26 @@
 *   Author: DarrenHuang
 *   Create Time: 2020/06/14  19:43(Sunday)
 *   Description:
+*       As we shall know,
+*       source code ---Lexer-->  Tokens ----Parser---> statements
+*       ----interpreter--->output
+*       This is interpretation.
 *
 ================================================================*/
 
+#include "../includes/main.h"
 
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 
-#include "../includes/main.h"
-#include "../includes/Lexer.h"
-#include "../includes/Scanner.h"
 #include "../includes/Token.h"
-#include "../includes/RecursiveDescentParser.h"
+#include "../includes/Lexer.h"
+#include "../includes/Parser.h"
 #include "../includes/Interpreter.h"
 
-using namespace std;
-
+using std::ifstream;
 
 bool hadError = false; //has error ?
 bool hadRuntimeError = false;
@@ -31,9 +33,6 @@ bool hadRuntimeError = false;
 static void runFile(const char *path);
 static void runPrompt();
 static void run(const string &source);
-
-
-static Interpreter interpreter;
 
 int main(int argc, char *argv[])
 {
@@ -54,10 +53,12 @@ int main(int argc, char *argv[])
 
 static void runFile(const char *path)
 {
-    string cmd;
+    string source, temp;
     ifstream is(path); 
-    is>>cmd;
-    run(cmd);
+    while (getline(is, temp)) {
+        source.append(temp + "\n");
+    }
+    run(source);
     is.close();
     if (hadError) exit(65);
     if (hadRuntimeError) exit(70);
@@ -77,21 +78,22 @@ static void runPrompt()
 
 static void run(const string &source)
 {
-    //abstract!!!!!!!!!
+    // interpreter has some information to preserve.
+    static Interpreter interpreter;
+
     //1.词法
-    Lexer *lexer = new Scanner(source);
-    const vector<const Token*>& tokens = lexer->scanTokens();
-    //2.句法
-    Parser *parser = new RecursiveDescentParser(tokens);
-    vector<Stmt*> statements = parser->parse();
+    unique_ptr<Lexer> lexer(new Lexer(source));
+    const vector<shared_ptr<Token>> &tokens = lexer->scanTokens();
+    
+    //2.句法or语法
+    unique_ptr<Parser> parser(new Parser(tokens));
+    vector<shared_ptr<Stmt>> statements = parser->parse();
 
     if (!hadError) {
         //3/.语义
        interpreter.interprete(statements);
         //delete astP;
     }
-    delete parser;
-    delete lexer;
 }
 
 

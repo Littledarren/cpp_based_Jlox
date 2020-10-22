@@ -1,13 +1,27 @@
+/*================================================================
+*    
+*   
+*   FileName: main.h
+*   Author: DarrenHuang
+*   Create Time: 2020/10/19  19:48(Monday)
+*   Description:
+*
+================================================================*/
+
 #ifndef MAIN_H
 #define MAIN_H
 #include <iostream>
 
-using namespace std;
-extern bool hadError; //has error ?
-extern bool hadRuntimeError;
-
 #include "Token.h"
 #include "RuntimeError.h"
+
+using std::cout;
+using std::cin;
+using std::cerr;
+using std::endl;
+
+extern bool hadError; //has error ?
+extern bool hadRuntimeError;
 
 inline void report(int line, const string &where, const string &message)
 {
@@ -31,11 +45,7 @@ inline void runtimeError(const RuntimeError &e)
 {
     cerr<<e.what()<<"\n[line "<<  e.token->line <<"]";
     hadRuntimeError = true;
-
 }
-
-
-
 
 #endif
 

@@ -1,8 +1,6 @@
-#include <sstream>
-
 #include "../includes/Value.h"
-#include "../includes/RuntimeError.h"
 
+#include <sstream>
 
 
 String String::operator+(const Number &value) const
@@ -20,6 +18,5 @@ String String::operator+(const Bool &value) const
 }
 
 
-#include "../includes/Interpreter.h"
 
 

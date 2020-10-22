@@ -17,15 +17,11 @@
 #include <sstream>
 #include <map>
 
-class Scanner : public Lexer
+class Scanner 
 {
 public:
-    Scanner(const string &source):
-        Lexer(source)
-    {
-
-    }
-    virtual const vector<const Token*>& scanTokens() override;
+    const vector<shared_ptr<Token>>& scanTokens();
+    Scanner(const string &source):source(source){}
 private:
     bool isAtEnd();
     void scanToken();
@@ -40,8 +36,11 @@ private:
     bool match(char expected);
     char advance();
     void addToken(TokenType type);
-    void addToken(TokenType type,const Object* literal);
+    void addToken(TokenType type, shared_ptr<const Object> literal);
+
     //new feature! after..c++11?
+    const string &source;
+    vector<shared_ptr<Token>> tokens_list;
     int start = 0;
     int current = 0;
     int line = 1;

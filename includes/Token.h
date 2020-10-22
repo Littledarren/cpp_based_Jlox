@@ -11,30 +11,26 @@
 #ifndef _TOKEN_H_
 #define _TOKEN_H_
 
-
+#include <memory>
 
 #include "TokenType.h"
 #include "Value.h"
 
+using std::shared_ptr;
+
 struct Token 
 {
-public:
-    Token(TokenType type, const string &lexeme,const Object *literal, int line):
+    Token(TokenType type, const string &lexeme,shared_ptr<const Object> literal, int line):
         type(type), lexeme(lexeme), literal(literal), line(line)
     {
-    };
+    }
     operator string() const
     {
         return getNameOfType(type) + " " + lexeme + " ";
     }
-    virtual ~Token()
-    {
-        delete literal;
-    }
-//private:
     const TokenType type;
     const string lexeme;
-    const Object* const literal;
+    const shared_ptr<const Object> literal;
     const int line;
 };
 

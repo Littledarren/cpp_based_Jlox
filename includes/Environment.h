@@ -12,31 +12,29 @@
 
 #include <map>
 #include <string>
-using std::string;
+#include <memory>
 
 #include "../includes/Value.h"
 class Token;
 
+using std::string;
+using std::shared_ptr;
+
 class Environment
 {
     public:
-        Environment(Environment *enclosing = nullptr) : 
+        Environment(shared_ptr<Environment> enclosing = nullptr) : 
             enclosing(enclosing){}
-        ~Environment() {
-            for (const std::pair<string, const Object*> &pair : values) {
-                delete pair.second;
-            }
-        }
 
-        void define(const string &name, const Object* value);
-        const Object* get(const Token *name);
-        void assign(const Token* name, const Object* value);
-        Environment* enclosing;
+        void define(const string &name, shared_ptr<const Object> value);
+        shared_ptr<const Object> get(shared_ptr<const Token> name);
+        void assign(shared_ptr<const Token> name, shared_ptr<const Object> value);
+        shared_ptr<Environment> enclosing;
 
         //const std::map<string, Object*>& getObjects() const;
         void print() const;
     private:
-        std::map<const string, const Object*> values;
+        std::map<const string, shared_ptr<const Object>> values;
 
 };
 

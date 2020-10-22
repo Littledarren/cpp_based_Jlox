@@ -1,10 +1,11 @@
+#include <exception>
 #include "../includes/Interpreter.h"
 #include "../includes/main.h"
 
 
 
 
-void Interpreter::interprete(vector<Stmt*> statements)
+void Interpreter::interprete(vector<StmtPtr> statements)
 {
     try {
         for (auto p : statements) {
@@ -15,7 +16,7 @@ void Interpreter::interprete(vector<Stmt*> statements)
     }
 }
 
-const Object* Interpreter::interprete(const Expr *expr)
+CObjectPtr Interpreter::interprete(CExprPtr expr)
 {
     try {
         return evaluate(expr);
@@ -28,136 +29,132 @@ const Object* Interpreter::interprete(const Expr *expr)
 }
 
 
-const Object* Interpreter::evaluate(const Expr *expr)
+CObjectPtr Interpreter::evaluate(CExprPtr expr)
 {
-    if (expr != nullptr)
+    if (expr)
         return expr->accept(this);
     else 
         return nullptr;
 }
-void Interpreter::execute(const Stmt *stmt)
+void Interpreter::execute(CStmtPtr stmt)
 {
-    if (stmt != nullptr)
+    if (stmt)
         stmt->accept(this);
 }
-void Interpreter::executeBlock(vector<Stmt*> stmts, Environment *environment)
+void Interpreter::executeBlock(vector<shared_ptr<Stmt>> stmts, shared_ptr<Environment> environment)
 {
-    Environment *previous = this->environment;
+    shared_ptr<Environment> previous = this->environment;
     try {
-        this->environment = environment;
-        for (const Stmt* statement : stmts) {
-            execute(statement);
+        this->environment = (environment);
+        for (auto ptr : stmts) {
+            execute(ptr);
         }
-    } catch (const exception &e) {
+    } catch (const std::exception &e) {
         cout<<e.what()<<endl;
     }
-    delete this->environment;
     this->environment = previous;
 }
-const Object* Interpreter::visitTernaryExpr(const Ternary *expr) 
+CObjectPtr Interpreter::visitTernaryExpr(const Ternary *expr) 
 {
     return nullptr;
 }
-const Object* Interpreter::visitBinaryExpr(const Binary *expr) 
+CObjectPtr Interpreter::visitBinaryExpr(const Binary *expr) 
 {
     //this will creat a new ..
-    const Object &left = *evaluate(expr->left);
-    const Object &right = *evaluate(expr->right);
+    CObjectPtr left = evaluate(expr->left);
+    CObjectPtr right = evaluate(expr->right);
 
 
-    bool is_string = typeid(left) == typeid(String);
+    bool is_string = !!std::dynamic_pointer_cast<const String>(left);
 
-    const Object *result = nullptr;
+    CObjectPtr result;
+
     switch(expr->op->type)
     {
         case PLUS:
             checkStringOrNumber(expr->op, left, right);
             if (is_string) {
-                if (typeid(right) == typeid(Number))
-                    result = new String(dynamic_cast<const String&>(left) + dynamic_cast<const Number&>(right));
-                else if (typeid(right) == typeid(Bool))
-                    result = new String(dynamic_cast<const String&>(left) + dynamic_cast<const Bool&>(right));
+                if (auto temp_number = std::dynamic_pointer_cast<const Number>(right)) 
+                    result = std::make_shared<String>(*std::dynamic_pointer_cast<const String>(left) + *temp_number);
+                else if (auto temp_bool = std::dynamic_pointer_cast<const Bool>(right))
+                    result = std::make_shared<String>(*std::dynamic_pointer_cast<const String>(left) + *temp_bool);
                 else
-                    result = new String((const string)dynamic_cast<const String&>(left) + (const string)dynamic_cast<const String&>(right));
-
+                    result = std::make_shared<String>((string)*std::dynamic_pointer_cast<const String>(left) + (string)*std::dynamic_pointer_cast<const String>(right));
             } else
-                result = new Number(dynamic_cast<const Number&>(left) + dynamic_cast<const Number&>(right));
+                result = std::make_shared<Number>(*std::dynamic_pointer_cast<const Number>(left) + *std::dynamic_pointer_cast<const Number>(right));
             break;
         case MINUS:
             chechNumber(expr->op, left, right);
-            result = new Number(dynamic_cast<const Number&>(left) - dynamic_cast<const Number&>(right));
+            result = std::make_shared<Number>(*std::dynamic_pointer_cast<const Number>(left) - *std::dynamic_pointer_cast<const Number>(right));
             break;
         case STAR:
             chechNumber(expr->op, left, right);
-            result = new Number(dynamic_cast<const Number&>(left) * dynamic_cast<const Number&>(right));
+            result = std::make_shared<Number>(*std::dynamic_pointer_cast<const Number>(left) * *std::dynamic_pointer_cast<const Number>(right));
             break;
         case SLASH:
             chechNumber(expr->op, left, right);
-            result = new Number(dynamic_cast<const Number&>(left) / dynamic_cast<const Number&>(right));
+            result = std::make_shared<Number>(*std::dynamic_pointer_cast<const Number>(left) / *std::dynamic_pointer_cast<const Number>(right));
             break;
         case COMMA:
-            delete &left;
-            return &right;
+            return right;
             break;
         case GREATER:
             chechNumber(expr->op, left, right);
-            result = new Bool(dynamic_cast<const Number&>(left) > dynamic_cast<const Number&>(right));
+            result = std::make_shared<Bool>(*std::dynamic_pointer_cast<const Number>(left) > *std::dynamic_pointer_cast<const Number>(right));
             break;
         case GREATER_EQUAL:
             chechNumber(expr->op, left, right);
-            result = new Bool(dynamic_cast<const Number&>(left) >= dynamic_cast<const Number&>(right));
+            result = std::make_shared<Bool>(*std::dynamic_pointer_cast<const Number>(left) >= *std::dynamic_pointer_cast<const Number>(right));
             break;
         case LESS:
             chechNumber(expr->op, left, right);
-            result = new Bool(dynamic_cast<const Number&>(left) < dynamic_cast<const Number&>(right));
+            result = std::make_shared<Bool>(*std::dynamic_pointer_cast<const Number>(left) < *std::dynamic_pointer_cast<const Number>(right));
             break;
         case LESS_EQUAL:
             chechNumber(expr->op, left, right);
-            result = new Bool(dynamic_cast<const Number&>(left) <= dynamic_cast<const Number&>(right));
+            result = std::make_shared<Bool>(*std::dynamic_pointer_cast<const Number>(left) <= *std::dynamic_pointer_cast<const Number>(right));
             break;
         case EQUAL_EQUAL:
-            result = new Bool(left == right);
+            result = std::make_shared<Bool>(left==right);
             break;
         case BANG_EQUAL:
-            result = new Bool(!(left == right));
+            result = std::make_shared<Bool>(!(left==right));
             break;
         default:
             throw string("ERROR UNKONE OP") + expr->op->lexeme;
     }
-    delete &left;
-    delete &right;
     return result;
 }
-const Object* Interpreter::visitUnaryExpr(const Unary *expr) 
+CObjectPtr Interpreter::visitUnaryExpr(const Unary *expr) 
 {
-    const Object* temp = evaluate(expr->right);
-    const Object* result = nullptr;
+    CObjectPtr temp = evaluate(expr->right);
+    CObjectPtr result = nullptr;
     switch(expr->op->type) {
         case MINUS:
-            result = new Number(-dynamic_cast<const Number&>(*temp));
+            result = std::make_shared<Number>(-*std::dynamic_pointer_cast<const Number>(temp));
             break;
         case BANG:
-            result = new Bool(!dynamic_cast<const Bool&>(*temp));
+            result = std::make_shared<Bool>(!*std::dynamic_pointer_cast<const Bool>(temp));
             break;
         default:
             throw std::runtime_error("r u kidding me with a wrong unary op?");
     }
-    delete temp;
     return result;
 }
-const Object* Interpreter::visitGroupingExpr(const Grouping *expr) 
+CObjectPtr Interpreter::visitGroupingExpr(const Grouping *expr) 
 {
     return evaluate(expr->expr);
 }
-const Object* Interpreter::visitLiteralExpr(const Literal *expr) 
+CObjectPtr Interpreter::visitLiteralExpr(const Literal *expr) 
 {
     //默认拷贝。
     //所有的字面量都是临时常量
-    return Object::clone(expr->value);
+    return expr->value;
+    //return Object::clone(expr->value);
 }
-const Object*  Interpreter::visitVariableExpr(const Variable *expr) 
+CObjectPtr  Interpreter::visitVariableExpr(const Variable *expr) 
 {
-    return Object::clone(environment->get(expr->name));
+    return environment->get(expr->name);
 }
 
 void  Interpreter::visitExpressionStmt(const Expression *stmt) 
@@ -166,13 +163,13 @@ void  Interpreter::visitExpressionStmt(const Expression *stmt)
 }
 void  Interpreter::visitPrintStmt(const Print *stmt) 
 {
-   const Object* value = interprete(stmt->expr);
-   std::cout<<Object::toString(value)<<endl;
+   CObjectPtr value = interprete(stmt->expr);
+   std::cout<<(value)->toString()<<endl;
 }
 
 void Interpreter::visitVarStmt(const Var *stmt)
 {
-    const Object* value = nullptr;
+    CObjectPtr value = nullptr;
     if (stmt->initializer != nullptr) {
         value = evaluate(stmt->initializer);
     }
@@ -180,13 +177,13 @@ void Interpreter::visitVarStmt(const Var *stmt)
 }
 void Interpreter::visitBlockStmt(const Block *stmt)
 {
-    executeBlock(stmt->statements, new Environment(environment));
+    executeBlock(stmt->statements, std::make_shared<Environment>(environment));
 }
 
 void Interpreter::visitIfStmt(const If *stmt)
 {
+    shared_ptr<const Bool> value = std::dynamic_pointer_cast<const Bool>(evaluate(stmt->condition));
 
-    const Bool* value = dynamic_cast<const Bool*>(evaluate(stmt->condition));
     if (*value) {
         execute(stmt->thenBranch);
     } else {
@@ -196,9 +193,9 @@ void Interpreter::visitIfStmt(const If *stmt)
 
 void Interpreter::printEnvironment()
 {
-    Environment *temp = this->environment;
+    shared_ptr<Environment> temp = this->environment;
     int scopeCount = 0;
-    while (temp != nullptr) {
+    while (temp) {
         cout<<"SCOPE:"<<scopeCount<<endl;
         temp->print();
         temp = temp->enclosing;
@@ -207,46 +204,46 @@ void Interpreter::printEnvironment()
 
 void Interpreter::visitWhileStmt(const While *stmt) 
 {
-    while (*dynamic_cast<const Bool*>(evaluate(stmt->condition))) {
+    while (*std::dynamic_pointer_cast<const Bool>(evaluate(stmt->condition))) {
         execute(stmt->body);
     }
 }
 
-const Object* Interpreter::visitAssignExpr(const Assign *expr)
+CObjectPtr Interpreter::visitAssignExpr(const Assign *expr)
 {
-    const Object* value = evaluate(expr->value);
+    CObjectPtr value = evaluate(expr->value);
     environment->assign(expr->name, value);
-    return Object::clone(value);
+    //may be clone???
+    return value;
 }
 
-const Object* Interpreter::visitLogicalExpr(const Logical *expr)
+CObjectPtr Interpreter::visitLogicalExpr(const Logical *expr)
 {
-    const Bool *left = dynamic_cast<const Bool*>(evaluate(expr->left));
+    shared_ptr<const Bool> left = std::dynamic_pointer_cast<const Bool>(evaluate(expr->left));
     if (expr->op->type == AND) {
         if (!*left) return left;
     } else {
         if (*left) return left;
     }
-    delete left;
     return evaluate(expr->right);
 }
 
-const Object* Interpreter::visitCallExpr(const Call *expr)
+CObjectPtr Interpreter::visitCallExpr(const Call *expr)
 {
-    const Object* callee = (evaluate(expr->callee));
+    CObjectPtr callee = (evaluate(expr->callee));
 
-    vector<const Object*> arguments;
+    vector<CObjectPtr> arguments;
     for (auto p : expr->arguments) {
         arguments.push_back(evaluate(p));
     }
 
-    const Callable* function = dynamic_cast<const Callable*>(callee);
-    if (function == nullptr) {
+    shared_ptr<const Callable> function = std::dynamic_pointer_cast<const Callable>(callee);
+    if (!function) {
         throw RuntimeError(expr->paren, "can only call functions and classes");
     }
     if (arguments.size() != function->arity()) {
         ostringstream oss;
-        oss<<"Expected "<<function->arity() + "arguments but got"<<
+        oss<<"Expected "<<function->arity() << "arguments but got"<<
             arguments.size()<<".";
         throw RuntimeError(expr->paren, oss.str());
     }
@@ -255,19 +252,19 @@ const Object* Interpreter::visitCallExpr(const Call *expr)
     return nullptr;
 }
 
-void Interpreter::checkStringOrNumber(const Token *op, const Object &l, const Object &r)
+void Interpreter::checkStringOrNumber(shared_ptr<const Token>op, CObjectPtr l, CObjectPtr r)
 {
-    if (typeid(l) == typeid(const Number) && typeid(r) == typeid(const Number)) return;
-    if (typeid(l) == typeid(const String)) return;
+    if (std::dynamic_pointer_cast<const Number>(l) && std::dynamic_pointer_cast<const Number>(r)) return;
+    if (std::dynamic_pointer_cast<const String>(l)) return;
     throw RuntimeError(op, "operands should be numbers or strings ");
 }
-void Interpreter::chechNumber(const Token *op, const Object &v)
+void Interpreter::chechNumber(shared_ptr<const Token>op, CObjectPtr v)
 {
-    if (typeid(v) == typeid(const Number)) return;
+    if (std::dynamic_pointer_cast<const Number>(v)) return;
     throw RuntimeError(op, "Operand must be a number");
 }
-void Interpreter::chechNumber(const Token *op, const Object &l, const  Object &r)
+void Interpreter::chechNumber(shared_ptr<const Token>op, CObjectPtr l, CObjectPtr r)
 {
-    if (typeid(l) == typeid(const Number) && typeid(r) == typeid(const Number)) return;
+    if (std::dynamic_pointer_cast<const Number>(l) && std::dynamic_pointer_cast<const Number>(r)) return;
     throw RuntimeError(op, "operands should be numbers");
 }

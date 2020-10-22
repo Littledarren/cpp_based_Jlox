@@ -1,28 +1,23 @@
 #ifndef LEXER_H
 #define LEXER_H
 #include <vector>
+#include <memory>
 using std::vector;
+using std::unique_ptr;
+using std::shared_ptr;
+
 #include "Token.h"
 
-//abstract class for lexical parsing
+class Scanner;
+//interface for lexical parsing
 class Lexer
 {
 public:
-    virtual const vector<const Token*>& scanTokens()=0;
-    Lexer(const string &source):
-        source(source)
-    {
-    };
-    virtual ~Lexer()
-    {
-        //delete tokens
-        for (auto p : tokens) {
-            delete p;
-        }
-    };
-protected:
-    const string source;
-    vector<const Token*> tokens;
+    const vector<shared_ptr<Token>>& scanTokens();
+    Lexer(const string &source);
+    ~Lexer();
+private:
+    unique_ptr<Scanner> impl;
 };
 
 #endif

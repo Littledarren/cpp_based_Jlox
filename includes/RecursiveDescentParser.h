@@ -26,47 +26,47 @@ public:
 };
 
 // a implementation of Parser
-class RecursiveDescentParser : public Parser
+class RecursiveDescentParser 
 {
 public:
 
-    RecursiveDescentParser(const vector<const Token*>& tokens) : Parser(tokens)
+    RecursiveDescentParser(const vector<shared_ptr<Token>> &tokens) : tokens(tokens)
     {}
-    virtual vector<Stmt*> parse() override;
+    vector<shared_ptr<Stmt>> parse() ;
 private:
     //声明，后面会包括函数声明，类声明
     //现在只有变量定义
-    Stmt* declaration();
+    shared_ptr<Stmt> declaration();
     //用来解析变量定义
-    Stmt* varDeclaration();
+    shared_ptr<Stmt> varDeclaration();
     //语句，即可执行的语句.
-    Stmt* statement();
-    Stmt* ifStatement();
-    Stmt* whileStatement();
-    Stmt* forStatement();
-    Stmt* printStatement();
-    Stmt* expressionStatement();
-    vector<Stmt*> block();
+    shared_ptr<Stmt> statement();
+    shared_ptr<Stmt> ifStatement();
+    shared_ptr<Stmt> whileStatement();
+    shared_ptr<Stmt> forStatement();
+    shared_ptr<Stmt> printStatement();
+    shared_ptr<Stmt> expressionStatement();
+    vector<shared_ptr<Stmt>> block();
 
-    Expr* expression();
+    shared_ptr<Expr> expression();
 
-    Expr* assignment();
-    Expr* logicalOr();
-    Expr* logicalAnd();
+    shared_ptr<Expr> assignment();
+    shared_ptr<Expr> logicalOr();
+    shared_ptr<Expr> logicalAnd();
 
-    Expr* commaExpression();
-    Expr* ternaryExpression();
-    Expr* equality();
-    Expr* comparison();
-    Expr* addition();
-    Expr* multiplication();
-    Expr* unary();
-    Expr* call();
-    Expr* finishCall(Expr *callee_test);
-    Expr* primary();
+    shared_ptr<Expr> commaExpression();
+    shared_ptr<Expr> ternaryExpression();
+    shared_ptr<Expr> equality();
+    shared_ptr<Expr> comparison();
+    shared_ptr<Expr> addition();
+    shared_ptr<Expr> multiplication();
+    shared_ptr<Expr> unary();
+    shared_ptr<Expr> call();
+    shared_ptr<Expr> finishCall(shared_ptr<Expr>callee_test);
+    shared_ptr<Expr> primary();
 
-    const Token* consume(TokenType type,const string &message);
-    ParseError error(const Token *token, const string &message);
+    shared_ptr<const Token> consume(TokenType type,const string &message);
+    ParseError error(shared_ptr<const Token>token, const string &message);
     void synchronize();
 
     bool match(std::initializer_list<TokenType> types)
@@ -86,7 +86,7 @@ private:
         if (isAtEnd()) return false;
         return peek()->type == t;
     }
-    const Token* advance()
+    shared_ptr<const Token> advance()
     {
         if (!isAtEnd()) current++;
         return previous();
@@ -97,15 +97,15 @@ private:
         return peek()->type == FOE;
     }
 
-    const Token* peek() const
+    shared_ptr<const Token> peek() const
     {
         return tokens.at(current);
     }
-    const Token* previous() const
+    shared_ptr<const Token> previous() const
     {
         return tokens.at(current-1);
     }
-
+    const vector<shared_ptr<Token>> &tokens;
     int current = 0;
 
 };

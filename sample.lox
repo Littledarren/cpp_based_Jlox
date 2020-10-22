@@ -1,12 +1,12 @@
 var x = 1;
-func f(x, y)
-{
-    return x + y;
-}
-
 var y = 1;
-
-"Hello " + " world"
+print x;
+print y;
+print x+y;
+print x-y;
+print x/y;
+print x*y;
+print "Hello " + " world";
 
 1+(1-1)+(1-1)*(1+2 * 4 - 3) + 2*4 + 1/5 + 1*1*2+1
 1+ 0 + 0 * (1 + 8 -3) + 2*4+1/5+2+1

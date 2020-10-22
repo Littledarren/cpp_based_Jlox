@@ -19,9 +19,9 @@ using std::runtime_error;
 class RuntimeError : public runtime_error
 {
 public:
-    RuntimeError(const Token *token, const string &str) : runtime_error(str), token(token)
+    RuntimeError(shared_ptr<const Token> token, const string &str) : runtime_error(str), token(token)
     {}
     
-    const Token *token;
+    shared_ptr<const Token> token;
 };
 #endif

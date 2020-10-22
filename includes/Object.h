@@ -11,17 +11,17 @@
 #define _OBJECT_H_
 
 #include <string>
-
+#include <memory>
 using std::string;
+using std::shared_ptr;
 
 struct Object
 {
     virtual ~Object(){}
     virtual bool operator ==(const Object &o) const;
     virtual string toString() const;
+    virtual shared_ptr<Object> clone() const=0;
 
-    static Object* clone(const Object* o);
-    static string toString(const Object* o);
 };
 
 #endif

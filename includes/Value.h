@@ -11,12 +11,13 @@
 #define _Value_H_
 
 #include <vector>
+#include <sstream>
+#include <functional>
+using std::ostringstream;
 using std::vector;
 
-#include "Object.h"
 
-#include <sstream>
-using std::ostringstream;
+#include "Object.h"
 
 struct Number;
 struct Bool;
@@ -45,6 +46,10 @@ struct Number : public virtual Object
         oss<<value;
         return oss.str();
     }
+    virtual shared_ptr<Object> clone() const  override
+    {
+        return std::make_shared<Number>(value);
+    }
     double value;
 };
 
@@ -70,6 +75,10 @@ struct Bool : public virtual Object
     string toString() const override
     {
         return value?"True":"False";
+    }
+    virtual shared_ptr<Object> clone() const override
+    {
+        return std::make_shared<Bool>(value);
     }
 
     bool value;
@@ -99,6 +108,10 @@ struct String : public virtual Object
     {
         return value;
     }
+    virtual shared_ptr<Object> clone() const override
+    {
+        return std::make_shared<String>(value);
+    }
     String operator+(const Number &value) const;
     String operator+(const Bool &value) const;
     string value;
@@ -109,8 +122,10 @@ class Interpreter;
 
 struct Callable : public virtual Object
 {
-    virtual const Object* call(Interpreter* interpreter, const vector<const Object*> &arguments)const=0;
-    int arity();
+    std::function<shared_ptr<const Object>(shared_ptr<Interpreter> Interpreter, const vector<shared_ptr<const Object>> &arguments)> call;
+    std::function<int()> arity;
+    //virtual const Object* call(Interpreter* interpreter, const vector<const Object*> &arguments)const=0;
+    //int arity();
 };
 
 

@@ -8,32 +8,31 @@
 using std::endl;
 using std::cout;
 
-void Environment::define(const string &name, const Object *value)
+void Environment::define(const string &name, shared_ptr<const Object> value)
 {
     if (values.count(name) != 0) {
-        delete values.at(name);
         values.at(name) = value;
     } else {
-        values.insert(std::pair<const string, const Object*>(name, value));
+        values.insert(std::pair<const string, shared_ptr<const Object>>(name, value));
     }
 }
-const Object* Environment::get(const Token *name)
+shared_ptr<const Object> Environment::get(shared_ptr<const Token> name)
 {
 
     if (values.count(name->lexeme) != 0) {
         return values.at(name->lexeme);
     }
-    if (enclosing != nullptr) return enclosing->get(name);
+    if (enclosing) return enclosing->get(name);
     throw RuntimeError(name, string("Undefined variable") + name->lexeme);
 }
-void Environment::assign(const Token *name, const Object *value)
+void Environment::assign(shared_ptr<const Token> name, shared_ptr<const Object> value)
 {
 
     if (values.count(name->lexeme) != 0) {
         values.at(name->lexeme) = value;
         return;
     }
-    if (enclosing != nullptr) {
+    if (enclosing) {
         enclosing->assign(name, value);
         return;
     }
@@ -46,6 +45,6 @@ void Environment::assign(const Token *name, const Object *value)
 void Environment::print() const
 {
     for (auto kv : values) {
-        cout<<kv.first<<"\t:\t"<<Object::toString(kv.second)<<endl;
+        cout<<kv.first<<"\t:\t"<<(kv.second)->toString()<<endl;
     }
 }

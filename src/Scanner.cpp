@@ -19,17 +19,17 @@ std::map<string, TokenType> Scanner::keywords = {
                         {"var", VAR},
                         {"while", WHILE},
 };
-
-const vector<const Token*>& Scanner::scanTokens() 
+const vector<shared_ptr<Token>>& Scanner::scanTokens()
 {
     while (!isAtEnd()) {
         start = current;
         scanToken();
     }
-    tokens.push_back(new Token(TokenType::FOE, "", nullptr, line));
+    tokens_list.push_back(std::make_shared<Token>(TokenType::FOE, "", nullptr, line));
     
-    return tokens;
+    return tokens_list;
 }
+
 bool Scanner::isAtEnd()
 {
     return current >= source.length();
@@ -123,7 +123,7 @@ void Scanner::takeNumber()
     std::istringstream is(source.substr(start, current-start));
     is>>val;
 
-    addToken(NUMBER, new Number(val));
+    addToken(NUMBER, std::make_shared<Number>(val));
 }
 char Scanner::peekNext()
 {
@@ -145,7 +145,7 @@ void Scanner::takeString()
     advance();
 
     string value = source.substr(start+1, current - 1 - start - 1);
-    addToken(STRING, new String(value));
+    addToken(STRING, std::make_shared<String>(value));
 }
 char Scanner::peek() 
 {
@@ -170,8 +170,8 @@ void Scanner::addToken(TokenType type)
 {
     addToken(type, nullptr);
 }
-void Scanner::addToken(TokenType type, const Object* literal)
+void Scanner::addToken(TokenType type, shared_ptr<const Object> literal)
 {
     string text = source.substr(start, current-start);
-    tokens.push_back(new Token(type, text, literal, line));
+    tokens_list.push_back(std::make_shared<Token>(type, text, literal, line));
 }

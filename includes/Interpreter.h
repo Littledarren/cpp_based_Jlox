@@ -11,8 +11,8 @@
 #define _INTERPRETER_H_
 
 #include <initializer_list>
+#include <memory>
 #include <vector>
-using std::vector;
 
 #include "Expr.h"
 #include "Stmt.h"
@@ -20,32 +20,36 @@ using std::vector;
 #include "Value.h"
 
 #include "Environment.h"
+using std::vector;
+using std::unique_ptr;
 
+typedef shared_ptr<Stmt> StmtPtr;
+typedef shared_ptr<const Stmt> CStmtPtr;
+typedef shared_ptr<const Expr> CExprPtr;
+typedef shared_ptr<const Object> CObjectPtr;
 
+// tree walker
 class Interpreter : public Expr::Visitor, public Stmt::Visitor
 {
 
 public:
     Interpreter():environment(new Environment()){}
-    ~Interpreter() {
-        delete environment;
-    }
-    void interprete(vector<Stmt*> statements);
+    void interprete(vector<StmtPtr> statements);
 
-    const Object* interprete(const Expr *expr);
-    const Object* evaluate(const Expr *expr);
-    void execute(const Stmt * stmt);
-    void executeBlock(vector<Stmt*> stmts, Environment *environment);
+    CObjectPtr interprete(shared_ptr<const Expr>expr);
+    CObjectPtr evaluate(shared_ptr<const Expr>expr);
+    void execute(shared_ptr<const Stmt>  stmt);
+    void executeBlock(vector<StmtPtr> stmts, shared_ptr<Environment> environment);
     //expr
-    const Object* visitAssignExpr(const Assign *expr) override;
-    const Object* visitBinaryExpr(const Binary *expr) override;
-    const Object* visitGroupingExpr(const Grouping *expr) override;
-    const Object* visitLiteralExpr(const Literal *expr) override;
-    const Object* visitUnaryExpr(const Unary *expr) override;
-    const Object* visitTernaryExpr(const Ternary *expr) override;
-    const Object* visitLogicalExpr(const Logical *expr) override;
-    const Object* visitVariableExpr(const Variable *expr) override;
-    const Object* visitCallExpr(const Call *expr) override;
+    CObjectPtr visitAssignExpr(const Assign *expr) override;
+    CObjectPtr visitBinaryExpr(const Binary *expr) override;
+    CObjectPtr visitGroupingExpr(const Grouping *expr) override;
+    CObjectPtr visitLiteralExpr(const Literal *expr) override;
+    CObjectPtr visitUnaryExpr(const Unary *expr) override;
+    CObjectPtr visitTernaryExpr(const Ternary *expr) override;
+    CObjectPtr visitLogicalExpr(const Logical *expr) override;
+    CObjectPtr visitVariableExpr(const Variable *expr) override;
+    CObjectPtr visitCallExpr(const Call *expr) override;
     //Stmt
     void visitExpressionStmt(const Expression *stmt) override;
     void visitPrintStmt(const Print *stmt) override;
@@ -58,10 +62,10 @@ public:
     void printEnvironment();
 private:
     //check operant type
-    static void checkStringOrNumber(const Token *op, const Object &l, const Object &r);
-    static void chechNumber(const Token *op, const Object &v);
-    static void chechNumber(const Token *op, const Object &l, const Object &r);
-    Environment *environment;
+    static void checkStringOrNumber(shared_ptr<const Token>op, CObjectPtr l, CObjectPtr r);
+    static void chechNumber(shared_ptr<const Token>op, CObjectPtr v);
+    static void chechNumber(shared_ptr<const Token>op, CObjectPtr l, CObjectPtr r);
+    shared_ptr<Environment> environment;
 
 };
 

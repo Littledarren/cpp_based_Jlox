@@ -11,26 +11,27 @@
 #define _PARSER_H_
 
 #include <vector>
-using std::vector;
+#include <memory>
 
 #include "TokenType.h"
 #include "Token.h"
 #include "Expr.h"
 #include "Stmt.h"
 
-class Parser
+using std::vector;
+using std::unique_ptr;
 
+class RecursiveDescentParser;
+//construct abstract syntax tree
+class Parser
 {
 public:
-    Parser(const vector<const Token*> &tokens):tokens(tokens)
-    {}
+    Parser(const vector<shared_ptr<Token>> &tokens);
+    vector<shared_ptr<Stmt>> parse();
+    ~Parser();
 
-    virtual vector<Stmt*> parse()=0;
-    virtual ~Parser(){}
-
-protected:
-   const vector<const Token*> &tokens;
-
+private:
+    unique_ptr<RecursiveDescentParser> impl;
 };
 
 
