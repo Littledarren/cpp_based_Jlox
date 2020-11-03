@@ -43,7 +43,8 @@ inline void error(const Token &token, const string &msg)
 
 inline void runtimeError(const RuntimeError &e)
 {
-    cerr<<e.what()<<"\n[line "<<  e.token->line <<"]";
+    //cerr<<e.what()<<"\n[line "<<  e.token->line <<"]";
+    error(*e.token, e.what());
     hadRuntimeError = true;
 }
 

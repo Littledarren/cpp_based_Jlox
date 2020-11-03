@@ -115,7 +115,7 @@ struct Literal: public Expr
     {
         return visitor->visitLiteralExpr(this);
     }
-    shared_ptr<const Object>value;
+    shared_ptr<const Object> value;
 };
 
 struct Unary : public Expr

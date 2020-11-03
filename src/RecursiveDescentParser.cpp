@@ -268,7 +268,7 @@ shared_ptr<Expr> RecursiveDescentParser::finishCall(shared_ptr<Expr>callee)
 shared_ptr<Expr> RecursiveDescentParser::primary()
 {
     if (match({FALSE, TRUE}))
-        return std::make_shared<Literal>(std::make_shared<Bool>(previous()->type));
+        return std::make_shared<Literal>(std::make_shared<Bool>(previous()->type == TokenType::TRUE));
     if (match({NIL}))
         return std::make_shared<Literal>(nullptr);
     if (match({STRING, NUMBER}))

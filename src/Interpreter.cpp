@@ -115,10 +115,10 @@ CObjectPtr Interpreter::visitBinaryExpr(const Binary *expr)
             result = std::make_shared<Bool>(*std::dynamic_pointer_cast<const Number>(left) <= *std::dynamic_pointer_cast<const Number>(right));
             break;
         case EQUAL_EQUAL:
-            result = std::make_shared<Bool>(left==right);
+            result = std::make_shared<Bool>(*left==*right);
             break;
         case BANG_EQUAL:
-            result = std::make_shared<Bool>(!(left==right));
+            result = std::make_shared<Bool>(!(*left==*right));
             break;
         default:
             throw string("ERROR UNKONE OP") + expr->op->lexeme;
@@ -163,7 +163,7 @@ void  Interpreter::visitExpressionStmt(const Expression *stmt)
 }
 void  Interpreter::visitPrintStmt(const Print *stmt) 
 {
-   CObjectPtr value = interprete(stmt->expr);
+   CObjectPtr value = evaluate(stmt->expr);
    std::cout<<(value)->toString()<<endl;
 }
 
