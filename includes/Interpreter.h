@@ -21,13 +21,11 @@
 
 #include "Environment.h"
 using std::vector;
-using std::unique_ptr;
 
 typedef shared_ptr<Stmt> StmtPtr;
 typedef shared_ptr<const Stmt> CStmtPtr;
 typedef shared_ptr<const Expr> CExprPtr;
 typedef shared_ptr<const Object> CObjectPtr;
-
 // tree walker
 class Interpreter : public Expr::Visitor, public Stmt::Visitor
 {
