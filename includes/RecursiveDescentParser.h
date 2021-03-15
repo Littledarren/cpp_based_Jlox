@@ -14,7 +14,6 @@
 #include <exception>
 #include "Parser.h"
 #include "Expr.h"
-#include "main.h"
 
 class ParseError : public std::runtime_error
 {
@@ -26,7 +25,7 @@ public:
 };
 
 // a implementation of Parser
-class RecursiveDescentParser 
+class Parser::RecursiveDescentParser 
 {
 public:
 
@@ -65,8 +64,8 @@ private:
     shared_ptr<Expr> finishCall(shared_ptr<Expr>callee_test);
     shared_ptr<Expr> primary();
 
-    shared_ptr<const Token> consume(TokenType type,const string &message);
-    ParseError error(shared_ptr<const Token>token, const string &message);
+    shared_ptr<Token> consume(TokenType type, const string &message);
+    ParseError error(shared_ptr<Token>token, const string &message);
     void synchronize();
 
     bool match(std::initializer_list<TokenType> types)
@@ -86,7 +85,7 @@ private:
         if (isAtEnd()) return false;
         return peek()->type == t;
     }
-    shared_ptr<const Token> advance()
+    shared_ptr<Token> advance()
     {
         if (!isAtEnd()) current++;
         return previous();
@@ -97,11 +96,11 @@ private:
         return peek()->type == FOE;
     }
 
-    shared_ptr<const Token> peek() const
+    shared_ptr<Token> peek() const
     {
         return tokens.at(current);
     }
-    shared_ptr<const Token> previous() const
+    shared_ptr<Token> previous() const
     {
         return tokens.at(current-1);
     }

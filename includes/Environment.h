@@ -26,15 +26,15 @@ class Environment
         Environment(shared_ptr<Environment> enclosing = nullptr) : 
             enclosing(enclosing){}
 
-        void define(const string &name, shared_ptr<const Object> value);
-        shared_ptr<const Object> get(shared_ptr<const Token> name);
-        void assign(shared_ptr<const Token> name, shared_ptr<const Object> value);
+        void define(const string &name, shared_ptr<Object> value);
+        shared_ptr<Object> get(shared_ptr<Token> name);
+        void assign(shared_ptr<Token> name, shared_ptr<Object> value);
         shared_ptr<Environment> enclosing;
 
         //const std::map<string, Object*>& getObjects() const;
         void print() const;
     private:
-        std::map<const string, shared_ptr<const Object>> values;
+        std::map<const string, shared_ptr<Object>> values;
 
 };
 

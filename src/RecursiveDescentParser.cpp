@@ -1,8 +1,10 @@
-#include "../includes/RecursiveDescentParser.h"
+#include "RecursiveDescentParser.h"
+
+#include "Value.h"
+#include "main.h"
 
 
-
-vector<shared_ptr<Stmt>> RecursiveDescentParser::parse() 
+vector<shared_ptr<Stmt>> Parser::RecursiveDescentParser::parse() 
 {
     vector<shared_ptr<Stmt>> statements;
     while (!isAtEnd()) {
@@ -10,19 +12,20 @@ vector<shared_ptr<Stmt>> RecursiveDescentParser::parse()
     }
     return statements;
 }
-shared_ptr<Stmt> RecursiveDescentParser::declaration()
+shared_ptr<Stmt> Parser::RecursiveDescentParser::declaration()
 {
     try {
         if (match({VAR})) return varDeclaration();
+        //function..class..etc
         return statement();
     } catch (const ParseError &e) {
         synchronize();
         return nullptr;
     }
 }
-shared_ptr<Stmt> RecursiveDescentParser::varDeclaration()
+shared_ptr<Stmt> Parser::RecursiveDescentParser::varDeclaration()
 {
-   shared_ptr<const Token> name = consume(IDENTIFIER, "Expect variable name");
+   shared_ptr<Token> name = consume(IDENTIFIER, "Expect variable name");
    shared_ptr<Expr> initializer = nullptr;
    if (match ({EQUAL})) {
        initializer = expression();
@@ -30,7 +33,7 @@ shared_ptr<Stmt> RecursiveDescentParser::varDeclaration()
    consume(SEMICOLON, "Expect ';' after variable declaration");
    return std::make_shared<Var>(name, initializer);
 }
-shared_ptr<Stmt> RecursiveDescentParser::statement()
+shared_ptr<Stmt> Parser::RecursiveDescentParser::statement()
 {
     if (match({PRINT})) return printStatement();
     if (match({LEFT_BRACE})) return std::make_shared<Block>(block());
@@ -40,7 +43,7 @@ shared_ptr<Stmt> RecursiveDescentParser::statement()
 
     return expressionStatement();
 }
-shared_ptr<Stmt> RecursiveDescentParser::whileStatement()
+shared_ptr<Stmt> Parser::RecursiveDescentParser::whileStatement()
 {
     consume(LEFT_PAREN, "Expect '(' after while");
     shared_ptr<Expr>condition = expression();
@@ -48,7 +51,7 @@ shared_ptr<Stmt> RecursiveDescentParser::whileStatement()
     shared_ptr<Stmt>body = statement();
     return std::make_shared<While>(condition, body);
 }
-shared_ptr<Stmt> RecursiveDescentParser::ifStatement()
+shared_ptr<Stmt> Parser::RecursiveDescentParser::ifStatement()
 {
     consume(LEFT_PAREN, "Expect '(' after 'if'");
     shared_ptr<Expr>condition = expression();
@@ -63,7 +66,7 @@ shared_ptr<Stmt> RecursiveDescentParser::ifStatement()
 
 }
 
-shared_ptr<Stmt> RecursiveDescentParser::forStatement()
+shared_ptr<Stmt> Parser::RecursiveDescentParser::forStatement()
 {
    consume(LEFT_PAREN, "Expect a '(' after for");
 
@@ -100,15 +103,32 @@ shared_ptr<Stmt> RecursiveDescentParser::forStatement()
    if (initializer)
        body = std::make_shared<Block>(vector<shared_ptr<Stmt>>({initializer, body}));
    return body;
+   /*
+    *
+    * for(initializer; condition; increment)
+    *       statements;
+    *
+    *   ---->
+    *
+    *   {
+    *       initializer;
+    *       while(condition) {
+    *           statements;
+    *           increment
+    *       }
+    *   }
+    *
+    *
+    */
 }
-shared_ptr<Stmt> RecursiveDescentParser::printStatement()
+shared_ptr<Stmt> Parser::RecursiveDescentParser::printStatement()
 {
     shared_ptr<Expr> value = expression();
     consume(SEMICOLON, "Expect ';' after value");
     return std::make_shared<Print>(value);
 }
 
-shared_ptr<Stmt> RecursiveDescentParser::expressionStatement()
+shared_ptr<Stmt> Parser::RecursiveDescentParser::expressionStatement()
 {
 
     shared_ptr<Expr> expr = expression();
@@ -118,7 +138,7 @@ shared_ptr<Stmt> RecursiveDescentParser::expressionStatement()
         return std::make_shared<Print>(expr);
 }
 
-vector<shared_ptr<Stmt>> RecursiveDescentParser::block()
+vector<shared_ptr<Stmt>> Parser::RecursiveDescentParser::block()
 {
     vector<shared_ptr<Stmt>> statements;
     while (!check(RIGHT_BRACE) && !isAtEnd()) {
@@ -128,23 +148,33 @@ vector<shared_ptr<Stmt>> RecursiveDescentParser::block()
     return statements;
 
 }
-shared_ptr<Expr> RecursiveDescentParser::expression()
+shared_ptr<Expr> Parser::RecursiveDescentParser::expression()
 {
-    return assignment();
+    return commaExpression();
 }
-shared_ptr<Expr> RecursiveDescentParser::assignment()
+shared_ptr<Expr> Parser::RecursiveDescentParser::commaExpression()
+{
+    shared_ptr<Expr> expr = assignment();
+    while (match({COMMA})) {
+        shared_ptr<Token> op = previous();
+        shared_ptr<Expr>right = assignment();
+        expr = std::make_shared<Binary>(expr, op, right);
+    }
+    return expr;
+}
+shared_ptr<Expr> Parser::RecursiveDescentParser::assignment()
 {
     //because
     //lvalue can be something like bar.foo.x
     //so we can not tell a lvalue until we found a =
-    shared_ptr<Expr>expr = logicalOr();
+    shared_ptr<Expr> expr = ternaryExpression();
 
     if (match({EQUAL})) {
-        shared_ptr<const Token> equals = previous();
+        shared_ptr<Token> equals = previous();
         shared_ptr<Expr>value = assignment();
         //bad manner. though it works.
         if (auto temp = std::dynamic_pointer_cast<Variable>(expr)) {
-            shared_ptr<const Token> name = temp->name;
+            shared_ptr<Token> name = temp->name;
             return std::make_shared<Assign>(name, value);
         }
 
@@ -152,92 +182,88 @@ shared_ptr<Expr> RecursiveDescentParser::assignment()
     }
     return expr;
 }
-shared_ptr<Expr> RecursiveDescentParser::logicalOr()
+shared_ptr<Expr> Parser::RecursiveDescentParser::ternaryExpression() 
+{
+    shared_ptr<Expr>expr = logicalOr();
+    if (match({QUESTION_MASK})) {
+        shared_ptr<Expr> if_yes = ternaryExpression();
+        consume(COLON, "Expect ':' in ternaryExpression");
+        shared_ptr<Expr> if_no = ternaryExpression();
+        expr = std::make_shared<Ternary>(expr, if_yes, if_no);
+    }
+    return expr; 
+}
+shared_ptr<Expr> Parser::RecursiveDescentParser::logicalOr()
 {
     shared_ptr<Expr> expr = logicalAnd();
     while (match({OR})) {
-        shared_ptr<const Token> op = previous();
+        shared_ptr<Token> op = previous();
         shared_ptr<Expr> right = logicalAnd();
         expr = std::make_shared<Logical>(expr, op, right);
     }
     return expr;
 }
-shared_ptr<Expr> RecursiveDescentParser::logicalAnd()
+shared_ptr<Expr> Parser::RecursiveDescentParser::logicalAnd()
 {
     shared_ptr<Expr>expr = equality();
     while (match({AND})) {
-        shared_ptr<const Token> op = previous();
+        shared_ptr<Token> op = previous();
         shared_ptr<Expr>right = equality();
         expr = std::make_shared<Logical>(expr, op, right);
     }
     return expr;
 }
-shared_ptr<Expr> RecursiveDescentParser::commaExpression()
-{
-    shared_ptr<Expr>expr = equality();
-    while (match({COMMA})) {
-        shared_ptr<const Token> op = previous();
-        shared_ptr<Expr>right = equality();
-        expr = std::make_shared<Binary>(expr, op, right);
-    }
-    return expr;
-}
-shared_ptr<Expr> RecursiveDescentParser::ternaryExpression() 
-{
-    //shared_ptr<Expr>expr = equality();
-    return nullptr; 
-}
-shared_ptr<Expr> RecursiveDescentParser::equality()
+shared_ptr<Expr> Parser::RecursiveDescentParser::equality()
 {
     shared_ptr<Expr>expr = comparison();
     while (match({BANG_EQUAL, EQUAL_EQUAL})) {
-        shared_ptr<const Token> op = previous();
+        shared_ptr<Token> op = previous();
         shared_ptr<Expr>right = comparison();
         expr = std::make_shared<Binary>(expr, op, right);
     }
     return expr;
 }
-shared_ptr<Expr> RecursiveDescentParser::comparison()
+shared_ptr<Expr> Parser::RecursiveDescentParser::comparison()
 {
     shared_ptr<Expr>expr = addition();
     while (match({GREATER, GREATER_EQUAL, LESS_EQUAL, LESS})) {
-        shared_ptr<const Token> op = previous();
+        shared_ptr<Token> op = previous();
         shared_ptr<Expr>right = addition();
         expr = std::make_shared<Binary>(expr, op, right);
     }
     return expr;
 }
-shared_ptr<Expr> RecursiveDescentParser::addition()
+shared_ptr<Expr> Parser::RecursiveDescentParser::addition()
 {
     shared_ptr<Expr>expr = multiplication();
 
     while (match({MINUS, PLUS})) {
-        shared_ptr<const Token> op = previous();
+        shared_ptr<Token> op = previous();
         shared_ptr<Expr>right = multiplication();
         expr = std::make_shared<Binary>(expr, op, right);
     }
     return expr;
 }
-shared_ptr<Expr> RecursiveDescentParser::multiplication()
+shared_ptr<Expr> Parser::RecursiveDescentParser::multiplication()
 {
     shared_ptr<Expr>expr = unary();
     while (match({STAR, SLASH})) {
-        shared_ptr<const Token> op = previous();
+        shared_ptr<Token> op = previous();
         shared_ptr<Expr>right = unary();
         expr = std::make_shared<Binary>(expr, op, right);
     }
     return expr;
 }
-shared_ptr<Expr> RecursiveDescentParser::unary()
+shared_ptr<Expr> Parser::RecursiveDescentParser::unary()
 {
     if (match({BANG, MINUS})) {
-        shared_ptr<const Token> op = previous();
+        shared_ptr<Token> op = previous();
         shared_ptr<Expr>right = unary();
         return std::make_shared<Unary>(op, right);
     }
     return call();
 }
-shared_ptr<Expr> RecursiveDescentParser::call()
+shared_ptr<Expr> Parser::RecursiveDescentParser::call()
 {
    shared_ptr<Expr>expr = primary(); 
 
@@ -251,7 +277,7 @@ shared_ptr<Expr> RecursiveDescentParser::call()
 
    return expr;
 }
-shared_ptr<Expr> RecursiveDescentParser::finishCall(shared_ptr<Expr>callee)
+shared_ptr<Expr> Parser::RecursiveDescentParser::finishCall(shared_ptr<Expr>callee)
 {
     vector<shared_ptr<Expr>> arguments;
     if (!check(RIGHT_PAREN)) {
@@ -262,10 +288,10 @@ shared_ptr<Expr> RecursiveDescentParser::finishCall(shared_ptr<Expr>callee)
             arguments.push_back(expression());
         } while (match({COMMA}));
     }
-    shared_ptr<const Token> paren = consume(RIGHT_PAREN, "Expect ')' after arguments");
+    shared_ptr<Token> paren = consume(RIGHT_PAREN, "Expect ')' after arguments");
     return std::make_shared<Call>(callee, paren, arguments);
 }
-shared_ptr<Expr> RecursiveDescentParser::primary()
+shared_ptr<Expr> Parser::RecursiveDescentParser::primary()
 {
     if (match({FALSE, TRUE}))
         return std::make_shared<Literal>(std::make_shared<Bool>(previous()->type == TokenType::TRUE));
@@ -284,19 +310,19 @@ shared_ptr<Expr> RecursiveDescentParser::primary()
     }
     throw error(peek(), "Expect expression.");
 }
-shared_ptr<const Token> RecursiveDescentParser::consume(TokenType type,const string &message)
+shared_ptr<Token> Parser::RecursiveDescentParser::consume(TokenType type,const string &message)
 {
     if (check(type))  return advance();
     throw error(peek(), message);
 }
-ParseError RecursiveDescentParser::error(shared_ptr<const Token>token, const string &message)
+ParseError Parser::RecursiveDescentParser::error(shared_ptr<Token>token, const string &message)
 {
     ::error(*token, message);
     return ParseError(message);
 }
-void RecursiveDescentParser::synchronize()
+void Parser::RecursiveDescentParser::synchronize()
 {
-    //consume the const Token that makes error.
+    //consume the last Token that makes error.
     advance();
 
     while (!isAtEnd()) {

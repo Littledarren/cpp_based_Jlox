@@ -5,6 +5,7 @@
 *   Author: DarrenHuang
 *   Create Time: 2020/07/06  08:30(星期一)
 *   Description:
+*           Booleans, Numbers, Strings, NIl
 *
 ================================================================*/
 #ifndef _Value_H_
@@ -13,6 +14,8 @@
 #include <vector>
 #include <sstream>
 #include <functional>
+#include <stdexcept>
+using std::runtime_error;
 using std::ostringstream;
 using std::vector;
 
@@ -22,6 +25,38 @@ using std::vector;
 struct Number;
 struct Bool;
 struct String;
+
+// 没啥用，还麻烦，不好弄。。。
+//struct Nil;
+//
+//
+//struct Nil : public virtual Object
+//{
+//    virtual shared_ptr<Object> clone() const  override
+//    {
+//        return getInstance();
+//    }
+//    string toString() const override
+//    {
+//        std::ostringstream oss;
+//        oss<<"Nil";
+//        return oss.str();
+//    }
+//    bool operator==(const Object &r) const override
+//    {
+//        return false;
+//    }
+//    static Nil& getInstance() 
+//    {
+//        static Nil instance;
+//        return instance;
+//    }
+//private:
+//    Nil()=default;
+//    Nil(const Nil& o)=delete;
+//    Nil(Nil&& o)=delete;
+//};
+
 
 struct Number : public virtual Object
 {
@@ -37,7 +72,8 @@ struct Number : public virtual Object
     bool operator==(const Object &r) const override
     {
         const Number* rp = dynamic_cast<const Number*>(&r);
-        if (rp == nullptr) return false;
+        if (rp == nullptr) 
+            throw runtime_error("Number class should not be compared with nullptr");
         return value == rp->value;
     }
     string toString() const override

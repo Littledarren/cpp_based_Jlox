@@ -5,21 +5,23 @@
 *   Author: DarrenHuang
 *   Create Time: 2020/07/06  09:20(星期一)
 *   Description:
+*           Define TokenType as the basic description for Lexer to use.
 *
 ================================================================*/
 #ifndef _TOKENTYPE_H_
 #define _TOKENTYPE_H_
 
 
-
 #include <string>
+using std::string;
+
 enum TokenType
 {
     //Single character tokens
     NUL,
     LEFT_PAREN, RIGHT_PAREN, LEFT_BRACE, RIGHT_BRACE,
     COMMA, DOT,
-    MINUS, PLUS, SLASH, STAR, SEMICOLON,
+    MINUS, PLUS, SLASH, STAR, SEMICOLON, QUESTION_MASK, COLON,
 
     //one or two character tokens
     BANG, BANG_EQUAL,
@@ -36,13 +38,28 @@ enum TokenType
 
     FOE
 };
-using std::string;
+
+
+
+/******************************************************************************
+* Function:         getNameOfType
+* Description:      
+* Where:
+* Return:           
+* Error:            
+*****************************************************************************/
 inline string getNameOfType(const TokenType &type)
 {
     switch(type)
     {
         case LEFT_PAREN:
             return "LEFT_PAREN";
+            break;
+        case QUESTION_MASK:
+            return "QUESTION_MASK";
+            break;
+        case COLON:
+            return "COLON";
             break;
         case RIGHT_PAREN:
             return "RIGHT_PAREN";

@@ -3,10 +3,12 @@
 
 
 
-.PHONY:all run
+.PHONY:all run clean
 
 
 all : 
-	cd build && make
+	cd build && make -j4
 run:
 	./build/lox.out
+clean:
+	cd build && make clean

@@ -8,15 +8,15 @@
 using std::endl;
 using std::cout;
 
-void Environment::define(const string &name, shared_ptr<const Object> value)
+void Environment::define(const string &name, shared_ptr<Object> value)
 {
     if (values.count(name) != 0) {
         values.at(name) = value;
     } else {
-        values.insert(std::pair<const string, shared_ptr<const Object>>(name, value));
+        values.insert(std::pair<const string, shared_ptr<Object>>(name, value));
     }
 }
-shared_ptr<const Object> Environment::get(shared_ptr<const Token> name)
+shared_ptr<Object> Environment::get(shared_ptr<Token> name)
 {
 
     if (values.count(name->lexeme) != 0) {
@@ -25,7 +25,7 @@ shared_ptr<const Object> Environment::get(shared_ptr<const Token> name)
     if (enclosing) return enclosing->get(name);
     throw RuntimeError(name, string("Undefined variable") + name->lexeme);
 }
-void Environment::assign(shared_ptr<const Token> name, shared_ptr<const Object> value)
+void Environment::assign(shared_ptr<Token> name, shared_ptr<Object> value)
 {
 
     if (values.count(name->lexeme) != 0) {

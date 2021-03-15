@@ -10,13 +10,12 @@
 
 #ifndef MAIN_H
 #define MAIN_H
+
 #include <iostream>
 
 #include "Token.h"
 #include "RuntimeError.h"
 
-using std::cout;
-using std::cin;
 using std::cerr;
 using std::endl;
 

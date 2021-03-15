@@ -23,9 +23,9 @@
 using std::vector;
 
 typedef shared_ptr<Stmt> StmtPtr;
-typedef shared_ptr<const Stmt> CStmtPtr;
-typedef shared_ptr<const Expr> CExprPtr;
-typedef shared_ptr<const Object> CObjectPtr;
+
+using RETURN_TYPE = shared_ptr<Object>;
+
 // tree walker
 class Interpreter : public Expr::Visitor, public Stmt::Visitor
 {
@@ -34,35 +34,35 @@ public:
     Interpreter():environment(new Environment()){}
     void interprete(vector<StmtPtr> statements);
 
-    CObjectPtr interprete(shared_ptr<const Expr>expr);
-    CObjectPtr evaluate(shared_ptr<const Expr>expr);
-    void execute(shared_ptr<const Stmt>  stmt);
+    RETURN_TYPE interprete(shared_ptr<Expr>expr);
+    RETURN_TYPE evaluate(shared_ptr<Expr>expr);
+    void execute(shared_ptr<Stmt>  stmt);
     void executeBlock(vector<StmtPtr> stmts, shared_ptr<Environment> environment);
     //expr
-    CObjectPtr visitAssignExpr(const Assign *expr) override;
-    CObjectPtr visitBinaryExpr(const Binary *expr) override;
-    CObjectPtr visitGroupingExpr(const Grouping *expr) override;
-    CObjectPtr visitLiteralExpr(const Literal *expr) override;
-    CObjectPtr visitUnaryExpr(const Unary *expr) override;
-    CObjectPtr visitTernaryExpr(const Ternary *expr) override;
-    CObjectPtr visitLogicalExpr(const Logical *expr) override;
-    CObjectPtr visitVariableExpr(const Variable *expr) override;
-    CObjectPtr visitCallExpr(const Call *expr) override;
+    RETURN_TYPE visit(const Assign &expr) override;
+    RETURN_TYPE visit(const Binary &expr) override;
+    RETURN_TYPE visit(const Grouping &expr) override;
+    RETURN_TYPE visit(const Literal &expr) override;
+    RETURN_TYPE visit(const Unary &expr) override;
+    RETURN_TYPE visit(const Ternary &expr) override;
+    RETURN_TYPE visit(const Logical &expr) override;
+    RETURN_TYPE visit(const Variable &expr) override;
+    RETURN_TYPE visit(const Call &expr) override;
     //Stmt
-    void visitExpressionStmt(const Expression *stmt) override;
-    void visitPrintStmt(const Print *stmt) override;
-    void visitVarStmt(const Var *stmt) override;
-    void visitBlockStmt(const Block *stmt) override;
-    void visitIfStmt(const If *stmt) override;
-    void visitWhileStmt(const While *stmt) override;
+    void visit(const Expression &stmt) override;
+    void visit(const Print &stmt) override;
+    void visit(const Var &stmt) override;
+    void visit(const Block &stmt) override;
+    void visit(const If &stmt) override;
+    void visit(const While &stmt) override;
 
     //aditional funcs for debug
     void printEnvironment();
 private:
     //check operant type
-    static void checkStringOrNumber(shared_ptr<const Token>op, CObjectPtr l, CObjectPtr r);
-    static void chechNumber(shared_ptr<const Token>op, CObjectPtr v);
-    static void chechNumber(shared_ptr<const Token>op, CObjectPtr l, CObjectPtr r);
+    static void checkStringOrNumber(shared_ptr<Token>op, RETURN_TYPE l, RETURN_TYPE r);
+    static void chechNumber(shared_ptr<Token>op, RETURN_TYPE v);
+    static void chechNumber(shared_ptr<Token>op, RETURN_TYPE l, RETURN_TYPE r);
     shared_ptr<Environment> environment;
 
 };

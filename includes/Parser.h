@@ -21,7 +21,6 @@
 using std::vector;
 using std::unique_ptr;
 
-class RecursiveDescentParser;
 //construct abstract syntax tree
 class Parser
 {
@@ -31,6 +30,7 @@ public:
     ~Parser();
 
 private:
+    class RecursiveDescentParser;
     unique_ptr<RecursiveDescentParser> impl;
 };
 

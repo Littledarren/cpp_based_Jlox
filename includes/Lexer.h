@@ -8,16 +8,18 @@ using std::shared_ptr;
 
 #include "Token.h"
 
-class Scanner;
 //interface for lexical parsing
 class Lexer
 {
 public:
-    const vector<shared_ptr<Token>>& scanTokens();
+    vector<shared_ptr<Token>> scanTokens();
     Lexer(const string &source);
+    //ERROR, no complete LexerImp here
+    //~Lexer()=default;
     ~Lexer();
 private:
-    unique_ptr<Scanner> impl;
+    class LexerImp;
+    unique_ptr<LexerImp> impl;
 };
 
 #endif

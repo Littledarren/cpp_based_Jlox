@@ -25,96 +25,79 @@ struct While;
 struct Stmt {
     struct Visitor
     {
-        virtual void visitExpressionStmt(const Expression *stmt)=0;
-        virtual void visitPrintStmt(const Print *stmt)= 0;
-        virtual void visitVarStmt(const Var *stmt)=0;
-        virtual void visitBlockStmt(const Block *stmt)=0;
-        virtual void visitIfStmt(const If *stmt)=0;
-        virtual void visitWhileStmt(const While *stmt)=0;
-        virtual ~Visitor(){}
+        virtual void visit(const Expression &stmt)=0;
+        virtual void visit(const Print &stmt)= 0;
+        virtual void visit(const Var &stmt)=0;
+        virtual void visit(const Block &stmt)=0;
+        virtual void visit(const If &stmt)=0;
+        virtual void visit(const While &stmt)=0;
     };
 
-    virtual void accept(Visitor *visitor)const=0;
-    virtual ~Stmt(){}
+    virtual void accept(Visitor &visitor)const=0;
 
+#define STMT_VISITABLE() \
+    virtual void accept(Visitor &visitor) const override \
+    { visitor.visit(*this); }
 };
 
 struct Var : public Stmt
 {
 
-    Var(shared_ptr<const Token> name, shared_ptr<const Expr> initializer):
-        name(name), initializer(initializer){}
-    void accept(Visitor *visitor)const override
-    {
-        visitor->visitVarStmt(this);
-    }
-    shared_ptr<const Token> name;
-    shared_ptr<const Expr> initializer;
+    Var(shared_ptr<Token> name, shared_ptr<Expr> initializer):
+        name(name), initializer(initializer)
+    {}
+    STMT_VISITABLE();
+    shared_ptr<Token> name;
+    shared_ptr<Expr> initializer;
 
 };
 
 
 struct Expression : public Stmt
 {
-    Expression(shared_ptr<const Expr> expr) : expr(expr){}
+    Expression(shared_ptr<Expr> expr) : expr(expr){}
 
+    STMT_VISITABLE();
 
-    void accept(Visitor *visitor) const override
-    {
-        visitor->visitExpressionStmt(this);
-    }
-
-    shared_ptr<const Expr> expr;
+    shared_ptr<Expr> expr;
 };
 
 struct Print : public Stmt
 {
-    Print(shared_ptr<const Expr> expr) : expr(expr){}
+    Print(shared_ptr<Expr> expr) : expr(expr){}
 
-    void accept(Visitor *visitor) const override
-    {
-        visitor->visitPrintStmt(this);
-    }
+    STMT_VISITABLE();
 
-    shared_ptr<const Expr> expr;
+    shared_ptr<Expr> expr;
 };
 
 struct Block : public Stmt
 {
     Block(const vector<shared_ptr<Stmt>> &statements) :
         statements(statements){}
-    void accept(Visitor *visitor) const override
-    {
-        visitor->visitBlockStmt(this);
-    }
+    STMT_VISITABLE();
 
     vector<shared_ptr<Stmt>> statements;
 };
 
 struct If : public Stmt
 {
-    If(shared_ptr<const Expr> condition, shared_ptr<const Stmt> thenBranch, shared_ptr<const Stmt> elseBranch):
+    If(shared_ptr<Expr> condition, shared_ptr<Stmt> thenBranch, shared_ptr<Stmt> elseBranch):
         condition(condition), thenBranch(thenBranch), elseBranch(elseBranch){}
-    void accept(Visitor *visitor) const override
-    {
-        visitor->visitIfStmt(this);
-    }
-    shared_ptr<const Expr>condition;
-    shared_ptr<const Stmt> thenBranch;
-    shared_ptr<const Stmt> elseBranch;
+    STMT_VISITABLE();
+    shared_ptr<Expr>condition;
+    shared_ptr<Stmt> thenBranch;
+    shared_ptr<Stmt> elseBranch;
 };
 
 struct While : public Stmt
 {
-    While(shared_ptr<const Expr> condition, shared_ptr<const Stmt> body):
+    While(shared_ptr<Expr> condition, shared_ptr<Stmt> body):
         condition(condition), body(body){}
-    void accept(Visitor *visitor) const override
-    {
-        visitor->visitWhileStmt(this);
-    }
+    STMT_VISITABLE();
 
-    shared_ptr<const Expr>condition;
-    shared_ptr<const Stmt>body;
+    shared_ptr<Expr>condition;
+    shared_ptr<Stmt>body;
 };
 
 #endif

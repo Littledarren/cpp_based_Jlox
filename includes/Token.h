@@ -1,6 +1,6 @@
 /*================================================================
 *    
-*   
+*   👌 
 *   FileName: Token.h
 *   Author: DarrenHuang
 *   Create Time: 2020/07/06  09:16(星期一)
@@ -11,26 +11,28 @@
 #ifndef _TOKEN_H_
 #define _TOKEN_H_
 
-#include <memory>
-
 #include "TokenType.h"
-#include "Value.h"
+#include "Object.h"
 
-using std::shared_ptr;
-
+// 符号，最基础的语义单元, 类似于单词word
+// 字母->单词->句子
 struct Token 
 {
-    Token(TokenType type, const string &lexeme,shared_ptr<const Object> literal, int line):
+    Token(TokenType type, const string &lexeme, const shared_ptr<Object> &literal, int line):
         type(type), lexeme(lexeme), literal(literal), line(line)
     {
     }
     operator string() const
     {
-        return getNameOfType(type) + " " + lexeme + " ";
+        return getNameOfType(type) + "---[" + lexeme + "]---[" + (literal?"VAL":"NIL") + "]";
     }
+    // 类型
     const TokenType type;
+    // 名字
     const string lexeme;
-    const shared_ptr<const Object> literal;
+    // 实际值
+    const shared_ptr<Object> literal;
+    // 没啥用，用于调试
     const int line;
 };
 

@@ -8,9 +8,9 @@
 *
 ================================================================*/
 
-#include "../includes/Parser.h"
+#include "Parser.h"
 
-#include "../includes/RecursiveDescentParser.h"
+#include "RecursiveDescentParser.h"
 
 
 Parser::Parser(const vector<shared_ptr<Token>> &tokens):impl(new RecursiveDescentParser(tokens))
