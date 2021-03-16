@@ -20,3 +20,10 @@ string Object::toString() const
     return oss.str(); 
 }
 
+
+bool Object::isTrue() const 
+{
+    //能调用的肯定不是nullptr
+    return true;
+}
+

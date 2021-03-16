@@ -21,6 +21,7 @@ struct Object
     virtual bool operator ==(const Object &o) const;
     virtual string toString() const;
     virtual shared_ptr<Object> clone() const=0;
+    virtual bool isTrue() const;
 
 };
 

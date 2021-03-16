@@ -55,11 +55,23 @@ struct Expr
     { return visitor.visit(*this); }
 };
 
+#undef DEBUG
+#ifdef DEBUG
+#include <iostream>
+using std::cout;
+using std::endl;
+#endif
+
 struct Assign : public Expr
 {
 
     Assign(shared_ptr<Token> name, shared_ptr<Expr> value):name(name), value(value)
-    {}
+    {
+
+#ifdef DEBUG
+        cout<<"============ASSIGN_EXPR=============="<<endl;
+#endif
+    }
 
     EXPR_VISITABLE()
 
@@ -70,7 +82,11 @@ struct Assign : public Expr
 struct Binary : public Expr
 {
     Binary(shared_ptr<Expr>left, shared_ptr<Token>op, shared_ptr<Expr>right):left(left), op(op),right(right)
-    {}
+    {
+        #ifdef DEBUG
+        cout<<"============Binary_EXPR=============="<<endl;
+#endif
+    }
     EXPR_VISITABLE();
     shared_ptr< Expr> left;
     shared_ptr< Token> op;
@@ -81,7 +97,11 @@ struct Ternary : public Expr
 {
     Ternary (shared_ptr<Expr>condition, shared_ptr<Expr>if_yes, shared_ptr<Expr>if_no):
         condition(condition), if_yes(if_yes), if_no(if_no)
-    {}
+    {
+        #ifdef DEBUG
+        cout<<"============Ternary_EXPR=============="<<endl;
+#endif
+    }
     EXPR_VISITABLE();
 
     shared_ptr<Expr> condition;
@@ -92,7 +112,11 @@ struct Ternary : public Expr
 struct Grouping : public Expr
 {
     Grouping(shared_ptr<Expr>expr):expr(expr)
-    {}
+    {
+        #ifdef DEBUG
+        cout<<"============Grouping_EXPR=============="<<endl;
+#endif
+    }
     EXPR_VISITABLE();
     shared_ptr<Expr> expr;
 };
@@ -100,7 +124,11 @@ struct Grouping : public Expr
 struct Literal: public Expr
 {
     explicit Literal(RETURN_TYPE value=nullptr):value(value)
-    {}
+    {
+#ifdef DEBUG
+        cout<<"============Literal_EXPR=============="<<endl;
+#endif
+    }
     string getStr()
     {
         if (!value) return "NIL";
@@ -115,7 +143,11 @@ struct Literal: public Expr
 struct Unary : public Expr
 {
     Unary(shared_ptr<Token>op, shared_ptr<Expr>right) : op(op), right(right)
-    {}
+    {
+#ifdef DEBUG
+        cout<<"============Unary_EXPR=============="<<endl;
+#endif
+    }
     EXPR_VISITABLE();
     shared_ptr<Token> op;
     shared_ptr<Expr> right;
@@ -123,7 +155,12 @@ struct Unary : public Expr
 struct Variable : public Expr
 {
     Variable(shared_ptr<Token> name):
-        name(name){}
+        name(name)
+    {
+#ifdef DEBUG
+        cout<<"============Variable_EXPR=============="<<endl;
+#endif
+    }
     EXPR_VISITABLE();
     shared_ptr<Token> name;
 };
@@ -131,7 +168,12 @@ struct Variable : public Expr
 struct Logical : public Expr 
 {
     Logical(shared_ptr<Expr> left, shared_ptr<Token> op, shared_ptr<Expr> right):
-        left(left), op(op), right(right){}
+        left(left), op(op), right(right)
+    {
+#ifdef DEBUG
+        cout<<"============Logical_EXPR=============="<<endl;
+#endif
+    }
 
     EXPR_VISITABLE();
     shared_ptr<Expr>left;
@@ -142,7 +184,12 @@ struct Logical : public Expr
 struct Call : public Expr
 {
     Call(shared_ptr<Expr>callee, shared_ptr<Token>paren, vector<shared_ptr<Expr>> &arguments):
-        callee(callee), paren(paren), arguments(arguments){}
+        callee(callee), paren(paren), arguments(arguments)
+    {
+#ifdef DEBUG
+        cout<<"============Call_EXPR=============="<<endl;
+#endif
+    }
     EXPR_VISITABLE();
     shared_ptr<Expr>callee;
     shared_ptr<Token>paren;

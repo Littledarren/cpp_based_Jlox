@@ -86,12 +86,15 @@ struct Number : public virtual Object
     {
         return std::make_shared<Number>(value);
     }
+    virtual bool isTrue() const override{
+        return value != 0;
+    }
     double value;
 };
 
 struct Bool : public virtual Object
 {
-    Bool(bool value): value(value){}
+    Bool(bool value=false): value(value){}
 
     operator bool()
     {
@@ -116,6 +119,9 @@ struct Bool : public virtual Object
     {
         return std::make_shared<Bool>(value);
     }
+    virtual bool isTrue() const override{
+        return value;
+    }
 
     bool value;
 };
@@ -123,8 +129,8 @@ struct Bool : public virtual Object
 
 struct String : public virtual Object
 {
-    String(const char *value):value(value){}
-    String(const string &value):value(value){}
+    String(const char *value=""):value(value){}
+    String(const string &value=""):value(value){}
     operator string()
     {
         return value;
@@ -148,6 +154,10 @@ struct String : public virtual Object
     {
         return std::make_shared<String>(value);
     }
+    virtual bool isTrue() const override{
+        return !value.empty();
+    }
+    String operator+(const shared_ptr<Object> &value) const;
     String operator+(const Number &value) const;
     String operator+(const Bool &value) const;
     string value;

@@ -22,10 +22,10 @@ RETURN_TYPE Interpreter::interprete(shared_ptr<Expr> expr)
 {
     try {
         return evaluate(expr);
-    } catch (const char *str) {
-        std::cout<<str<<std::endl;
     } catch (const RuntimeError &e) {
         runtimeError(e);
+    } catch (...) {
+        std::cout<<"other exception found"<<std::endl;
     }
     return nullptr;
 }
@@ -36,7 +36,7 @@ RETURN_TYPE Interpreter::evaluate(shared_ptr<Expr> expr)
     if (expr)
         return expr->accept(*this);
     else 
-        return nullptr;
+        throw RuntimeError(std::make_shared<Token>(NUL, "", nullptr, -1), "expr is nullptr!!");
 }
 void Interpreter::execute(shared_ptr<Stmt> stmt)
 {
@@ -53,8 +53,8 @@ void Interpreter::executeBlock(vector<shared_ptr<Stmt>> stmts, shared_ptr<Enviro
         for (auto ptr : stmts) {
             execute(ptr);
         }
-    } catch (const std::exception &e) {
-        cout<<e.what()<<endl;
+    } catch (const RuntimeError &e) {
+        runtimeError(e);
     }
     this->environment = previous;
 }
@@ -75,11 +75,11 @@ RETURN_TYPE Interpreter::visit(const Assign &expr)
 
 RETURN_TYPE Interpreter::visit(const Logical &expr)
 {
-    shared_ptr<Bool> left = std::dynamic_pointer_cast<Bool>(evaluate(expr.left));
+    RETURN_TYPE left = evaluate(expr.left);
     if (expr.op->type == AND) {
-        if (!*left) return left;
+        if (!left->isTrue()) return left;
     } else {
-        if (*left) return left;
+        if (left->isTrue()) return left;
     }
     return evaluate(expr.right);
 }
@@ -111,9 +111,9 @@ RETURN_TYPE Interpreter::visit(const Call &expr)
 RETURN_TYPE Interpreter::visit(const Ternary &expr) 
 {
 
-    shared_ptr<Bool> value = std::dynamic_pointer_cast<Bool>(evaluate(expr.condition));
+    RETURN_TYPE cond = evaluate(expr.condition);
 
-    if (value && *value) {
+    if (cond->isTrue()) {
         return evaluate(expr.if_yes);
     } else {
         return evaluate(expr.if_no);
@@ -128,12 +128,14 @@ RETURN_TYPE Interpreter::visit(const Binary &expr)
 
     bool is_string = !!std::dynamic_pointer_cast<String>(left);
 
-    RETURN_TYPE result;
+    RETURN_TYPE result = nullptr;
 
     switch(expr.op->type)
     {
         case PLUS:
             checkStringOrNumber(expr.op, left, right);
+            //字符串可以跟其他类型+
+            //要么都是数字，要么左边是字符串，没有其他可能
             if (is_string) {
                 if (auto temp_number = std::dynamic_pointer_cast<Number>(right)) 
                     result = std::make_shared<String>(*std::dynamic_pointer_cast<String>(left) + *temp_number);
@@ -198,7 +200,7 @@ RETURN_TYPE Interpreter::visit(const Unary &expr)
             result = std::make_shared<Bool>(!*std::dynamic_pointer_cast<Bool>(temp));
             break;
         default:
-            throw std::runtime_error("r u kidding me with a wrong unary op?");
+            throw RuntimeError(expr.op, "r u kidding me with a wrong unary op?");
     }
     return result;
 }
@@ -208,10 +210,7 @@ RETURN_TYPE Interpreter::visit(const Grouping &expr)
 }
 RETURN_TYPE Interpreter::visit(const Literal &expr) 
 {
-    //默认拷贝。
-    //所有的字面量都是临时常量
     return expr.value;
-    //return Object::clone(expr.value);
 }
 RETURN_TYPE  Interpreter::visit(const Variable &expr) 
 {
@@ -246,9 +245,8 @@ void Interpreter::visit(const Block &stmt)
 
 void Interpreter::visit(const If &stmt)
 {
-    shared_ptr<Bool> value = std::dynamic_pointer_cast<Bool>(evaluate(stmt.condition));
-
-    if (*value) {
+    RETURN_TYPE cond = evaluate(stmt.condition);
+    if (cond->isTrue()) {
         execute(stmt.thenBranch);
     } else {
         execute(stmt.elseBranch);
@@ -260,7 +258,7 @@ void Interpreter::printEnvironment()
     shared_ptr<Environment> temp = this->environment;
     int scopeCount = 0;
     while (temp) {
-        cout<<"SCOPE:"<<scopeCount<<endl;
+        cout<<"======SCOPE:"<<scopeCount<<"======"<<endl;
         temp->print();
         temp = temp->enclosing;
     }
@@ -268,7 +266,7 @@ void Interpreter::printEnvironment()
 
 void Interpreter::visit(const While &stmt) 
 {
-    while (*std::dynamic_pointer_cast<Bool>(evaluate(stmt.condition))) {
+    while (evaluate(stmt.condition)->isTrue()) {
         execute(stmt.body);
     }
 }
