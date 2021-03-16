@@ -23,7 +23,7 @@ shared_ptr<Object> Environment::get(shared_ptr<Token> name)
         return values.at(name->lexeme);
     }
     if (enclosing) return enclosing->get(name);
-    throw RuntimeError(name, string("Undefined variable") + name->lexeme);
+    throw RuntimeError(name, string("Undefined variable:") + name->lexeme);
 }
 void Environment::assign(shared_ptr<Token> name, shared_ptr<Object> value)
 {

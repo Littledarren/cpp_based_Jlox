@@ -1,8 +1,9 @@
-#include "../includes/Value.h"
+#include "Value.h"
 
 #include <sstream>
 
 
+#include "Interpreter.h"
 
 String String::operator+(const shared_ptr<Object> &right) const 
 {
@@ -29,7 +30,5 @@ String String::operator+(const Bool &value) const
     oss<<value;
     return this->value + oss.str();
 }
-
-
 
 

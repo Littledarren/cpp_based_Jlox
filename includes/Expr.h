@@ -33,6 +33,7 @@ struct Ternary;
 struct Variable;
 struct Logical;
 struct Call;
+struct Lambda;
 
 struct Expr
 {
@@ -47,6 +48,8 @@ struct Expr
         virtual RETURN_TYPE visit(const Logical &expr)=0;
         virtual RETURN_TYPE visit(const Variable &expr)=0;
         virtual RETURN_TYPE visit(const Call &expr)=0;
+        virtual RETURN_TYPE visit(const Lambda &expr)=0;
+        
     };
 
     virtual RETURN_TYPE accept(Visitor &visitor)const = 0;
@@ -57,7 +60,6 @@ struct Expr
 
 #undef DEBUG
 #ifdef DEBUG
-#include <iostream>
 using std::cout;
 using std::endl;
 #endif
@@ -194,5 +196,21 @@ struct Call : public Expr
     shared_ptr<Expr>callee;
     shared_ptr<Token>paren;
     vector<shared_ptr<Expr>> arguments;
+};
+struct Stmt;
+struct Lambda : public Expr
+{
+    Lambda(vector<shared_ptr<Token>> params,vector<shared_ptr<Stmt>> body):
+        params(params), body(body)
+    {
+#ifdef DEBUG
+            cout<<"=======Lambda_expr======="<<endl;
+#endif
+
+    }
+    
+    EXPR_VISITABLE();
+    vector<shared_ptr<Token>> params;
+    vector<shared_ptr<Stmt>> body;
 };
 #endif

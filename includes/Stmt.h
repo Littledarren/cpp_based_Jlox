@@ -15,12 +15,17 @@ using std::vector;
 
 #include "Expr.h"
 
+//struct Expr;
+//struct Token;
+
 struct Expression;
 struct Print;
 struct Var;
 struct Block;
 struct If;
 struct While;
+struct Function;
+struct Return;
 
 struct Stmt {
     struct Visitor
@@ -30,7 +35,9 @@ struct Stmt {
         virtual void visit(const Var &stmt)=0;
         virtual void visit(const Block &stmt)=0;
         virtual void visit(const If &stmt)=0;
+        virtual void visit(const Function &func)=0;
         virtual void visit(const While &stmt)=0;
+        virtual void visit(const Return &stmt)=0;
     };
 
     virtual void accept(Visitor &visitor)const=0;
@@ -129,6 +136,39 @@ struct While : public Stmt
 
     shared_ptr<Expr>condition;
     shared_ptr<Stmt>body;
+};
+struct Function : public Stmt
+{
+
+    Function(shared_ptr<Token> name,vector<shared_ptr<Token>> params,vector<shared_ptr<Stmt>> body):
+        name(name), params(params), body(body)
+    {
+#ifdef DEBUG
+            cout<<"=======FUNCTION_STMT======="<<endl;
+#endif
+
+    }
+    
+    STMT_VISITABLE();
+    shared_ptr<Token> name;
+    vector<shared_ptr<Token>> params;
+    vector<shared_ptr<Stmt>> body;
+};
+
+
+struct Return : public Stmt
+{
+    Return(shared_ptr<Token> name, shared_ptr<Expr> value):
+        name(name), value(value)
+    {
+#ifdef DEBUG
+            cout<<"=======RETURN_STMT======="<<endl;
+#endif
+    }
+
+    STMT_VISITABLE();
+    shared_ptr<Token> name;
+    shared_ptr<Expr> value;
 };
 
 #endif

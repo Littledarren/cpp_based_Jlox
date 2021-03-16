@@ -13,7 +13,6 @@
 #include <initializer_list>
 #include <exception>
 #include "Parser.h"
-#include "Expr.h"
 
 class ParseError : public std::runtime_error
 {
@@ -38,6 +37,10 @@ private:
     shared_ptr<Stmt> declaration();
     //用来解析变量定义
     shared_ptr<Stmt> varDeclaration();
+    //函数定义
+    shared_ptr<Stmt> funDeclaration();
+    //定义
+    shared_ptr<Stmt> clsDeclaration();
     //语句，即可执行的语句.
     shared_ptr<Stmt> statement();
     shared_ptr<Stmt> ifStatement();
@@ -45,6 +48,7 @@ private:
     shared_ptr<Stmt> forStatement();
     shared_ptr<Stmt> printStatement();
     shared_ptr<Stmt> expressionStatement();
+    shared_ptr<Stmt> returnStatement();
     vector<shared_ptr<Stmt>> block();
 
     shared_ptr<Expr> expression();
@@ -59,6 +63,7 @@ private:
     shared_ptr<Expr> comparison();
     shared_ptr<Expr> addition();
     shared_ptr<Expr> multiplication();
+    shared_ptr<Expr> lambdaFunc();
     shared_ptr<Expr> unary();
     shared_ptr<Expr> call();
     shared_ptr<Expr> finishCall(shared_ptr<Expr>callee_test);
@@ -68,6 +73,7 @@ private:
     ParseError error(shared_ptr<Token>token, const string &message);
     void synchronize();
 
+    //有就吃掉，没有就false
     bool match(std::initializer_list<TokenType> types)
     {
         //toleratable types list
@@ -80,6 +86,7 @@ private:
         return false;
 
     }
+    //如果有，
     bool check(TokenType t) const
     {
         if (isAtEnd()) return false;

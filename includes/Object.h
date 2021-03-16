@@ -17,11 +17,11 @@ using std::shared_ptr;
 
 struct Object
 {
-    virtual ~Object(){}
     virtual bool operator ==(const Object &o) const;
     virtual string toString() const;
-    virtual shared_ptr<Object> clone() const=0;
+    virtual shared_ptr<Object> clone() const;
     virtual bool isTrue() const;
+    virtual ~Object(){}
 
 };
 

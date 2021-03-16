@@ -11,7 +11,6 @@
 *       This is interpretation.
 *
 ================================================================*/
-#define DEBUG
 #include "main.h"
 
 #include <iostream>

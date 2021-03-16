@@ -13,25 +13,24 @@
 #include <initializer_list>
 #include <memory>
 #include <vector>
+#include <ctime>
 
-#include "Expr.h"
 #include "Stmt.h"
-#include "TokenType.h"
 #include "Value.h"
 
 #include "Environment.h"
 using std::vector;
 
-typedef shared_ptr<Stmt> StmtPtr;
+typedef std::shared_ptr<Stmt> StmtPtr;
 
-using RETURN_TYPE = shared_ptr<Object>;
+using RETURN_TYPE = std::shared_ptr<Object>;
 
 // tree walker
 class Interpreter : public Expr::Visitor, public Stmt::Visitor
 {
 
 public:
-    Interpreter():environment(new Environment()){}
+    Interpreter();
     void interprete(vector<StmtPtr> statements);
 
     RETURN_TYPE interprete(shared_ptr<Expr>expr);
@@ -48,6 +47,7 @@ public:
     RETURN_TYPE visit(const Logical &expr) override;
     RETURN_TYPE visit(const Variable &expr) override;
     RETURN_TYPE visit(const Call &expr) override;
+    RETURN_TYPE visit(const Lambda &expr) override;
     //Stmt
     void visit(const Expression &stmt) override;
     void visit(const Print &stmt) override;
@@ -55,15 +55,18 @@ public:
     void visit(const Block &stmt) override;
     void visit(const If &stmt) override;
     void visit(const While &stmt) override;
+    void visit(const Function &func) override;
+    void visit(const Return&stmt) override;
 
     //aditional funcs for debug
     void printEnvironment();
+
+    shared_ptr<Environment> environment;
 private:
     //check operant type
     static void checkStringOrNumber(shared_ptr<Token>op, RETURN_TYPE l, RETURN_TYPE r);
     static void chechNumber(shared_ptr<Token>op, RETURN_TYPE v);
     static void chechNumber(shared_ptr<Token>op, RETURN_TYPE l, RETURN_TYPE r);
-    shared_ptr<Environment> environment;
 
 };
 

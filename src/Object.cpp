@@ -13,6 +13,11 @@ bool Object::operator==(const Object &o) const
 #include <sstream>
 
 
+shared_ptr<Object> Object::clone() const
+{
+    return nullptr;
+}
+
 string Object::toString() const
 {
     std::ostringstream oss;

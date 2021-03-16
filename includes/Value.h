@@ -164,15 +164,7 @@ struct String : public virtual Object
 };
 
 
-class Interpreter;
 
-struct Callable : public virtual Object
-{
-    std::function<shared_ptr<const Object>(shared_ptr<Interpreter> Interpreter, const vector<shared_ptr<const Object>> &arguments)> call;
-    std::function<int()> arity;
-    //virtual const Object* call(Interpreter* interpreter, const vector<const Object*> &arguments)const=0;
-    //int arity();
-};
 
 
 

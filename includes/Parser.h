@@ -13,9 +13,6 @@
 #include <vector>
 #include <memory>
 
-#include "TokenType.h"
-#include "Token.h"
-#include "Expr.h"
 #include "Stmt.h"
 
 using std::vector;

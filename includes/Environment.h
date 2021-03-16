@@ -14,8 +14,8 @@
 #include <string>
 #include <memory>
 
-#include "../includes/Value.h"
-class Token;
+#include "Value.h"
+struct Token;
 
 using std::string;
 using std::shared_ptr;
@@ -29,9 +29,9 @@ class Environment
         void define(const string &name, shared_ptr<Object> value);
         shared_ptr<Object> get(shared_ptr<Token> name);
         void assign(shared_ptr<Token> name, shared_ptr<Object> value);
+
         shared_ptr<Environment> enclosing;
 
-        //const std::map<string, Object*>& getObjects() const;
         void print() const;
     private:
         std::map<const string, shared_ptr<Object>> values;

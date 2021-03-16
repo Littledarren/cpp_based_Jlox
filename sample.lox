@@ -1,13 +1,29 @@
-var x = 1;
-var y = 1;
-print x;
-print y;
-print x+y;
-print x-y;
-print x/y;
-print x*y;
-print "Hello " + " world";
 
-1+(1-1)+(1-1)*(1+2 * 4 - 3) + 2*4 + 1/5 + 1*1*2+1
-1+ 0 + 0 * (1 + 8 -3) + 2*4+1/5+2+1
 
+
+
+//lox file
+
+
+fun fib(n) {
+    if (n <= 1) return n;
+    return fib(n-2) + fib(n-1);
+}
+
+for (var i = 0; i < 20; i = i+1) {
+//    print fib(i);
+}
+
+
+var makeCounter = fun () {
+    var i = 0;
+    fun count() {
+        i = i + 1;
+        print i;
+    }
+    return count;
+};
+
+var counter = makeCounter();
+counter();
+counter();

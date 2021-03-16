@@ -6,7 +6,7 @@
 
 vector<shared_ptr<Stmt>> Parser::RecursiveDescentParser::parse() 
 {
-    vector<shared_ptr<Stmt>> statements;
+    decltype(parse()) statements;
     while (!isAtEnd()) {
         statements.push_back(declaration());
     }
@@ -16,6 +16,7 @@ shared_ptr<Stmt> Parser::RecursiveDescentParser::declaration()
 {
     try {
         if (match({VAR})) return varDeclaration();
+        if (match({FUN})) return funDeclaration();
         //function..class..etc
         return statement();
     } catch (const ParseError &e) {
@@ -25,13 +26,41 @@ shared_ptr<Stmt> Parser::RecursiveDescentParser::declaration()
 }
 shared_ptr<Stmt> Parser::RecursiveDescentParser::varDeclaration()
 {
-   shared_ptr<Token> name = consume(IDENTIFIER, "Expect variable name");
-   shared_ptr<Expr> initializer = nullptr;
+   auto name = consume(IDENTIFIER, "Expect variable name");
+   decltype(expression()) initializer = nullptr;
+
    if (match ({EQUAL})) {
        initializer = expression();
    }
    consume(SEMICOLON, "Expect ';' after variable declaration");
    return std::make_shared<Var>(name, initializer);
+}
+shared_ptr<Stmt> Parser::RecursiveDescentParser::clsDeclaration()
+{
+    return nullptr;
+}
+shared_ptr<Stmt> Parser::RecursiveDescentParser::funDeclaration()
+{
+   shared_ptr<Token> name = consume(IDENTIFIER, "Expect function name");
+
+   //parameters
+   consume(LEFT_PAREN, "Expect '(' after Function declaration");
+
+   vector<decltype(consume(IDENTIFIER, "Expect parameter name"))> params;
+   if (!check(RIGHT_PAREN)) {
+       do {
+           if (params.size() >= 255)  {
+               error(peek(), "can't have more than 255 parameters");
+           }
+
+           params.push_back(consume(IDENTIFIER, "Expect parameter name"));
+       } while(match({COMMA}));
+   }
+   consume(RIGHT_PAREN, "Expect ')' after parameters");
+   //body
+   consume(LEFT_BRACE, "Expect '{' before function body");
+   auto body = block();
+   return std::make_shared<Function>(name, params, body);
 }
 shared_ptr<Stmt> Parser::RecursiveDescentParser::statement()
 {
@@ -40,6 +69,7 @@ shared_ptr<Stmt> Parser::RecursiveDescentParser::statement()
     if (match({IF})) return ifStatement(); 
     if (match({WHILE})) return whileStatement();
     if (match({FOR})) return forStatement();
+    if (match({RETURN})) return returnStatement();
 
     return expressionStatement();
 }
@@ -137,27 +167,36 @@ shared_ptr<Stmt> Parser::RecursiveDescentParser::expressionStatement()
     else 
         return std::make_shared<Print>(expr);
 }
+shared_ptr<Stmt> Parser::RecursiveDescentParser::returnStatement()
+{
+    auto keyword = previous();
+    shared_ptr<Expr> expr = nullptr;
+    if (!check(SEMICOLON))
+        expr = expression();
+    consume(SEMICOLON, "Expect ';' after return value");
+    return std::make_shared<Return>(keyword, expr);
+}
 
 vector<shared_ptr<Stmt>> Parser::RecursiveDescentParser::block()
 {
-    vector<shared_ptr<Stmt>> statements;
+    decltype(block()) statements;
     while (!check(RIGHT_BRACE) && !isAtEnd()) {
         statements.push_back(declaration());
     }
     consume(RIGHT_BRACE, "Expect '}' after block");
     return statements;
-
 }
 shared_ptr<Expr> Parser::RecursiveDescentParser::expression()
 {
+    if (match({FUN})) return lambdaFunc();
     return commaExpression();
 }
 shared_ptr<Expr> Parser::RecursiveDescentParser::commaExpression()
 {
-    shared_ptr<Expr> expr = assignment();
+    auto expr = assignment();
     while (match({COMMA})) {
-        shared_ptr<Token> op = previous();
-        shared_ptr<Expr>right = assignment();
+        auto op = previous();
+        auto right = assignment();
         expr = std::make_shared<Binary>(expr, op, right);
     }
     return expr;
@@ -167,7 +206,7 @@ shared_ptr<Expr> Parser::RecursiveDescentParser::assignment()
     //because
     //lvalue can be something like bar.foo.x
     //so we can not tell a lvalue until we found a =
-    shared_ptr<Expr> expr = ternaryExpression();
+    auto expr = ternaryExpression();
 
     if (match({EQUAL})) {
         shared_ptr<Token> equals = previous();
@@ -276,6 +315,27 @@ shared_ptr<Expr> Parser::RecursiveDescentParser::call()
    }
 
    return expr;
+}
+shared_ptr<Expr> Parser::RecursiveDescentParser::lambdaFunc()
+{
+   //parameters
+   consume(LEFT_PAREN, "Expect '(' after Function declaration");
+
+   vector<decltype(consume(IDENTIFIER, "Expect parameter name"))> params;
+   if (!check(RIGHT_PAREN)) {
+       do {
+           if (params.size() >= 255)  {
+               error(peek(), "can't have more than 255 parameters");
+           }
+
+           params.push_back(consume(IDENTIFIER, "Expect parameter name"));
+       } while(match({COMMA}));
+   }
+   consume(RIGHT_PAREN, "Expect ')' after parameters");
+   //body
+   consume(LEFT_BRACE, "Expect '{' before function body");
+   auto body = block();
+   return std::make_shared<Lambda>(params, body);
 }
 shared_ptr<Expr> Parser::RecursiveDescentParser::finishCall(shared_ptr<Expr>callee)
 {

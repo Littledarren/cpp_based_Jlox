@@ -1,10 +1,18 @@
 #include <exception>
 #include "Interpreter.h"
 #include "main.h"
+#include "LoxCallable.h"
 
 #include <iostream>
 using std::cout;
 using std::cin;
+
+
+
+Interpreter::Interpreter():environment(new Environment())
+{
+    environment->define("clock", std::make_shared<Clock>());
+}
 
 
 void Interpreter::interprete(vector<StmtPtr> statements)
@@ -53,8 +61,9 @@ void Interpreter::executeBlock(vector<shared_ptr<Stmt>> stmts, shared_ptr<Enviro
         for (auto ptr : stmts) {
             execute(ptr);
         }
-    } catch (const RuntimeError &e) {
-        runtimeError(e);
+    } catch (...) {
+        this->environment = previous;
+        throw;
     }
     this->environment = previous;
 }
@@ -77,9 +86,9 @@ RETURN_TYPE Interpreter::visit(const Logical &expr)
 {
     RETURN_TYPE left = evaluate(expr.left);
     if (expr.op->type == AND) {
-        if (!left->isTrue()) return left;
+        if (!left || !left->isTrue()) return left;
     } else {
-        if (left->isTrue()) return left;
+        if (left && left->isTrue()) return left;
     }
     return evaluate(expr.right);
 }
@@ -105,7 +114,7 @@ RETURN_TYPE Interpreter::visit(const Call &expr)
     }
 
     //return new Object((*callee)(arguments));
-    return nullptr;
+    return function->call(*this, arguments);
 }
 
 RETURN_TYPE Interpreter::visit(const Ternary &expr) 
@@ -113,7 +122,7 @@ RETURN_TYPE Interpreter::visit(const Ternary &expr)
 
     RETURN_TYPE cond = evaluate(expr.condition);
 
-    if (cond->isTrue()) {
+    if (cond && cond->isTrue()) {
         return evaluate(expr.if_yes);
     } else {
         return evaluate(expr.if_no);
@@ -217,6 +226,10 @@ RETURN_TYPE  Interpreter::visit(const Variable &expr)
     return environment->get(expr.name);
 }
 
+RETURN_TYPE Interpreter::visit(const Lambda &expr) 
+{
+    return std::make_shared<LoxFunction>(Function(nullptr, expr.params, expr.body), environment);
+}
 void  Interpreter::visit(const Expression &stmt) 
 {
     evaluate(stmt.expr);
@@ -246,9 +259,9 @@ void Interpreter::visit(const Block &stmt)
 void Interpreter::visit(const If &stmt)
 {
     RETURN_TYPE cond = evaluate(stmt.condition);
-    if (cond->isTrue()) {
+    if (cond && cond->isTrue()) {
         execute(stmt.thenBranch);
-    } else {
+    } else if(stmt.elseBranch) {
         execute(stmt.elseBranch);
     } 
 }
@@ -266,11 +279,25 @@ void Interpreter::printEnvironment()
 
 void Interpreter::visit(const While &stmt) 
 {
-    while (evaluate(stmt.condition)->isTrue()) {
+    RETURN_TYPE p = nullptr;
+    while ((p = evaluate(stmt.condition)) && p->isTrue()) {
         execute(stmt.body);
     }
 }
+void Interpreter::visit(const Function &func) 
+{
+    environment->define(func.name->lexeme, std::make_shared<LoxFunction>(func, this->environment));
+}
 
+
+void Interpreter::visit(const Return&stmt) 
+{
+    RETURN_TYPE value = nullptr;
+    if (stmt.value) {
+        value = evaluate(stmt.value);
+    }
+    throw Control(value, stmt.name->type);
+}
 void Interpreter::checkStringOrNumber(shared_ptr<Token>op, RETURN_TYPE l, RETURN_TYPE r)
 {
     if (std::dynamic_pointer_cast<Number>(l) && std::dynamic_pointer_cast<Number>(r)) return;

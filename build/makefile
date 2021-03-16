@@ -1,8 +1,9 @@
-CC      = g++ 
-CFLAGS  = -Wall -O -g -std=c++11
+CC      = g++
+#clang++
+CFLAGS  = -Wall -O0 -g -std=c++11
 INCLUDEFLAGS = -I ../includes/
 LDFLAGS = 
-OBJS    = Object.o main.o  Value.o Lexer.o Parser.o  RecursiveDescentParser.o Environment.o Interpreter.o
+OBJS    = Object.o main.o  Value.o Lexer.o Parser.o  RecursiveDescentParser.o Environment.o Interpreter.o LoxCallable.o
 TARGETS = lox.out
 
 vpath %.cpp ../src
