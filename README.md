@@ -1,4 +1,7 @@
 # cpp_based_Jlox
+[![C/C++ CI](https://github.com/Littledarren/cpp_based_Jlox/actions/workflows/c-cpp.yml/badge.svg?branch=master)](https://github.com/Littledarren/cpp_based_Jlox/actions/workflows/c-cpp.yml)
+
+
 an implementation of the jlox compiler, which is built in c++
 
 
