@@ -73,12 +73,15 @@ struct LoxFunction : public Callable
 
     virtual int arity() override
     {
-        return declaration->params.size();
+        return declaration->lambda.params.size();
     }
     
     virtual string toString() const override
     {
-        return "<userdefined fn:" + declaration->name->lexeme +">";
+        if (declaration->name)
+            return "<userdefined fn:" + declaration->name->lexeme +">";
+        else
+            return "<userdefined lambda fn>";
     }
 
     virtual ~LoxFunction() = default;

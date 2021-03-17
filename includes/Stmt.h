@@ -140,8 +140,8 @@ struct While : public Stmt
 struct Function : public Stmt
 {
 
-    Function(shared_ptr<Token> name,vector<shared_ptr<Token>> params,vector<shared_ptr<Stmt>> body):
-        name(name), params(params), body(body)
+    Function(shared_ptr<Token> name, const Lambda &lambda):
+        name(name), lambda(lambda)
     {
 #ifdef DEBUG
             cout<<"=======FUNCTION_STMT======="<<endl;
@@ -151,8 +151,7 @@ struct Function : public Stmt
     
     STMT_VISITABLE();
     shared_ptr<Token> name;
-    vector<shared_ptr<Token>> params;
-    vector<shared_ptr<Stmt>> body;
+    const Lambda lambda;
 };
 
 

@@ -43,24 +43,9 @@ shared_ptr<Stmt> Parser::RecursiveDescentParser::funDeclaration()
 {
    shared_ptr<Token> name = consume(IDENTIFIER, "Expect function name");
 
-   //parameters
-   consume(LEFT_PAREN, "Expect '(' after Function declaration");
+   shared_ptr<Lambda> lambda = lambdaFunc();
 
-   vector<decltype(consume(IDENTIFIER, "Expect parameter name"))> params;
-   if (!check(RIGHT_PAREN)) {
-       do {
-           if (params.size() >= 255)  {
-               error(peek(), "can't have more than 255 parameters");
-           }
-
-           params.push_back(consume(IDENTIFIER, "Expect parameter name"));
-       } while(match({COMMA}));
-   }
-   consume(RIGHT_PAREN, "Expect ')' after parameters");
-   //body
-   consume(LEFT_BRACE, "Expect '{' before function body");
-   auto body = block();
-   return std::make_shared<Function>(name, params, body);
+   return std::make_shared<Function>(name, *lambda);
 }
 shared_ptr<Stmt> Parser::RecursiveDescentParser::statement()
 {
@@ -316,7 +301,7 @@ shared_ptr<Expr> Parser::RecursiveDescentParser::call()
 
    return expr;
 }
-shared_ptr<Expr> Parser::RecursiveDescentParser::lambdaFunc()
+shared_ptr<Lambda> Parser::RecursiveDescentParser::lambdaFunc()
 {
    //parameters
    consume(LEFT_PAREN, "Expect '(' after Function declaration");

@@ -22,6 +22,7 @@
 #include "Lexer.h"
 #include "Parser.h"
 #include "Interpreter.h"
+#include "Resolver.h"
 
 using std::ifstream;
 using std::cin;
@@ -106,6 +107,9 @@ static void run(const string &source)
     //2.句法or语法
     Parser parser(tokens);
     vector<shared_ptr<Stmt>> statements = parser.parse();
+
+    Resolver resolver(interpreter);
+    resolver.resolve(statements);
 
     if (!hadError) {
         //3/.语义

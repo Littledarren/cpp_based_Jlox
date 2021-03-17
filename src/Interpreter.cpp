@@ -9,7 +9,7 @@ using std::cin;
 
 
 
-Interpreter::Interpreter():environment(new Environment())
+Interpreter::Interpreter():globals(std::make_shared<Environment>(nullptr)), environment(globals)
 {
     environment->define("clock", std::make_shared<Clock>());
 }
@@ -77,8 +77,12 @@ void Interpreter::executeBlock(vector<shared_ptr<Stmt>> stmts, shared_ptr<Enviro
 RETURN_TYPE Interpreter::visit(const Assign &expr)
 {
     RETURN_TYPE value = evaluate(expr.value);
-    environment->assign(expr.name, value);
-    //may be clone???
+
+    auto iter = locals.find(&expr);
+    if (iter == locals.end()) 
+        globals->assign(expr.name, value);
+    else
+        environment->assignAt(iter->second, expr.name, value);
     return value;
 }
 
@@ -223,12 +227,12 @@ RETURN_TYPE Interpreter::visit(const Literal &expr)
 }
 RETURN_TYPE  Interpreter::visit(const Variable &expr) 
 {
-    return environment->get(expr.name);
+    return lookUpVariable(expr.name, &expr);
 }
 
 RETURN_TYPE Interpreter::visit(const Lambda &expr) 
 {
-    return std::make_shared<LoxFunction>(Function(nullptr, expr.params, expr.body), environment);
+    return std::make_shared<LoxFunction>(Function(nullptr, expr), environment);
 }
 void  Interpreter::visit(const Expression &stmt) 
 {
@@ -297,6 +301,14 @@ void Interpreter::visit(const Return&stmt)
         value = evaluate(stmt.value);
     }
     throw Control(value, stmt.name->type);
+}
+RETURN_TYPE Interpreter::lookUpVariable(shared_ptr<Token> name, const Expr* key)
+{
+    auto iter = locals.find(key);
+    if (iter == locals.end()) 
+        return globals->get(name);
+    else
+        return environment->getAt(iter->second, name->lexeme);
 }
 void Interpreter::checkStringOrNumber(shared_ptr<Token>op, RETURN_TYPE l, RETURN_TYPE r)
 {

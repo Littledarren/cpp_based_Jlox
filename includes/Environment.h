@@ -28,11 +28,24 @@ class Environment
 
         void define(const string &name, shared_ptr<Object> value);
         shared_ptr<Object> get(shared_ptr<Token> name);
+        shared_ptr<Object> getAt(int dis, const string &name);
         void assign(shared_ptr<Token> name, shared_ptr<Object> value);
-
-        shared_ptr<Environment> enclosing;
+        void assignAt(int dis, shared_ptr<Token> name, shared_ptr<Object> value);
 
         void print() const;
+
+    public:
+        shared_ptr<Environment> enclosing;
+
+    private:
+        Environment* ancestor(int dis) {
+            Environment *environment  = this;
+            while (dis--) {
+                environment = environment->enclosing.get();
+                //                         ^^^^^^^^^->shared_ptr;
+            }
+            return environment;
+        }
     private:
         std::map<const string, shared_ptr<Object>> values;
 

@@ -24,6 +24,9 @@ var makeCounter = fun () {
     return count;
 };
 
+print makeCounter;
+print fib;
+
 var counter = makeCounter();
 counter();
 counter();

@@ -63,7 +63,7 @@ private:
     shared_ptr<Expr> comparison();
     shared_ptr<Expr> addition();
     shared_ptr<Expr> multiplication();
-    shared_ptr<Expr> lambdaFunc();
+    shared_ptr<Lambda> lambdaFunc();
     shared_ptr<Expr> unary();
     shared_ptr<Expr> call();
     shared_ptr<Expr> finishCall(shared_ptr<Expr>callee_test);
