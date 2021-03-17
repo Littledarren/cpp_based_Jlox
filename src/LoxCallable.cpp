@@ -3,7 +3,7 @@
 #include "LoxCallable.h"
 
 #include "Interpreter.h"
-
+#include "LoxInstance.h"
 
 shared_ptr<Object> LoxFunction::call(Interpreter &interpreter, const vector<shared_ptr<Object>> &arguments)
 {
@@ -25,3 +25,11 @@ shared_ptr<Object> LoxFunction::call(Interpreter &interpreter, const vector<shar
     return return_value;
 }
 
+shared_ptr<Object> LoxClass::call(Interpreter &interpreter, const vector<shared_ptr<Object>> &arguments)
+{
+    return std::make_shared<LoxInstance>(*this);
+}
+int LoxClass::arity()
+{
+    return 0;
+}

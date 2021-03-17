@@ -39,6 +39,7 @@ class Devonshirecream {
     }
 }
 print Devonshirecream;
+print Devonshirecream();
 print "===================TEST===================";
 
 
