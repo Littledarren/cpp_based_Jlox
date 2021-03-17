@@ -323,9 +323,14 @@ void Interpreter::visit(const Return&stmt)
 }
 void Interpreter::visit(const Class&stmt) 
 {
-   //感觉暂时没必要这样做，这只是声明，应该无所谓
    environment->define(stmt.name->lexeme, nullptr);
-   auto kclass = std::make_shared<LoxClass>(stmt.name->lexeme);
+   std::map<string, shared_ptr<LoxFunction>> methods;
+   for (auto& method : stmt.body) {
+//LoxFunction(const Function &func, shared_ptr<Environment> closure)
+       methods[method->name->lexeme]=std::make_shared<LoxFunction>(*method, environment);
+   }
+
+   auto kclass = std::make_shared<LoxClass>(stmt.name->lexeme, methods);
    environment->assign(stmt.name, kclass);
 }
 RETURN_TYPE Interpreter::lookUpVariable(shared_ptr<Token> name, const Expr* key)

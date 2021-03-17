@@ -44,6 +44,7 @@ print "===================TEST===================";
 var x = Devonshirecream();
 x.x = 1;
 print x.x;
+print x.serveOn();
 print "===================TEST===================";
 
 

@@ -33,6 +33,8 @@ public:
     {
         if (fields.find(token->lexeme) != fields.end())
             return fields.at(token->lexeme);
+        auto method =  klass.findMethod(token->lexeme);
+        if(method) return method;
 
         throw RuntimeError(token, "Undefined property '" + token->lexeme + "'");
     }

@@ -30,7 +30,8 @@ using std::map;
 
 enum class FunctionType {
     NONE,
-    FUNCTION
+    FUNCTION,
+    METHOD
 };
 
 // 本质上语法树已经给出来了，很多工作都可以基于AST做，所以Treewalker也好，

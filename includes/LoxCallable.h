@@ -90,12 +90,15 @@ private:
     shared_ptr<Environment> closure;
 };
 
+#include <map>
+using std::map;
 struct LoxClass : public Callable
 {
 
     using FIELD_TYPE = shared_ptr<Object>;
 
-    LoxClass(const string& name) : name(name)
+    LoxClass(const string& name, const map<string, shared_ptr<LoxFunction>> &methods) : 
+        name(name), methods(methods)
     {}
 
     virtual shared_ptr<Object> call(Interpreter &interpreter, const vector<shared_ptr<Object>> &arguments) override;
@@ -104,8 +107,13 @@ struct LoxClass : public Callable
     {
         return name;
     }
+    shared_ptr<LoxFunction> findMethod(string methodName) 
+    {
+        return methods[methodName];
+    }
 public:
     string name;
+    map<string, shared_ptr<LoxFunction>> methods;
 };
 
 
