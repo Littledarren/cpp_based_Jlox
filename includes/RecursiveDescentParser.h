@@ -38,9 +38,9 @@ private:
     //用来解析变量定义
     shared_ptr<Stmt> varDeclaration();
     //函数定义
-    shared_ptr<Stmt> funDeclaration();
+    shared_ptr<Function> funDeclaration(const string& des);
     //定义
-    shared_ptr<Stmt> clsDeclaration();
+    shared_ptr<Class> clsDeclaration();
     //语句，即可执行的语句.
     shared_ptr<Stmt> statement();
     shared_ptr<Stmt> ifStatement();

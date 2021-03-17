@@ -141,3 +141,8 @@ void Resolver::visit(const Return&stmt)
     }
 }
 
+void Resolver::visit(const Class&stmt) 
+{
+    declare(stmt.name);
+    define(stmt.name);
+}

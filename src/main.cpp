@@ -108,8 +108,10 @@ static void run(const string &source)
     Parser parser(tokens);
     vector<shared_ptr<Stmt>> statements = parser.parse();
 
-    Resolver resolver(interpreter);
-    resolver.resolve(statements);
+    if (!hadError) {
+        Resolver resolver(interpreter);
+        resolver.resolve(statements);
+    }
 
     if (!hadError) {
         //3/.语义

@@ -16,8 +16,9 @@ shared_ptr<Stmt> Parser::RecursiveDescentParser::declaration()
 {
     try {
         if (match({VAR})) return varDeclaration();
-        if (match({FUN})) return funDeclaration();
-        //function..class..etc
+        if (match({FUN})) return funDeclaration("Function");
+        if (match({CLASS})) return clsDeclaration();
+
         return statement();
     } catch (const ParseError &e) {
         synchronize();
@@ -35,13 +36,21 @@ shared_ptr<Stmt> Parser::RecursiveDescentParser::varDeclaration()
    consume(SEMICOLON, "Expect ';' after variable declaration");
    return std::make_shared<Var>(name, initializer);
 }
-shared_ptr<Stmt> Parser::RecursiveDescentParser::clsDeclaration()
+shared_ptr<Class> Parser::RecursiveDescentParser::clsDeclaration()
 {
-    return nullptr;
+    auto name = consume(IDENTIFIER, "Expect class name");
+    consume(LEFT_BRACE, "Expect '{' after class name");
+    vector<shared_ptr<Function>> methods;
+    while (!check(RIGHT_BRACE) && !isAtEnd()) {
+        methods.push_back(funDeclaration("Method"));
+    }
+    consume(RIGHT_BRACE, "Expect '}' after class name");
+
+    return std::make_shared<Class>(name, methods);
 }
-shared_ptr<Stmt> Parser::RecursiveDescentParser::funDeclaration()
+shared_ptr<Function> Parser::RecursiveDescentParser::funDeclaration(const string& des)
 {
-   shared_ptr<Token> name = consume(IDENTIFIER, "Expect function name");
+   shared_ptr<Token> name = consume(IDENTIFIER, "Expect " + des + " name");
 
    shared_ptr<Lambda> lambda = lambdaFunc();
 

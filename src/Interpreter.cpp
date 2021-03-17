@@ -302,6 +302,13 @@ void Interpreter::visit(const Return&stmt)
     }
     throw Control(value, stmt.name->type);
 }
+void Interpreter::visit(const Class&stmt) 
+{
+   //感觉暂时没必要这样做，这只是声明，应该无所谓
+   environment->define(stmt.name->lexeme, nullptr);
+   auto kclass = std::make_shared<LoxClass>(stmt.name->lexeme);
+   environment->assign(stmt.name, kclass);
+}
 RETURN_TYPE Interpreter::lookUpVariable(shared_ptr<Token> name, const Expr* key)
 {
     auto iter = locals.find(key);

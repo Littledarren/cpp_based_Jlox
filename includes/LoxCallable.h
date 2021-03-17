@@ -90,4 +90,26 @@ private:
     shared_ptr<Environment> closure;
 };
 
+struct LoxClass : public Callable
+{
+
+    LoxClass(const string& name) : name(name)
+    {}
+
+    virtual shared_ptr<Object> call(Interpreter &interpreter, const vector<shared_ptr<Object>> &arguments) override
+    {
+        return nullptr;
+    }
+    virtual int arity() override
+    {
+        return 0;
+    }
+    string name;
+    virtual string toString() const override
+    {
+        return name;
+    }
+};
+
+
 #endif

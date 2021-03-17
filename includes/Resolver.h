@@ -65,6 +65,7 @@ public:
     void visit(const While &stmt) override;
     void visit(const Function &func) override;
     void visit(const Return&stmt) override;
+    void visit(const Class&stmt) override;
 private:
     //void resolve(const shared_ptr<Stmt> &stmt);
     template<typename T>

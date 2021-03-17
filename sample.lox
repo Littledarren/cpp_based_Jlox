@@ -5,6 +5,7 @@
 //lox file
 
 
+print "===================TEST===================";
 fun fib(n) {
     if (n <= 1) return n;
     return fib(n-2) + fib(n-1);
@@ -30,3 +31,15 @@ print fib;
 var counter = makeCounter();
 counter();
 counter();
+print "===================TEST===================";
+
+class Devonshirecream {
+    serveOn() {
+        return "Scones";
+    }
+}
+print Devonshirecream;
+print "===================TEST===================";
+
+
+/* vim: set filetype=javascript : */

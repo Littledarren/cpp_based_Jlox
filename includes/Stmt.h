@@ -26,6 +26,7 @@ struct If;
 struct While;
 struct Function;
 struct Return;
+struct Class;
 
 struct Stmt {
     struct Visitor
@@ -38,6 +39,7 @@ struct Stmt {
         virtual void visit(const Function &func)=0;
         virtual void visit(const While &stmt)=0;
         virtual void visit(const Return &stmt)=0;
+        virtual void visit(const Class &stmt)=0;
     };
 
     virtual void accept(Visitor &visitor)const=0;
@@ -168,6 +170,21 @@ struct Return : public Stmt
     STMT_VISITABLE();
     shared_ptr<Token> name;
     shared_ptr<Expr> value;
+};
+
+struct Class : public Stmt
+{
+    Class(shared_ptr<Token> name, const vector<shared_ptr<Function>> &body):
+        name(name), body(body)
+    {
+#ifdef DEBUG
+            cout<<"=======CLass_STMT======="<<endl;
+#endif
+    }
+
+    STMT_VISITABLE();
+    shared_ptr<Token> name;
+    vector<shared_ptr<Function>> body;
 };
 
 #endif
