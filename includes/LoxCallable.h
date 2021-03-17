@@ -93,6 +93,8 @@ private:
 struct LoxClass : public Callable
 {
 
+    using FIELD_TYPE = shared_ptr<Object>;
+
     LoxClass(const string& name) : name(name)
     {}
 

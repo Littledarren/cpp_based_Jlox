@@ -56,6 +56,8 @@ public:
     RETURN_TYPE visit(const Variable &expr) override;
     RETURN_TYPE visit(const Call &expr) override;
     RETURN_TYPE visit(const Lambda &expr) override;
+    RETURN_TYPE visit(const Get &expr) override;
+    RETURN_TYPE visit(const Set &expr) override;
     //Stmt
     void visit(const Expression &stmt) override;
     void visit(const Print &stmt) override;

@@ -2,6 +2,7 @@
 #include "Interpreter.h"
 #include "main.h"
 #include "LoxCallable.h"
+#include "LoxInstance.h"
 
 #include <iostream>
 using std::cout;
@@ -233,6 +234,24 @@ RETURN_TYPE  Interpreter::visit(const Variable &expr)
 RETURN_TYPE Interpreter::visit(const Lambda &expr) 
 {
     return std::make_shared<LoxFunction>(Function(nullptr, expr), environment);
+}
+RETURN_TYPE Interpreter::visit(const Get &expr) 
+{
+    shared_ptr<LoxInstance> obj = std::dynamic_pointer_cast<LoxInstance>(evaluate(expr.expr));
+    if (obj) {
+        return obj->get(expr.name);
+    }
+    throw RuntimeError(expr.name, "Only instances have properties");
+}
+RETURN_TYPE Interpreter::visit(const Set &expr) 
+{
+    shared_ptr<LoxInstance> obj = std::dynamic_pointer_cast<LoxInstance>(evaluate(expr.obj));
+    if (obj) {
+        auto value = evaluate(expr.value);
+        obj->set(expr.token, value);
+        return value;
+    }
+    throw RuntimeError(expr.token, "Only instances have fields");
 }
 void  Interpreter::visit(const Expression &stmt) 
 {

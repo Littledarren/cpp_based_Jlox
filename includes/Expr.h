@@ -34,13 +34,14 @@ struct Variable;
 struct Logical;
 struct Call;
 struct Lambda;
+struct Get;
+struct Set;
 
 struct Expr
 {
     struct Visitor
     {
-        virtual RETURN_TYPE visit(const Assign &expr)=0;
-        virtual RETURN_TYPE visit(const Binary &expr)=0;
+        virtual RETURN_TYPE visit(const Assign &expr)=0; virtual RETURN_TYPE visit(const Binary &expr)=0;
         virtual RETURN_TYPE visit(const Grouping &expr)=0;
         virtual RETURN_TYPE visit(const Literal &expr)=0;
         virtual RETURN_TYPE visit(const Unary &expr)=0;
@@ -49,6 +50,8 @@ struct Expr
         virtual RETURN_TYPE visit(const Variable &expr)=0;
         virtual RETURN_TYPE visit(const Call &expr)=0;
         virtual RETURN_TYPE visit(const Lambda &expr)=0;
+        virtual RETURN_TYPE visit(const Get &expr)=0;
+        virtual RETURN_TYPE visit(const Set &expr)=0;
         
     };
 
@@ -213,4 +216,39 @@ struct Lambda : public Expr
     vector<shared_ptr<Token>> params;
     vector<shared_ptr<Stmt>> body;
 };
+
+struct Get : public Expr 
+{
+    Get(shared_ptr<Expr> expr, shared_ptr<Token> name) :
+        expr(expr), name(name)
+    {
+#ifdef DEBUG
+        cout<<"=======Get_expr======="<<endl;
+#endif
+
+    }
+
+    EXPR_VISITABLE();
+    shared_ptr<Expr> expr;
+    shared_ptr<Token> name;
+};
+
+struct Set : public Expr 
+{
+    Set(shared_ptr<Expr> obj, shared_ptr<Token> token, shared_ptr<Expr> value) :
+        obj(obj), token(token), value(value)
+    {
+#ifdef DEBUG
+        cout<<"=======Set_expr======="<<endl;
+#endif
+    }
+
+    EXPR_VISITABLE();
+    shared_ptr<Expr> obj;
+    shared_ptr<Token> token;
+    shared_ptr<Expr> value;
+};
+
+
+
 #endif

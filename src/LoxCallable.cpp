@@ -33,3 +33,4 @@ int LoxClass::arity()
 {
     return 0;
 }
+

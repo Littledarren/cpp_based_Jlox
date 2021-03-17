@@ -209,6 +209,8 @@ shared_ptr<Expr> Parser::RecursiveDescentParser::assignment()
         if (auto temp = std::dynamic_pointer_cast<Variable>(expr)) {
             shared_ptr<Token> name = temp->name;
             return std::make_shared<Assign>(name, value);
+        } else if (auto temp = std::dynamic_pointer_cast<Get>(expr)) {
+            return std::make_shared<Set>(temp->expr, temp->name, value);
         }
 
         error(equals, "Invalid assignment target");
@@ -303,6 +305,9 @@ shared_ptr<Expr> Parser::RecursiveDescentParser::call()
    while (true) {
        if (match({LEFT_PAREN})) {
            expr = finishCall(expr);
+       } else if (match({DOT})) {
+           auto name = consume(IDENTIFIER, "Expect property name after '.'");
+           expr = std::make_shared<Get>(expr, name);
        } else {
            break;
        }

@@ -91,6 +91,17 @@ RETURN_TYPE Resolver::visit(const Lambda &expr)
     return nullptr;
 }
 
+RETURN_TYPE Resolver::visit(const Get &expr)
+{
+    resolve(expr.expr);
+    return nullptr;
+}
+RETURN_TYPE Resolver::visit(const Set &expr) 
+{
+    resolve(expr.value);
+    resolve(expr.obj);
+    return nullptr;
+}
 //Stmt
 void Resolver::visit(const Expression &stmt) 
 {
