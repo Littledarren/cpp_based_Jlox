@@ -1,7 +1,7 @@
 # cpp_based_Jlox
 
 [![Language grade: C/C++](https://img.shields.io/lgtm/grade/cpp/g/Littledarren/cpp_based_Jlox.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/Littledarren/cpp_based_Jlox/context:cpp)
-
+[![C/C++ CI](https://github.com/Littledarren/cpp_based_Jlox/actions/workflows/c-cpp.yml/badge.svg)](https://github.com/Littledarren/cpp_based_Jlox/actions/workflows/c-cpp.yml)
 
 an implementation of the jlox compiler, which is built in c++
 
