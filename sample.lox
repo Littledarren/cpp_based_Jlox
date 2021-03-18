@@ -35,6 +35,7 @@ print "===================TEST===================";
 
 class Devonshirecream {
     serveOn() {
+        print this.x+this.x;
         return "Scones";
     }
 }
@@ -42,7 +43,7 @@ print Devonshirecream;
 print Devonshirecream();
 print "===================TEST===================";
 var x = Devonshirecream();
-x.x = 1;
+x.x = 9;
 print x.x;
 print x.serveOn();
 print "===================TEST===================";
