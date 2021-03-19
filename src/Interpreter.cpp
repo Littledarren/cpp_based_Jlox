@@ -230,7 +230,8 @@ RETURN_TYPE Interpreter::visit(const Variable &expr) {
 }
 
 RETURN_TYPE Interpreter::visit(const Lambda &expr) {
-  return std::make_shared<LoxFunction>(Function(nullptr, expr), environment);
+  return std::make_shared<LoxFunction>(Function(nullptr, expr), environment,
+                                       false);
 }
 RETURN_TYPE Interpreter::visit(const Get &expr) {
   shared_ptr<LoxInstance> obj =
@@ -299,8 +300,8 @@ void Interpreter::visit(const While &stmt) {
   }
 }
 void Interpreter::visit(const Function &func) {
-  environment->define(func.name->lexeme,
-                      std::make_shared<LoxFunction>(func, this->environment));
+  environment->define(func.name->lexeme, std::make_shared<LoxFunction>(
+                                             func, this->environment, false));
 }
 
 void Interpreter::visit(const Return &stmt) {
@@ -314,8 +315,8 @@ void Interpreter::visit(const Class &stmt) {
   environment->define(stmt.name->lexeme, nullptr);
   std::map<string, shared_ptr<LoxFunction>> methods;
   for (auto &method : stmt.body) {
-    methods[method->name->lexeme] =
-        std::make_shared<LoxFunction>(*method, environment);
+    methods[method->name->lexeme] = std::make_shared<LoxFunction>(
+        *method, environment, method->name->lexeme == "init");
   }
 
   auto kclass = std::make_shared<LoxClass>(stmt.name->lexeme, methods);

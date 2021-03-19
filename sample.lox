@@ -49,6 +49,9 @@ print x.serveOn();
 print "===================TEST===================";
 
 class Cake {
+    init() {
+        this.flavor = "this init test"
+    }
     taste() {
         var adjective = "delicious";
         print "the " + this.flavor + " cake is " + adjective + "!";
@@ -72,4 +75,7 @@ cake.taste();
 
 var callback = Cake().getCallback();
 callback();
+
+cake = Cake();
+cake.taste();
 /* vim: set filetype=javascript : */

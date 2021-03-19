@@ -36,6 +36,7 @@ public:
 
     throw RuntimeError(token, "Undefined property '" + token->lexeme + "'");
   }
+
   void set(shared_ptr<Token> token, FIELD_TYPE value) {
     fields[token->lexeme] = value;
   }

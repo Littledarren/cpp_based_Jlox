@@ -24,7 +24,7 @@ using std::vector;
 #include "Interpreter.h"
 #include "main.h"
 
-enum class FunctionType { NONE, FUNCTION, METHOD };
+enum class FunctionType { NONE, FUNCTION, METHOD, INITIALIZER };
 enum class ClassType { NONE, CLASS};
 
 // 本质上语法树已经给出来了，很多工作都可以基于AST做，所以Treewalker也好，

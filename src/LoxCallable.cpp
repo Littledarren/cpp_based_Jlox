@@ -23,17 +23,32 @@ LoxFunction::call(Interpreter &interpreter,
   } catch (const runtime_error &e) {
     std::cerr << e.what() << std::endl;
   }
+  //这里进行修正
+  if (isInitializer)
+    return closure->getAt(0, "this");
   return return_value;
 }
 
 shared_ptr<Object> LoxClass::call(Interpreter &interpreter,
                                   const vector<shared_ptr<Object>> &arguments) {
-  return std::make_shared<LoxInstance>(*this);
+  auto initializer = findMethod("init");
+  auto instance = std::make_shared<LoxInstance>(*this);
+  if (initializer) {
+    initializer->bind(instance)->call(interpreter, arguments);
+  }
+  return instance;
 }
-int LoxClass::arity() { return 0; }
+int LoxClass::arity() {
+  shared_ptr<LoxFunction> initializer = findMethod("init");
+  if (initializer) {
+    return initializer->arity();
+  }
+  return 0;
+}
 
 shared_ptr<LoxFunction> LoxFunction::bind(shared_ptr<LoxInstance> owner) {
   shared_ptr<Environment> environment = std::make_shared<Environment>(closure);
   environment->define("this", owner);
-  return std::make_shared<LoxFunction>(*declaration, environment);
+  return std::make_shared<LoxFunction>(*declaration, environment,
+                                       isInitializer);
 }

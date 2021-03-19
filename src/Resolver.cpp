@@ -86,9 +86,9 @@ RETURN_TYPE Resolver::visit(const Set &expr) {
   return nullptr;
 }
 RETURN_TYPE Resolver::visit(const This &expr) {
-    if (currentClass == ClassType::NONE) {
-        ::error(*expr.keyword, "Can't use 'this' outside of a class");
-    }
+  if (currentClass == ClassType::NONE) {
+    ::error(*expr.keyword, "Can't use 'this' outside of a class");
+  }
   resolveLocal(expr, expr.keyword);
   return nullptr;
 }
@@ -127,6 +127,9 @@ void Resolver::visit(const Return &stmt) {
     ::error(*stmt.name, "Can't return from top-level code");
   }
   if (stmt.value) {
+    if (currentFunction == FunctionType::INITIALIZER) {
+      ::error(*stmt.name, "Can't return a value from an initializer");
+    }
     resolve(stmt.value);
   }
 }
@@ -140,7 +143,11 @@ void Resolver::visit(const Class &stmt) {
   beginScope();
   scopes.back()["this"] = true;
   for (auto &method : stmt.body) {
-    resolveLambda(method->lambda, FunctionType::METHOD);
+    FunctionType declaration = FunctionType::METHOD;
+    if (method->name->lexeme == "init") {
+      declaration = FunctionType::INITIALIZER;
+    }
+    resolveLambda(method->lambda, declaration);
   }
   endScope();
   currentClass = enclosingClass;

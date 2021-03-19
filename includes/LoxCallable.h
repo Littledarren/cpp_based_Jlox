@@ -52,8 +52,10 @@ struct Clock : public NativeFunction {
 
 struct LoxInstance;
 struct LoxFunction : public Callable {
-  LoxFunction(const Function &func, shared_ptr<Environment> closure)
-      : declaration(std::make_shared<Function>(func)), closure(closure) {}
+  LoxFunction(const Function &func, shared_ptr<Environment> closure,
+              bool isInitializer)
+      : declaration(std::make_shared<Function>(func)), closure(closure),
+        isInitializer(isInitializer) {}
 
   virtual shared_ptr<Object>
   call(Interpreter &interpreter,
@@ -74,6 +76,7 @@ struct LoxFunction : public Callable {
 private:
   shared_ptr<Function> declaration;
   shared_ptr<Environment> closure;
+  bool isInitializer;
 };
 
 #include <map>
