@@ -48,5 +48,28 @@ print x.x;
 print x.serveOn();
 print "===================TEST===================";
 
+class Cake {
+    taste() {
+        var adjective = "delicious";
+        print "the " + this.flavor + " cake is " + adjective + "!";
+    }
+    getCallback() {
+        fun localFunc() {
+            print this;
+        }
+        return localFunc;
+    }
 
+}
+
+var cake = Cake();
+cake.flavor = "Chocolote";
+cake.taste();
+
+cake = Cake();
+cake.flavor = "banana";
+cake.taste();
+
+var callback = Cake().getCallback();
+callback();
 /* vim: set filetype=javascript : */

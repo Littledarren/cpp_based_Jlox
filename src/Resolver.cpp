@@ -86,6 +86,9 @@ RETURN_TYPE Resolver::visit(const Set &expr) {
   return nullptr;
 }
 RETURN_TYPE Resolver::visit(const This &expr) {
+    if (currentClass == ClassType::NONE) {
+        ::error(*expr.keyword, "Can't use 'this' outside of a class");
+    }
   resolveLocal(expr, expr.keyword);
   return nullptr;
 }
@@ -129,6 +132,8 @@ void Resolver::visit(const Return &stmt) {
 }
 
 void Resolver::visit(const Class &stmt) {
+  ClassType enclosingClass = currentClass;
+  currentClass = ClassType::CLASS;
   declare(stmt.name);
   define(stmt.name);
 
@@ -138,4 +143,5 @@ void Resolver::visit(const Class &stmt) {
     resolveLambda(method->lambda, FunctionType::METHOD);
   }
   endScope();
+  currentClass = enclosingClass;
 }
