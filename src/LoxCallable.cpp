@@ -17,7 +17,7 @@ shared_ptr<Object>
 LoxFunction::call(Interpreter &interpreter,
                   const vector<shared_ptr<Object>> &arguments) {
   shared_ptr<Environment> environment = std::make_shared<Environment>(closure);
-  auto &params = declaration->lambda.params;
+  auto &params = declaration->lambda->params;
   for (auto i = 0; i < params.size(); ++i) {
     environment->define(params.at(i)->lexeme, arguments.at(i));
   }
@@ -25,7 +25,7 @@ LoxFunction::call(Interpreter &interpreter,
   decltype(this->call(interpreter, arguments)) return_value = nullptr;
 
   try {
-    interpreter.executeBlock(declaration->lambda.body, environment);
+    interpreter.executeBlock(declaration->lambda->body, environment);
   } catch (const Control &e) {
     return_value = e.data;
   } catch (const runtime_error &e) {
@@ -57,6 +57,5 @@ int LoxClass::arity() {
 shared_ptr<LoxFunction> LoxFunction::bind(shared_ptr<LoxInstance> owner) {
   shared_ptr<Environment> environment = std::make_shared<Environment>(closure);
   environment->define("this", owner);
-  return std::make_shared<LoxFunction>(*declaration, environment,
-                                       isInitializer);
+  return std::make_shared<LoxFunction>(declaration, environment, isInitializer);
 }

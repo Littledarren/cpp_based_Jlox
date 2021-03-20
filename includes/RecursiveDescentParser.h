@@ -39,7 +39,7 @@ private:
   shared_ptr<Class> clsDeclaration();
   //语句，即可执行的语句.
   shared_ptr<Stmt> statement();
-  shared_ptr<Stmt> ifStatement();
+  shared_ptr<If> ifStatement();
   shared_ptr<Stmt> whileStatement();
   shared_ptr<Stmt> forStatement();
   shared_ptr<Stmt> printStatement();

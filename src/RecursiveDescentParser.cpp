@@ -52,7 +52,7 @@ Parser::RecursiveDescentParser::funDeclaration(const string &des) {
 
   shared_ptr<Lambda> lambda = lambdaFunc();
 
-  return std::make_shared<Function>(name, *lambda);
+  return std::make_shared<Function>(name, lambda);
 }
 shared_ptr<Stmt> Parser::RecursiveDescentParser::statement() {
   if (match({PRINT}))
@@ -77,7 +77,7 @@ shared_ptr<Stmt> Parser::RecursiveDescentParser::whileStatement() {
   shared_ptr<Stmt> body = statement();
   return std::make_shared<While>(condition, body);
 }
-shared_ptr<Stmt> Parser::RecursiveDescentParser::ifStatement() {
+shared_ptr<If> Parser::RecursiveDescentParser::ifStatement() {
   consume(LEFT_PAREN, "Expect '(' after 'if'");
   shared_ptr<Expr> condition = expression();
   consume(RIGHT_PAREN, "Expect ')' after if condition");
@@ -269,7 +269,7 @@ shared_ptr<Expr> Parser::RecursiveDescentParser::addition() {
 }
 shared_ptr<Expr> Parser::RecursiveDescentParser::multiplication() {
   shared_ptr<Expr> expr = unary();
-  while (match({STAR, SLASH})) {
+  while (match({STAR, SLASH, PLUS})) {
     shared_ptr<Token> op = previous();
     shared_ptr<Expr> right = unary();
     expr = std::make_shared<Binary>(expr, op, right);

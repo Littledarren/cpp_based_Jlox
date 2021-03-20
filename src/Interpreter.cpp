@@ -6,7 +6,6 @@
 #include "LoxCallable.h"
 #include "LoxInstance.h"
 #include "main.h"
-using std::cin;
 using std::cout;
 
 Interpreter::Interpreter()
@@ -24,7 +23,7 @@ void Interpreter::interprete(vector<StmtPtr> statements) {
   }
 }
 
-RETURN_TYPE Interpreter::interprete(shared_ptr<Expr> expr) {
+Interpreter::RETURN_TYPE Interpreter::interprete(shared_ptr<Expr> expr) {
   try {
     return evaluate(expr);
   } catch (const RuntimeError &e) {
@@ -35,7 +34,7 @@ RETURN_TYPE Interpreter::interprete(shared_ptr<Expr> expr) {
   return nullptr;
 }
 
-RETURN_TYPE Interpreter::evaluate(shared_ptr<Expr> expr) {
+Interpreter::RETURN_TYPE Interpreter::evaluate(shared_ptr<Expr> expr) {
   if (expr)
     return expr->accept(*this);
   else
@@ -68,73 +67,73 @@ void Interpreter::executeBlock(vector<shared_ptr<Stmt>> stmts,
 //                               visit                                //
 ////////////////////////////////////////////////////////////////////////
 
-RETURN_TYPE Interpreter::visit(const Assign &expr) {
-  RETURN_TYPE value = evaluate(expr.value);
+Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Assign> expr) {
+  RETURN_TYPE value = evaluate(expr->value);
 
-  auto iter = locals.find(&expr);
+  auto iter = locals.find(expr);
   if (iter == locals.end())
-    globals->assign(expr.name, value);
+    globals->assign(expr->name, value);
   else
-    environment->assignAt(iter->second, expr.name, value);
+    environment->assignAt(iter->second, expr->name, value);
   return value;
 }
 
-RETURN_TYPE Interpreter::visit(const Logical &expr) {
-  RETURN_TYPE left = evaluate(expr.left);
-  if (expr.op->type == AND) {
+Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Logical> expr) {
+  RETURN_TYPE left = evaluate(expr->left);
+  if (expr->op->type == AND) {
     if (!left || !left->isTrue())
       return left;
   } else {
     if (left && left->isTrue())
       return left;
   }
-  return evaluate(expr.right);
+  return evaluate(expr->right);
 }
 
-RETURN_TYPE Interpreter::visit(const Call &expr) {
-  RETURN_TYPE callee = (evaluate(expr.callee));
+Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Call> expr) {
+  RETURN_TYPE callee = (evaluate(expr->callee));
 
   vector<RETURN_TYPE> arguments;
-  for (auto p : expr.arguments) {
+  for (auto p : expr->arguments) {
     arguments.push_back(evaluate(p));
   }
 
   shared_ptr<Callable> function = std::dynamic_pointer_cast<Callable>(callee);
   if (!function) {
-    throw RuntimeError(expr.paren, "can only call functions and classes");
+    throw RuntimeError(expr->paren, "can only call functions and classes");
   }
   if (arguments.size() != function->arity()) {
     ostringstream oss;
     oss << "Expected " << function->arity() << "arguments but got"
         << arguments.size() << ".";
-    throw RuntimeError(expr.paren, oss.str());
+    throw RuntimeError(expr->paren, oss.str());
   }
 
   // return new Object((*callee)(arguments));
   return function->call(*this, arguments);
 }
 
-RETURN_TYPE Interpreter::visit(const Ternary &expr) {
-  RETURN_TYPE cond = evaluate(expr.condition);
+Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Ternary> expr) {
+  RETURN_TYPE cond = evaluate(expr->condition);
 
   if (cond && cond->isTrue()) {
-    return evaluate(expr.if_yes);
+    return evaluate(expr->if_yes);
   } else {
-    return evaluate(expr.if_no);
+    return evaluate(expr->if_no);
   }
 }
-RETURN_TYPE Interpreter::visit(const Binary &expr) {
+Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Binary> expr) {
   // this will creat a new ..
-  RETURN_TYPE left = evaluate(expr.left);
-  RETURN_TYPE right = evaluate(expr.right);
+  RETURN_TYPE left = evaluate(expr->left);
+  RETURN_TYPE right = evaluate(expr->right);
 
   bool is_string = !!std::dynamic_pointer_cast<String>(left);
 
   RETURN_TYPE result = nullptr;
 
-  switch (expr.op->type) {
+  switch (expr->op->type) {
   case PLUS:
-    checkStringOrNumber(expr.op, left, right);
+    checkStringOrNumber(expr->op, left, right);
     //字符串可以跟其他类型+
     //要么都是数字，要么左边是字符串，没有其他可能
     if (is_string) {
@@ -154,19 +153,19 @@ RETURN_TYPE Interpreter::visit(const Binary &expr) {
                                    *std::dynamic_pointer_cast<Number>(right));
     break;
   case MINUS:
-    chechNumber(expr.op, left, right);
+    chechNumber(expr->op, left, right);
     result =
         std::make_shared<Number>(*std::dynamic_pointer_cast<Number>(left) -
                                  *std::dynamic_pointer_cast<Number>(right));
     break;
   case STAR:
-    chechNumber(expr.op, left, right);
+    chechNumber(expr->op, left, right);
     result =
         std::make_shared<Number>(*std::dynamic_pointer_cast<Number>(left) *
                                  *std::dynamic_pointer_cast<Number>(right));
     break;
   case SLASH:
-    chechNumber(expr.op, left, right);
+    chechNumber(expr->op, left, right);
     result =
         std::make_shared<Number>(*std::dynamic_pointer_cast<Number>(left) /
                                  *std::dynamic_pointer_cast<Number>(right));
@@ -175,22 +174,22 @@ RETURN_TYPE Interpreter::visit(const Binary &expr) {
     return right;
     break;
   case GREATER:
-    chechNumber(expr.op, left, right);
+    chechNumber(expr->op, left, right);
     result = std::make_shared<Bool>(*std::dynamic_pointer_cast<Number>(left) >
                                     *std::dynamic_pointer_cast<Number>(right));
     break;
   case GREATER_EQUAL:
-    chechNumber(expr.op, left, right);
+    chechNumber(expr->op, left, right);
     result = std::make_shared<Bool>(*std::dynamic_pointer_cast<Number>(left) >=
                                     *std::dynamic_pointer_cast<Number>(right));
     break;
   case LESS:
-    chechNumber(expr.op, left, right);
+    chechNumber(expr->op, left, right);
     result = std::make_shared<Bool>(*std::dynamic_pointer_cast<Number>(left) <
                                     *std::dynamic_pointer_cast<Number>(right));
     break;
   case LESS_EQUAL:
-    chechNumber(expr.op, left, right);
+    chechNumber(expr->op, left, right);
     result = std::make_shared<Bool>(*std::dynamic_pointer_cast<Number>(left) <=
                                     *std::dynamic_pointer_cast<Number>(right));
     break;
@@ -201,14 +200,14 @@ RETURN_TYPE Interpreter::visit(const Binary &expr) {
     result = std::make_shared<Bool>(!(*left == *right));
     break;
   default:
-    throw string("ERROR UNKONE OP") + expr.op->lexeme;
+    throw string("ERROR UNKONE OP") + expr->op->lexeme;
   }
   return result;
 }
-RETURN_TYPE Interpreter::visit(const Unary &expr) {
-  RETURN_TYPE temp = evaluate(expr.right);
+Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Unary> expr) {
+  RETURN_TYPE temp = evaluate(expr->right);
   RETURN_TYPE result = nullptr;
-  switch (expr.op->type) {
+  switch (expr->op->type) {
   case MINUS:
     result =
         std::make_shared<Number>(-*std::dynamic_pointer_cast<Number>(temp));
@@ -216,70 +215,76 @@ RETURN_TYPE Interpreter::visit(const Unary &expr) {
   case BANG:
     result = std::make_shared<Bool>(!*std::dynamic_pointer_cast<Bool>(temp));
     break;
+  case PLUS:
+    result = std::make_shared<Number>(*std::dynamic_pointer_cast<Number>(temp));
+    break;
   default:
-    throw RuntimeError(expr.op, "r u kidding me with a wrong unary op?");
+    throw RuntimeError(expr->op, "r u kidding me with a wrong unary op?");
   }
   return result;
 }
-RETURN_TYPE Interpreter::visit(const Grouping &expr) {
-  return evaluate(expr.expr);
+Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Grouping> expr) {
+  return evaluate(expr->expr);
 }
-RETURN_TYPE Interpreter::visit(const Literal &expr) { return expr.value; }
-RETURN_TYPE Interpreter::visit(const Variable &expr) {
-  return lookUpVariable(expr.name, &expr);
+Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Literal> expr) {
+  return expr->value;
+}
+Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Variable> expr) {
+  return lookUpVariable(expr->name, expr);
 }
 
-RETURN_TYPE Interpreter::visit(const Lambda &expr) {
-  return std::make_shared<LoxFunction>(Function(nullptr, expr), environment,
-                                       false);
+Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Lambda> expr) {
+  return std::make_shared<LoxFunction>(
+      std::make_shared<Function>(nullptr, expr->shared_from_this()),
+      environment, false);
 }
-RETURN_TYPE Interpreter::visit(const Get &expr) {
+Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Get> expr) {
   shared_ptr<LoxInstance> obj =
-      std::dynamic_pointer_cast<LoxInstance>(evaluate(expr.expr));
+      std::dynamic_pointer_cast<LoxInstance>(evaluate(expr->expr));
   if (obj) {
-    return obj->get(expr.name);
+    return obj->get(expr->name);
   }
-  throw RuntimeError(expr.name, "Only instances have properties");
+  throw RuntimeError(expr->name, "Only instances have properties");
 }
-RETURN_TYPE Interpreter::visit(const Set &expr) {
+Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Set> expr) {
   shared_ptr<LoxInstance> obj =
-      std::dynamic_pointer_cast<LoxInstance>(evaluate(expr.obj));
+      std::dynamic_pointer_cast<LoxInstance>(evaluate(expr->obj));
   if (obj) {
-    auto value = evaluate(expr.value);
-    obj->set(expr.token, value);
+    auto value = evaluate(expr->value);
+    obj->set(expr->token, value);
     return value;
   }
-  throw RuntimeError(expr.token, "Only instances have fields");
+  throw RuntimeError(expr->token, "Only instances have fields");
 }
-RETURN_TYPE Interpreter::visit(const This &expr) {
-  return lookUpVariable(expr.keyword, &expr);
+Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<This> expr) {
+  return lookUpVariable(expr->keyword, expr);
 }
-void Interpreter::visit(const Expression &stmt) { evaluate(stmt.expr); }
-void Interpreter::visit(const Print &stmt) {
-  RETURN_TYPE value = evaluate(stmt.expr);
+void Interpreter::visit(shared_ptr<Expression> stmt) { evaluate(stmt->expr); }
+void Interpreter::visit(shared_ptr<Print> stmt) {
+  RETURN_TYPE value = evaluate(stmt->expr);
   if (value)
     std::cout << (value)->toString() << endl;
   else
     std::cout << "Nil" << endl;
 }
 
-void Interpreter::visit(const Var &stmt) {
+void Interpreter::visit(shared_ptr<Var> stmt) {
   RETURN_TYPE value = nullptr;
-  if (stmt.initializer != nullptr) {
-    value = evaluate(stmt.initializer);
+  if (stmt->initializer != nullptr) {
+    value = evaluate(stmt->initializer);
   }
-  this->environment->define(stmt.name->lexeme, value);
+  this->environment->define(stmt->name->lexeme, value);
 }
-void Interpreter::visit(const Block &stmt) {
-  executeBlock(stmt.statements, std::make_shared<Environment>(environment));
+void Interpreter::visit(shared_ptr<Block> stmt) {
+  executeBlock(stmt->statements, std::make_shared<Environment>(environment));
 }
 
-void Interpreter::visit(const If &stmt) {
-  RETURN_TYPE cond = evaluate(stmt.condition);
+void Interpreter::visit(shared_ptr<If> stmt) {
+  RETURN_TYPE cond = evaluate(stmt->condition);
   if (cond && cond->isTrue()) {
-    execute(stmt.thenBranch);
-  } else if (stmt.elseBranch) {
-    execute(stmt.elseBranch);
+    execute(stmt->thenBranch);
+  } else if (stmt->elseBranch) {
+    execute(stmt->elseBranch);
   }
 }
 
@@ -293,37 +298,38 @@ void Interpreter::printEnvironment() {
   }
 }
 
-void Interpreter::visit(const While &stmt) {
+void Interpreter::visit(shared_ptr<While> stmt) {
   RETURN_TYPE p = nullptr;
-  while ((p = evaluate(stmt.condition)) && p->isTrue()) {
-    execute(stmt.body);
+  while ((p = evaluate(stmt->condition)) && p->isTrue()) {
+    execute(stmt->body);
   }
 }
-void Interpreter::visit(const Function &func) {
-  environment->define(func.name->lexeme, std::make_shared<LoxFunction>(
-                                             func, this->environment, false));
+void Interpreter::visit(shared_ptr<Function> func) {
+  environment->define(func->name->lexeme,
+                      std::make_shared<LoxFunction>(func->shared_from_this(),
+                                                    this->environment, false));
 }
 
-void Interpreter::visit(const Return &stmt) {
+void Interpreter::visit(shared_ptr<Return> stmt) {
   RETURN_TYPE value = nullptr;
-  if (stmt.value) {
-    value = evaluate(stmt.value);
+  if (stmt->value) {
+    value = evaluate(stmt->value);
   }
-  throw Control(value, stmt.name->type);
+  throw Control(value, stmt->name->type);
 }
-void Interpreter::visit(const Class &stmt) {
-  environment->define(stmt.name->lexeme, nullptr);
+void Interpreter::visit(shared_ptr<Class> stmt) {
+  environment->define(stmt->name->lexeme, nullptr);
   std::map<string, shared_ptr<LoxFunction>> methods;
-  for (auto &method : stmt.body) {
+  for (auto &method : stmt->body) {
     methods[method->name->lexeme] = std::make_shared<LoxFunction>(
-        *method, environment, method->name->lexeme == "init");
+        method, environment, method->name->lexeme == "init");
   }
 
-  auto kclass = std::make_shared<LoxClass>(stmt.name->lexeme, methods);
-  environment->assign(stmt.name, kclass);
+  auto kclass = std::make_shared<LoxClass>(stmt->name->lexeme, methods);
+  environment->assign(stmt->name, kclass);
 }
-RETURN_TYPE Interpreter::lookUpVariable(shared_ptr<Token> name,
-                                        const Expr *key) {
+Interpreter::RETURN_TYPE Interpreter::lookUpVariable(shared_ptr<Token> name,
+                                                     shared_ptr<Expr> key) {
   auto iter = locals.find(key);
   if (iter == locals.end())
     return globals->get(name);

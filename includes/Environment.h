@@ -29,6 +29,7 @@ class Environment : public std::enable_shared_from_this<Environment> {
   using VALUE_TYPE = shared_ptr<Object>;
 
 public:
+  //只容许使用make_shared构造
   Environment(shared_ptr<Environment> enclosing = nullptr)
       : enclosing(enclosing) {}
 

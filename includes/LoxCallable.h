@@ -52,16 +52,15 @@ struct Clock : public NativeFunction {
 
 struct LoxInstance;
 struct LoxFunction : public Callable {
-  LoxFunction(const Function &func, shared_ptr<Environment> closure,
+  LoxFunction(shared_ptr<Function> func, shared_ptr<Environment> closure,
               bool isInitializer)
-      : declaration(std::make_shared<Function>(func)), closure(closure),
-        isInitializer(isInitializer) {}
+      : declaration(func), closure(closure), isInitializer(isInitializer) {}
 
   virtual shared_ptr<Object>
   call(Interpreter &interpreter,
        const vector<shared_ptr<Object>> &arguments) override;
 
-  virtual int arity() override { return declaration->lambda.params.size(); }
+  virtual int arity() override { return declaration->lambda->params.size(); }
 
   virtual string toString() const override {
     if (declaration->name)
@@ -69,6 +68,7 @@ struct LoxFunction : public Callable {
     else
       return "<userdefined lambda fn>";
   }
+
   shared_ptr<LoxFunction> bind(shared_ptr<LoxInstance> owner);
 
   virtual ~LoxFunction() = default;

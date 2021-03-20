@@ -31,35 +31,37 @@ enum class ClassType { NONE, CLASS};
 // Resolver也好，都是一样的
 
 class Resolver : public Expr::Visitor, public Stmt::Visitor {
+  using RETURN_TYPE = Expr::RETURN_TYPE;
+
 public:
   Resolver(Interpreter &interpreter) : interpreter(interpreter) {}
   virtual ~Resolver() = default;
   void resolve(const vector<shared_ptr<Stmt>> &statements);
 
   // expr
-  RETURN_TYPE visit(const Assign &expr) override;
-  RETURN_TYPE visit(const Binary &expr) override;
-  RETURN_TYPE visit(const Grouping &expr) override;
-  RETURN_TYPE visit(const Literal &expr) override;
-  RETURN_TYPE visit(const Unary &expr) override;
-  RETURN_TYPE visit(const Ternary &expr) override;
-  RETURN_TYPE visit(const Logical &expr) override;
-  RETURN_TYPE visit(const Variable &expr) override;
-  RETURN_TYPE visit(const Call &expr) override;
-  RETURN_TYPE visit(const Lambda &expr) override;
-  RETURN_TYPE visit(const Get &expr) override;
-  RETURN_TYPE visit(const Set &expr) override;
-  RETURN_TYPE visit(const This &expr) override;
+  virtual RETURN_TYPE visit(shared_ptr<Assign> expr) override;
+  virtual RETURN_TYPE visit(shared_ptr<Binary> expr) override;
+  virtual RETURN_TYPE visit(shared_ptr<Grouping> expr) override;
+  virtual RETURN_TYPE visit(shared_ptr<Literal> expr) override;
+  virtual RETURN_TYPE visit(shared_ptr<Unary> expr) override;
+  virtual RETURN_TYPE visit(shared_ptr<Ternary> expr) override;
+  virtual RETURN_TYPE visit(shared_ptr<Logical> expr) override;
+  virtual RETURN_TYPE visit(shared_ptr<Variable> expr) override;
+  virtual RETURN_TYPE visit(shared_ptr<Call> expr) override;
+  virtual RETURN_TYPE visit(shared_ptr<Lambda> expr) override;
+  virtual RETURN_TYPE visit(shared_ptr<Get> expr) override;
+  virtual RETURN_TYPE visit(shared_ptr<Set> expr) override;
+  virtual RETURN_TYPE visit(shared_ptr<This> expr) override;
   // Stmt
-  void visit(const Expression &stmt) override;
-  void visit(const Print &stmt) override;
-  void visit(const Var &stmt) override;
-  void visit(const Block &stmt) override;
-  void visit(const If &stmt) override;
-  void visit(const While &stmt) override;
-  void visit(const Function &func) override;
-  void visit(const Return &stmt) override;
-  void visit(const Class &stmt) override;
+  virtual void visit(shared_ptr<Expression> stmt) override;
+  virtual void visit(shared_ptr<Print> stmt) override;
+  virtual void visit(shared_ptr<Var> stmt) override;
+  virtual void visit(shared_ptr<Block> stmt) override;
+  virtual void visit(shared_ptr<If> stmt) override;
+  virtual void visit(shared_ptr<Function> func) override;
+  virtual void visit(shared_ptr<While> stmt) override;
+  virtual void visit(shared_ptr<Return> stmt) override;
+  virtual void visit(shared_ptr<Class> stmt) override;
 
 private:
   // void resolve(const shared_ptr<Stmt> &stmt);
@@ -88,7 +90,7 @@ private:
     scope[name->lexeme] = true;
   }
 
-  void resolveLocal(const Expr &expr, const shared_ptr<Token> &name) {
+  void resolveLocal(shared_ptr<Expr> expr, const shared_ptr<Token> &name) {
     // 主要是看变量究竟在第几层，然后就固定不动了，不会每次都找
     // 即变量的绑定是在运行之前
     for (int i = scopes.size() - 1; i >= 0; --i) {
@@ -99,15 +101,15 @@ private:
     }
   }
 
-  void resolveLambda(const Lambda &func, FunctionType type) {
+  void resolveLambda(shared_ptr<Lambda> func, FunctionType type) {
     FunctionType enclosingFunction = currentFunction;
     currentFunction = type;
     beginScope();
-    for (auto &param : func.params) {
+    for (auto &param : func->params) {
       declare(param);
       define(param);
     }
-    resolve(func.body);
+    resolve(func->body);
     endScope();
     currentFunction = enclosingFunction;
   }
