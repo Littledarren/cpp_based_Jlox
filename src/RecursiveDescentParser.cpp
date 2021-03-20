@@ -277,7 +277,7 @@ shared_ptr<Expr> Parser::RecursiveDescentParser::multiplication() {
   return expr;
 }
 shared_ptr<Expr> Parser::RecursiveDescentParser::unary() {
-  if (match({BANG, MINUS})) {
+  if (match({BANG, MINUS, PLUS})) {
     shared_ptr<Token> op = previous();
     shared_ptr<Expr> right = unary();
     return std::make_shared<Unary>(op, right);

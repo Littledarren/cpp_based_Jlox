@@ -78,4 +78,6 @@ callback();
 
 cake = Cake();
 cake.taste();
+print "===================TEST===================";
+print +10;
 /* vim: set filetype=javascript : */
