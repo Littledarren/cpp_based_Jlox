@@ -20,16 +20,24 @@ struct Token;
 using std::shared_ptr;
 using std::string;
 
-class Environment {
+/*
+ * 环境，或者说作用域，保存变量，函数，类
+ *
+ */
+class Environment : public std::enable_shared_from_this<Environment> {
+  using KEY_TYPE = const string;
+  using VALUE_TYPE = shared_ptr<Object>;
+
 public:
   Environment(shared_ptr<Environment> enclosing = nullptr)
       : enclosing(enclosing) {}
 
-  void define(const string &name, shared_ptr<Object> value);
-  shared_ptr<Object> get(shared_ptr<Token> name);
-  shared_ptr<Object> getAt(int dis, const string &name);
-  void assign(shared_ptr<Token> name, shared_ptr<Object> value);
-  void assignAt(int dis, shared_ptr<Token> name, shared_ptr<Object> value);
+  void define(KEY_TYPE &key, VALUE_TYPE value);
+
+  VALUE_TYPE get(shared_ptr<Token> name);
+  VALUE_TYPE getAt(int dis, KEY_TYPE &name);
+  void assign(shared_ptr<Token> name, VALUE_TYPE value);
+  void assignAt(int dis, shared_ptr<Token> name, VALUE_TYPE value);
 
   void print() const;
 
@@ -37,17 +45,16 @@ public:
   shared_ptr<Environment> enclosing;
 
 private:
-  Environment *ancestor(int dis) {
-    Environment *environment = this;
+  shared_ptr<Environment> ancestor(int dis) {
+    auto environment = shared_from_this();
     while (dis--) {
-      environment = environment->enclosing.get();
-      //                         ^^^^^^^^^->shared_ptr;
+      environment = environment->enclosing;
     }
     return environment;
   }
 
 private:
-  std::map<const string, shared_ptr<Object>> values;
+  std::map<KEY_TYPE, VALUE_TYPE> values;
 };
 
 #endif
