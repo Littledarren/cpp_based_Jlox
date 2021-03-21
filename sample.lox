@@ -4,6 +4,11 @@
 
 //lox file
 
+/*
+ *
+ * comment test
+ *
+ */
 
 print "===================TEST===================";
 fun fib(n) {

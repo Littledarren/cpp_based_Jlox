@@ -122,7 +122,7 @@ void Lexer::LexerImp::scanToken() {
       while (peek() != '\n' && !isAtEnd())
         advance();
     } else if (match('*')) {
-      while (peek() != '*' && !isAtEnd() && peekNext() != '/') {
+      while (!isAtEnd() && !(peek() == '*' && peekNext() == '/')) {
         if (peek() == '\n')
           line++;
         advance();
