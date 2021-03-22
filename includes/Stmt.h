@@ -16,6 +16,11 @@ using std::vector;
 
 #include "Expr.h"
 
+enum class FUNCTION_TYPE {
+  METHOD,
+  FUNCTION,
+};
+
 struct Expression;
 struct Print;
 //变量声明
@@ -124,12 +129,12 @@ struct Return : ENABLED(Stmt, Return) {
 };
 
 struct Class : ENABLED(Stmt, Class) {
-  Class(shared_ptr<Token> name, const vector<shared_ptr<Function>> &body)
-      : name(name), body(body) {}
+  Class(shared_ptr<Token> name, const vector<shared_ptr<Function>> &methods)
+      : name(name), methods(methods) {}
 
   STMT_VISITABLE();
   shared_ptr<Token> name;
-  vector<shared_ptr<Function>> body;
+  vector<shared_ptr<Function>> methods;
 };
 
 #endif

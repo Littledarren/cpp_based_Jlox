@@ -40,7 +40,11 @@ shared_ptr<Class> Parser::RecursiveDescentParser::clsDeclaration() {
   consume(LEFT_BRACE, "Expect '{' after class name");
   vector<shared_ptr<Function>> methods;
   while (!check(RIGHT_BRACE) && !isAtEnd()) {
-    methods.push_back(funDeclaration("Method"));
+    if (match({CLASS})) {
+      methods.push_back(funDeclaration("static method"));
+    } else {
+      methods.push_back(funDeclaration("Method"));
+    }
   }
   consume(RIGHT_BRACE, "Expect '}' after class name");
 

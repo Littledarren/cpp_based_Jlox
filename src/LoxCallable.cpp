@@ -37,15 +37,20 @@ LoxFunction::call(Interpreter &interpreter,
   return return_value;
 }
 
+////////////////////////////////////////////////////////////////////////
+//                              LoxClass                              //
+////////////////////////////////////////////////////////////////////////
+
 shared_ptr<Object> LoxClass::call(Interpreter &interpreter,
                                   const vector<shared_ptr<Object>> &arguments) {
   auto initializer = findMethod("init");
-  auto instance = std::make_shared<LoxInstance>(*this);
+  auto instance = std::make_shared<LoxInstance>(this);
   if (initializer) {
     initializer->bind(instance)->call(interpreter, arguments);
   }
   return instance;
 }
+
 int LoxClass::arity() {
   shared_ptr<LoxFunction> initializer = findMethod("init");
   if (initializer) {
@@ -53,6 +58,9 @@ int LoxClass::arity() {
   }
   return 0;
 }
+////////////////////////////////////////////////////////////////////////
+//                            LoxFunction                             //
+////////////////////////////////////////////////////////////////////////
 
 shared_ptr<LoxFunction> LoxFunction::bind(shared_ptr<LoxInstance> owner) {
   shared_ptr<Environment> environment = std::make_shared<Environment>(closure);

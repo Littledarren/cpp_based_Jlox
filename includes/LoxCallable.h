@@ -15,6 +15,7 @@
 
 #include <stdexcept>
 
+#include "LoxInstance.h"
 #include "Object.h"
 #include "Stmt.h"
 #include "Value.h"
@@ -81,18 +82,20 @@ private:
 
 #include <map>
 using std::map;
-struct LoxClass : public Callable {
+struct LoxClass : public Callable, public LoxInstance {
   using FIELD_TYPE = shared_ptr<Object>;
 
   LoxClass(const string &name,
            const map<string, shared_ptr<LoxFunction>> &methods)
-      : name(name), methods(methods) {}
+      : LoxInstance(this), name(name), methods(methods) {}
 
+  virtual ~LoxClass() = default;
   virtual shared_ptr<Object>
   call(Interpreter &interpreter,
        const vector<shared_ptr<Object>> &arguments) override;
   virtual int arity() override;
   virtual string toString() const override { return name; }
+
   shared_ptr<LoxFunction> findMethod(string methodName) {
     return methods[methodName];
   }

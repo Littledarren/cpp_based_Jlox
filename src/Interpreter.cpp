@@ -320,7 +320,7 @@ void Interpreter::visit(shared_ptr<Return> stmt) {
 void Interpreter::visit(shared_ptr<Class> stmt) {
   environment->define(stmt->name->lexeme, nullptr);
   std::map<string, shared_ptr<LoxFunction>> methods;
-  for (auto &method : stmt->body) {
+  for (auto &method : stmt->methods) {
     methods[method->name->lexeme] = std::make_shared<LoxFunction>(
         method, environment, method->name->lexeme == "init");
   }

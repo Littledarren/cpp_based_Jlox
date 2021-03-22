@@ -143,8 +143,9 @@ void Resolver::visit(shared_ptr<Class> stmt) {
   define(stmt->name);
 
   beginScope();
+  //解析类的方法
   scopes.back()["this"] = true;
-  for (auto &method : stmt->body) {
+  for (auto &method : stmt->methods) {
     FunctionType declaration = FunctionType::METHOD;
     if (method->name->lexeme == "init") {
       declaration = FunctionType::INITIALIZER;
