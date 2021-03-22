@@ -84,5 +84,13 @@ callback();
 cake = Cake();
 cake.taste();
 print "===================TEST===================";
-print +10;
+print false?10:false?20:+30;
+/*
+ * is this should be valid? I suppose not.
+ */
+//fun (){};
+
+//The user may want this form and use this form to directly declare it is an expression
+(fun(){print "hello lambda";})();
+
 /* vim: set filetype=javascript : */

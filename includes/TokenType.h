@@ -58,6 +58,8 @@ enum TokenType {
   OR,
   PRINT,
   RETURN,
+  BREAK,
+  CONTINUE,
   SUPER,
   THIS,
   TRUE,
@@ -180,6 +182,12 @@ inline string getNameOfType(const TokenType &type) {
     break;
   case RETURN:
     return "RETURN";
+    break;
+  case BREAK:
+    return "BREAK";
+    break;
+  case CONTINUE:
+    return "CONTINUE";
     break;
   case SUPER:
     return "SUPER";
