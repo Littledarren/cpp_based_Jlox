@@ -65,17 +65,19 @@ struct LoxFunction : public Callable {
 
   virtual string toString() const override {
     if (declaration->name)
-      return "<userdefined fn:" + declaration->name->lexeme + ">";
+      return "<user defined fn:" + declaration->name->lexeme + ">";
     else
-      return "<userdefined lambda fn>";
+      return "<user defined lambda fn>";
   }
 
   shared_ptr<LoxFunction> bind(shared_ptr<LoxInstance> owner);
 
   virtual ~LoxFunction() = default;
 
-private:
+public:
   shared_ptr<Function> declaration;
+
+private:
   shared_ptr<Environment> closure;
   bool isInitializer;
 };

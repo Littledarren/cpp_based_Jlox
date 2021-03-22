@@ -15,7 +15,7 @@ shared_ptr<Stmt> Parser::RecursiveDescentParser::declaration() {
     if (match({VAR}))
       return varDeclaration();
     if (match({FUN}))
-      return funDeclaration("Function");
+      return funDeclaration("Function", FunctionType::FUNCTION);
     if (match({CLASS}))
       return clsDeclaration();
 
@@ -41,9 +41,10 @@ shared_ptr<Class> Parser::RecursiveDescentParser::clsDeclaration() {
   vector<shared_ptr<Function>> methods;
   while (!check(RIGHT_BRACE) && !isAtEnd()) {
     if (match({CLASS})) {
-      methods.push_back(funDeclaration("static method"));
+      methods.push_back(
+          funDeclaration("static method", FunctionType::STATIC_METHOD));
     } else {
-      methods.push_back(funDeclaration("Method"));
+      methods.push_back(funDeclaration("Method", FunctionType::METHOD));
     }
   }
   consume(RIGHT_BRACE, "Expect '}' after class name");
@@ -51,12 +52,16 @@ shared_ptr<Class> Parser::RecursiveDescentParser::clsDeclaration() {
   return std::make_shared<Class>(name, methods);
 }
 shared_ptr<Function>
-Parser::RecursiveDescentParser::funDeclaration(const string &des) {
+Parser::RecursiveDescentParser::funDeclaration(const string &des,
+                                               FunctionType type) {
   shared_ptr<Token> name = consume(IDENTIFIER, "Expect " + des + " name");
+  //成员函数是init,初始化
+  if (name->lexeme == "init" && type == FunctionType::METHOD)
+    type = FunctionType::INITIALIZER;
 
   shared_ptr<Lambda> lambda = lambdaFunc();
 
-  return std::make_shared<Function>(name, lambda);
+  return std::make_shared<Function>(name, lambda, type);
 }
 shared_ptr<Stmt> Parser::RecursiveDescentParser::statement() {
   if (match({PRINT}))

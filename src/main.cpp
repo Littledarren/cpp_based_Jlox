@@ -103,7 +103,6 @@ static void run(const string &source) {
     Resolver resolver(interpreter);
     resolver.resolve(statements);
   }
-
   if (!hadError) {
     // 3/.语义
     interpreter.interprete(statements);

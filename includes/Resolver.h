@@ -24,8 +24,7 @@ using std::vector;
 #include "Interpreter.h"
 #include "main.h"
 
-enum class FunctionType { NONE, FUNCTION, METHOD, INITIALIZER };
-enum class ClassType { NONE, CLASS};
+enum class ClassType { NONE, CLASS };
 
 // 本质上语法树已经给出来了，很多工作都可以基于AST做，所以Treewalker也好，
 // Resolver也好，都是一样的
@@ -99,11 +98,13 @@ private:
         return;
       }
     }
+    //::error(*name, "can not find in this scope");
   }
 
   void resolveLambda(shared_ptr<Lambda> func, FunctionType type) {
     FunctionType enclosingFunction = currentFunction;
     currentFunction = type;
+
     beginScope();
     for (auto &param : func->params) {
       declare(param);

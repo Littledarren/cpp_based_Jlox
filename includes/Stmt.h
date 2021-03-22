@@ -16,10 +16,7 @@ using std::vector;
 
 #include "Expr.h"
 
-enum class FUNCTION_TYPE {
-  METHOD,
-  FUNCTION,
-};
+enum class FunctionType { NONE, FUNCTION, METHOD, INITIALIZER, STATIC_METHOD };
 
 struct Expression;
 struct Print;
@@ -111,12 +108,13 @@ struct While : ENABLED(Stmt, While) {
   shared_ptr<Stmt> body;
 };
 struct Function : ENABLED(Stmt, Function) {
-  Function(shared_ptr<Token> name, shared_ptr<Lambda> lambda)
-      : name(name), lambda(lambda) {}
+  Function(shared_ptr<Token> name, shared_ptr<Lambda> lambda, FunctionType type)
+      : name(name), lambda(lambda), type(type) {}
 
   STMT_VISITABLE();
   shared_ptr<Token> name;
   shared_ptr<Lambda> lambda;
+  FunctionType type;
 };
 
 struct Return : ENABLED(Stmt, Return) {

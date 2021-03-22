@@ -146,11 +146,8 @@ void Resolver::visit(shared_ptr<Class> stmt) {
   //解析类的方法
   scopes.back()["this"] = true;
   for (auto &method : stmt->methods) {
-    FunctionType declaration = FunctionType::METHOD;
-    if (method->name->lexeme == "init") {
-      declaration = FunctionType::INITIALIZER;
-    }
-    resolveLambda(method->lambda, declaration);
+    //在语法解析时候确定type
+    resolveLambda(method->lambda, method->type);
   }
   endScope();
   currentClass = enclosingClass;

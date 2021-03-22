@@ -235,7 +235,8 @@ Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Variable> expr) {
 
 Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Lambda> expr) {
   return std::make_shared<LoxFunction>(
-      std::make_shared<Function>(nullptr, expr->shared_from_this()),
+      std::make_shared<Function>(nullptr, expr->shared_from_this(),
+                                 FunctionType::FUNCTION),
       environment, false);
 }
 Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Get> expr) {
