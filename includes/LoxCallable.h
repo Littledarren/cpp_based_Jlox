@@ -1,7 +1,4 @@
 /*================================================================
-
-
-
 *
 *
 *   FileName: LoxCallable.h
@@ -13,23 +10,33 @@
 #ifndef _LOXCALLABLE_H_
 #define _LOXCALLABLE_H_
 
-#include <stdexcept>
 
 #include "LoxInstance.h"
-#include "Object.h"
 #include "Stmt.h"
 #include "Value.h"
 
+namespace clox {
+namespace runtime {
+
 class Interpreter;
 class Environment;
+using namespace compiling;
+using token::TokenType;
+using value::LoxInstance;
+using value::Object;
 
+//用于控制流，如break, continue, return
 struct Control : public runtime_error {
-  Control(const shared_ptr<Object> &data, TokenType type)
+  Control(TokenType type, const shared_ptr<token::Object> &data)
       : runtime_error(getNameOfType(type)), type(type), data(data) {}
 
   TokenType type;
   shared_ptr<Object> data;
 };
+
+////////////////////////////////////////////////////////////////////////
+//                                 借口                               //
+////////////////////////////////////////////////////////////////////////
 
 struct Callable : public virtual Object {
   virtual shared_ptr<Object> call(Interpreter &,
@@ -38,8 +45,12 @@ struct Callable : public virtual Object {
   virtual ~Callable() = default;
 };
 
+////////////////////////////////////////////////////////////////////////
+//                          Native Functions                          //
+////////////////////////////////////////////////////////////////////////
+
 struct NativeFunction : public Callable {
-  virtual string toString() const override { return "<native fn>"; }
+  virtual string toString() const { return "<native fn>"; }
   virtual ~NativeFunction() = default;
 };
 
@@ -47,11 +58,13 @@ struct Clock : public NativeFunction {
   virtual int arity() override { return 0; }
   virtual shared_ptr<Object> call(Interpreter &,
                                   const vector<shared_ptr<Object>> &) override {
-    return std::make_shared<Number>((double)time(0));
+    return std::make_shared<value::Number>((double)time(0));
   }
 };
+////////////////////////////////////////////////////////////////////////
+//                              Function                              //
+////////////////////////////////////////////////////////////////////////
 
-struct LoxInstance;
 struct LoxFunction : public Callable {
   LoxFunction(shared_ptr<Function> func, shared_ptr<Environment> closure,
               bool isInitializer)
@@ -79,10 +92,10 @@ public:
 
 private:
   shared_ptr<Environment> closure;
+  //应该没有必要了。必要的信息应该保存在编译时中
   bool isInitializer;
 };
 
-#include <map>
 using std::map;
 struct LoxClass : public Callable, public LoxInstance {
   using FIELD_TYPE = shared_ptr<Object>;
@@ -106,5 +119,7 @@ public:
   string name;
   map<string, shared_ptr<LoxFunction>> methods;
 };
+} // namespace runtime
+} // namespace clox
 
 #endif

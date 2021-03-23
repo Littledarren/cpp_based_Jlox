@@ -15,6 +15,9 @@
 
 #include "Stmt.h"
 
+namespace clox {
+namespace compiling {
+
 using std::unique_ptr;
 using std::vector;
 
@@ -29,5 +32,8 @@ private:
   class RecursiveDescentParser;
   unique_ptr<RecursiveDescentParser> impl;
 };
+
+} // namespace compiling
+} // namespace clox
 
 #endif

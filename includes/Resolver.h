@@ -17,13 +17,16 @@ using std::map;
 using std::vector;
 
 // 子类必须包含父类的头文件
+#include "ErrorReporting.h"
 #include "Stmt.h"
 #include "Value.h"
 
 //或许可以弄到cpp中，不过应该是强依赖关系？
 #include "Interpreter.h"
-#include "main.h"
 
+namespace clox {
+namespace compiling {
+using runtime::Interpreter;
 enum class ClassType { NONE, CLASS };
 
 // 本质上语法树已经给出来了，很多工作都可以基于AST做，所以Treewalker也好，
@@ -77,7 +80,7 @@ private:
 
     auto &scope = scopes.back();
     if (scope.find(name->lexeme) != scope.end()) {
-      ::error(*name, "already variable with this name in this scope");
+      error::error(*name, "already variable with this name in this scope");
     }
     scope[name->lexeme] = false;
   }
@@ -125,5 +128,8 @@ private:
   vector<map<string, bool>> scopes;
   Interpreter &interpreter;
 };
+
+} // namespace compiling
+} // namespace clox
 
 #endif /* RESOLVER_H */

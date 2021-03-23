@@ -1,9 +1,13 @@
-#include "../includes/Environment.h"
+#include "Environment.h"
 
 #include <iostream>
 
-#include "../includes/RuntimeError.h"
-#include "../includes/Token.h"
+#include "ErrorReporting.h"
+#include "Token.h"
+
+namespace clox {
+namespace runtime {
+using error::RuntimeError;
 using std::cout;
 using std::endl;
 
@@ -50,3 +54,5 @@ void Environment::print() const {
          << endl;
   }
 }
+} // namespace runtime
+} // namespace clox

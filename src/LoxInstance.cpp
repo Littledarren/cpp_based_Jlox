@@ -1,6 +1,13 @@
 #include "LoxInstance.h"
 #include "LoxCallable.h"
 
+namespace clox {
+namespace value {
+
+using namespace runtime;
+using namespace compiling;
+using namespace error;
+
 string LoxInstance::toString() const { return klass->name + "  instance"; }
 
 LoxInstance::FIELD_TYPE LoxInstance::get(shared_ptr<Token> token) {
@@ -21,3 +28,5 @@ LoxInstance::FIELD_TYPE LoxInstance::get(shared_ptr<Token> token) {
 
   throw RuntimeError(token, "Undefined property '" + token->lexeme + "'");
 }
+} // namespace value
+} // namespace clox

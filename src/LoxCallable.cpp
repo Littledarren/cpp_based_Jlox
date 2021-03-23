@@ -7,11 +7,13 @@
 *   Description:
 *
 ================================================================*/
-
 #include "LoxCallable.h"
 
 #include "Interpreter.h"
 #include "LoxInstance.h"
+
+namespace clox {
+namespace runtime {
 
 shared_ptr<Object>
 LoxFunction::call(Interpreter &interpreter,
@@ -67,3 +69,5 @@ shared_ptr<LoxFunction> LoxFunction::bind(shared_ptr<LoxInstance> owner) {
   environment->define("this", owner);
   return std::make_shared<LoxFunction>(declaration, environment, isInitializer);
 }
+} // namespace runtime
+} // namespace clox

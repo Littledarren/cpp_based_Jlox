@@ -13,17 +13,26 @@
 #include <map>
 #include <memory>
 
+#include "ErrorReporting.h"
 #include "Object.h"
-#include "RuntimeError.h"
 
+namespace clox {
+namespace runtime {
 struct LoxClass;
+}
+namespace value {
+// Token.h在error reporting中被包含了。。。
+using runtime::LoxClass;
+using token::Token;
 
 struct LoxInstance : public virtual Object,
                      public std::enable_shared_from_this<LoxInstance> {
   using FIELD_TYPE = shared_ptr<Object>;
 
 public:
+  //可能会传入this指针。。所以不能是自身的引用？
   LoxInstance(LoxClass *klass) : klass(klass) {}
+
   virtual ~LoxInstance() = default;
   virtual string toString() const override;
   FIELD_TYPE get(shared_ptr<Token> token);
@@ -37,5 +46,8 @@ private:
   LoxClass *klass;
   std::map<string, FIELD_TYPE> fields;
 };
+
+} // namespace value
+} // namespace clox
 
 #endif /* LOXINSTANCE_H */

@@ -1,7 +1,10 @@
 #include "RecursiveDescentParser.h"
 
 #include "Value.h"
-#include "main.h"
+
+namespace clox {
+namespace compiling {
+using namespace value;
 
 vector<shared_ptr<Stmt>> Parser::RecursiveDescentParser::parse() {
   decltype(parse()) statements;
@@ -373,7 +376,7 @@ Parser::RecursiveDescentParser::consume(TokenType type, const string &message) {
 }
 ParseError Parser::RecursiveDescentParser::error(shared_ptr<Token> token,
                                                  const string &message) {
-  ::error(*token, message);
+  error::error(*token, message);
   return ParseError(message);
 }
 void Parser::RecursiveDescentParser::synchronize() {
@@ -401,3 +404,5 @@ void Parser::RecursiveDescentParser::synchronize() {
     advance();
   }
 }
+} // namespace compiling
+} // namespace clox

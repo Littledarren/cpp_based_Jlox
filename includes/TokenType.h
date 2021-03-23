@@ -1,8 +1,7 @@
 /*================================================================
 *
 *
-*   FileName: TokenType.h
-*   Author: DarrenHuang
+*   FileName: TokenType.h *   Author: DarrenHuang
 *   Create Time: 2020/07/06  09:20(星期一)
 *   Description:
 *           Define TokenType as the basic description for Lexer to use.
@@ -12,8 +11,12 @@
 #define _TOKENTYPE_H_
 
 #include <string>
-using std::string;
+#include <unordered_map>
 
+namespace clox {
+using std::string;
+using std::unordered_map;
+namespace token {
 enum TokenType {
   // Single character tokens
   NUL,
@@ -63,148 +66,20 @@ enum TokenType {
   TRUE,
   VAR,
   WHILE,
+  CONTINUE,
+  BREAK,
 
   FOE
 };
 
-/******************************************************************************
- * Function:         getNameOfType
- * Description:
- * Where:
- * Return:
- * Error:
- *****************************************************************************/
+extern unordered_map<TokenType, string> mapper;
+
 inline string getNameOfType(const TokenType &type) {
-  switch (type) {
-  case LEFT_PAREN:
-    return "LEFT_PAREN";
-    break;
-  case QUESTION_MASK:
-    return "QUESTION_MASK";
-    break;
-  case COLON:
-    return "COLON";
-    break;
-  case RIGHT_PAREN:
-    return "RIGHT_PAREN";
-    break;
-  case LEFT_BRACE:
-    return "LEFT_BRACE";
-    break;
-  case RIGHT_BRACE:
-    return "RIGHT_BRACE";
-    break;
-  case COMMA:
-    return "COMMA";
-    break;
-  case DOT:
-    return "DOT";
-    break;
-  case MINUS:
-    return "MINUS";
-    break;
-  case PLUS:
-    return "PLUS";
-    break;
-  case STAR:
-    return "STAR";
-    break;
-  case SLASH:
-    return "SLASH";
-    break;
-  case SEMICOLON:
-    return "SEMICOLON";
-    break;
-  case BANG:
-    return "BANG";
-    break;
-  case BANG_EQUAL:
-    return "BANG_EQUAL";
-    break;
-  case EQUAL:
-    return "EQUAL";
-    break;
-  case EQUAL_EQUAL:
-    return "EQUAL_EQUAL";
-    break;
-  case GREATER:
-    return "GREATER";
-    break;
-  case GREATER_EQUAL:
-    return "GREATER_EQUAL";
-    break;
-  case LESS:
-    return "LESS";
-    break;
-  case LESS_EQUAL:
-    return "LESS_EQUAL";
-    break;
-  case IDENTIFIER:
-    return "IDENTIFIER";
-    break;
-  case STRING:
-    return "STRING";
-    break;
-  case NUMBER:
-    return "NUMBER";
-    break;
-  case AND:
-    return "AND";
-    break;
-  case CLASS:
-    return "CLASS";
-    break;
-  case ELSE:
-    return "ELSE";
-    break;
-  case FALSE:
-    return "FALSE";
-    break;
-  case FUN:
-    return "FUN";
-    break;
-  case FOR:
-    return "FOR";
-    break;
-  case IF:
-    return "IF";
-    break;
-  case NIL:
-    return "NIL";
-    break;
-  case OR:
-    return "OR";
-    break;
-  case PRINT:
-    return "PRINT";
-    break;
-  case RETURN:
-    return "RETURN";
-    break;
-  case SUPER:
-    return "SUPER";
-    break;
-  case THIS:
-    return "THIS";
-    break;
-  case TRUE:
-    return "TRUE";
-    break;
-  case VAR:
-    return "VAR";
-    break;
-  case WHILE:
-    return "WHILE";
-    break;
-  case FOE:
-    return "FOE";
-    break;
-  case NUL:
-    return "NUL SYMBOL!!!";
-  default:
-    return "UNKOWN TYPE";
-    break;
-  }
+  if (mapper.find(type) != mapper.end())
+    return mapper.at(type);
+  return "NOT FOUND";
 }
+} // namespace token
+} // namespace clox
 
 #endif

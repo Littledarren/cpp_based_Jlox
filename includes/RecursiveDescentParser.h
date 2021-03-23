@@ -13,13 +13,13 @@
 #include <exception>
 #include <initializer_list>
 
+#include "ErrorReporting.h"
 #include "Parser.h"
 
-class ParseError : public std::runtime_error {
-public:
-  ParseError(const string &s) : runtime_error(s) {}
-};
-
+namespace clox {
+namespace compiling {
+using namespace token;
+using namespace error;
 // a implementation of Parser
 class Parser::RecursiveDescentParser {
 public:
@@ -100,4 +100,6 @@ private:
   int current = 0;
 };
 
+} // namespace compiling
+} // namespace clox
 #endif

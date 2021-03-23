@@ -3,7 +3,7 @@ CC      = g++
 CFLAGS  = -Wall -O0 -g -std=c++11
 INCLUDEFLAGS = -I ../includes/
 LDFLAGS = 
-OBJS    = Object.o main.o  Value.o Lexer.o Parser.o  RecursiveDescentParser.o Environment.o Interpreter.o LoxCallable.o Resolver.o LoxInstance.o
+OBJS    = Object.o main.o  Value.o Lexer.o Parser.o  RecursiveDescentParser.o Environment.o Interpreter.o LoxCallable.o Resolver.o LoxInstance.o TokenType.o 
 TARGETS = lox.out
 
 vpath %.cpp ../src

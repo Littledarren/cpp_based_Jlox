@@ -6,8 +6,10 @@
 *   Create Time: 2021/03/17  10:54(星期三) *   Description:
 *
 ================================================================*/
-
 #include "Resolver.h"
+
+namespace clox {
+namespace compiling {
 
 void Resolver::resolve(const vector<shared_ptr<Stmt>> &statements) {
   for (auto &p : statements) {
@@ -54,7 +56,8 @@ Resolver::RETURN_TYPE Resolver::visit(shared_ptr<Variable> expr) {
       // java的get如果不存在返回null,c++必须先判断一下，如果不想出异常的话
       && scopes.back().find(expr->name->lexeme) != scopes.back().end() &&
       !scopes.back()[expr->name->lexeme]) {
-    ::error(*expr->name, "Can't read local variable in its own initializer");
+    error::error(*expr->name,
+                 "Can't read local variable in its own initializer");
   }
 
   resolveLocal(expr, expr->name);
@@ -89,7 +92,7 @@ Resolver::RETURN_TYPE Resolver::visit(shared_ptr<Set> expr) {
 }
 Resolver::RETURN_TYPE Resolver::visit(shared_ptr<This> expr) {
   if (currentClass == ClassType::NONE) {
-    ::error(*expr->keyword, "Can't use 'this' outside of a class");
+    error::error(*expr->keyword, "Can't use 'this' outside of a class");
   }
   resolveLocal(expr, expr->keyword);
   return nullptr;
@@ -126,11 +129,11 @@ void Resolver::visit(shared_ptr<Function> func) {
 }
 void Resolver::visit(shared_ptr<Return> stmt) {
   if (currentFunction == FunctionType::NONE) {
-    ::error(*stmt->name, "Can't return from top-level code");
+    error::error(*stmt->name, "Can't return from top-level code");
   }
   if (stmt->value) {
     if (currentFunction == FunctionType::INITIALIZER) {
-      ::error(*stmt->name, "Can't return a value from an initializer");
+      error::error(*stmt->name, "Can't return a value from an initializer");
     }
     resolve(stmt->value);
   }
@@ -152,3 +155,5 @@ void Resolver::visit(shared_ptr<Class> stmt) {
   endScope();
   currentClass = enclosingClass;
 }
+} // namespace compiling
+} // namespace clox

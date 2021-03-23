@@ -11,20 +11,20 @@
 #ifndef _Value_H_
 #define _Value_H_
 
-#include <functional>
 #include <sstream>
-#include <stdexcept>
-#include <vector>
-using std::ostringstream;
-using std::runtime_error;
-using std::vector;
 
 #include "Object.h"
+
+namespace clox {
+using std::ostringstream;
+namespace value {
 
 struct Number;
 struct Bool;
 struct String;
 
+shared_ptr<String> StringAdd(const shared_ptr<String> &str,
+                             const shared_ptr<Object> &ob);
 // 没啥用，还麻烦，不好弄。。。
 // struct Nil;
 //
@@ -60,35 +60,26 @@ struct Number : public virtual Object {
   Number(double value = 0.0) : value(value) {}
   operator double() { return value; }
   operator double() const { return value; }
-  bool operator==(const Object &r) const override {
-    const Number *rp = dynamic_cast<const Number *>(&r);
-    if (rp == nullptr)
-      throw runtime_error("Number class should not be compared with nullptr");
-    return value == rp->value;
-  }
-  string toString() const override {
-    std::ostringstream oss;
-    oss << value;
-    return oss.str();
-  }
+
+  bool operator==(const Object &r) const override;
+  string toString() const override;
+
   virtual shared_ptr<Object> clone() const override {
     return std::make_shared<Number>(value);
   }
+
   virtual bool isTrue() const override { return value != 0; }
+
+public:
   double value;
 };
 
 struct Bool : public virtual Object {
   Bool(bool value = false) : value(value) {}
-
   operator bool() { return value; }
   operator bool() const { return value; }
-  bool operator==(const Object &r) const override {
-    const Bool *rp = dynamic_cast<const Bool *>(&r);
-    if (rp == nullptr)
-      return false;
-    return value == rp->value;
-  }
+
+  bool operator==(const Object &r) const override;
 
   string toString() const override { return value ? "True" : "False"; }
   virtual shared_ptr<Object> clone() const override {
@@ -96,30 +87,34 @@ struct Bool : public virtual Object {
   }
   virtual bool isTrue() const override { return value; }
 
+public:
   bool value;
 };
 
 struct String : public virtual Object {
+
+  friend shared_ptr<String> StringAdd(const shared_ptr<String> &str,
+                                      const shared_ptr<Object> &ob);
   String(const char *value = "") : value(value) {}
   String(const string &value = "") : value(value) {}
   operator string() { return value; }
   operator string() const { return value; }
-  bool operator==(const Object &r) const override {
-    const String *rp = dynamic_cast<const String *>(&r);
-    if (rp == nullptr)
-      return false;
-    return value == rp->value;
-  }
+
+  bool operator==(const Object &r) const override;
 
   string toString() const override { return value; }
   virtual shared_ptr<Object> clone() const override {
     return std::make_shared<String>(value);
   }
+
   virtual bool isTrue() const override { return !value.empty(); }
-  String operator+(const shared_ptr<Object> &value) const;
-  String operator+(const Number &value) const;
-  String operator+(const Bool &value) const;
+  String operator+(const Object &obj) const;
+
+public:
   string value;
 };
+
+} // namespace value
+} // namespace clox
 
 #endif

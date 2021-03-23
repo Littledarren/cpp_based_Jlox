@@ -10,7 +10,6 @@
 #ifndef _INTERPRETER_H_
 #define _INTERPRETER_H_
 
-#include <ctime>
 #include <initializer_list>
 #include <memory>
 #include <vector>
@@ -18,7 +17,12 @@
 #include "Environment.h"
 #include "Stmt.h"
 #include "Value.h"
+
+namespace clox {
+namespace runtime {
+
 using std::vector;
+using namespace compiling;
 
 typedef std::shared_ptr<Stmt> StmtPtr;
 
@@ -80,5 +84,7 @@ private:
 private:
   std::map<shared_ptr<Expr>, int> locals;
 };
+} // namespace runtime
+} // namespace clox
 
 #endif

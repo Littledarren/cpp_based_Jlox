@@ -15,10 +15,17 @@
 #include <string>
 
 #include "Value.h"
-struct Token;
+namespace clox {
 
+namespace token {
+struct Token;
+}
+
+namespace runtime {
 using std::shared_ptr;
 using std::string;
+using namespace value;
+using namespace token;
 
 /*
  * 环境，或者说作用域，保存变量，函数，类
@@ -57,5 +64,8 @@ private:
 private:
   std::map<KEY_TYPE, VALUE_TYPE> values;
 };
+
+} // namespace runtime
+} // namespace clox
 
 #endif

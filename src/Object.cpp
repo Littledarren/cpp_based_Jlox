@@ -1,11 +1,11 @@
-
-#include "../includes/Object.h"
-
-#include "../includes/Value.h"
-
-bool Object::operator==(const Object &o) const { return this == &o; }
+#include "Object.h"
 
 #include <sstream>
+
+namespace clox {
+namespace value {
+
+bool Object::operator==(const Object &o) const { return this == &o; }
 
 shared_ptr<Object> Object::clone() const { return nullptr; }
 
@@ -20,3 +20,5 @@ bool Object::isTrue() const {
   //能调用的肯定不是nullptr
   return true;
 }
+} // namespace value
+} // namespace clox

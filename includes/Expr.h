@@ -19,8 +19,13 @@
 
 #include "Token.h"
 
+namespace clox {
+namespace compiling {
+
 using std::string;
 using std::vector;
+using token::Token;
+using value::Object;
 
 //用于继承，
 #define ENABLED(Base, Derived)                                                 \
@@ -200,5 +205,7 @@ struct This : ENABLED(Expr, This) {
   EXPR_VISITABLE();
   shared_ptr<Token> keyword;
 };
+} // namespace compiling
+} // namespace clox
 
 #endif

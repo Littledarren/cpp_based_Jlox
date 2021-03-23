@@ -2,11 +2,16 @@
 #define LEXER_H
 #include <memory>
 #include <vector>
+
+#include "Token.h"
+
+namespace clox {
+namespace compiling {
+
 using std::shared_ptr;
 using std::unique_ptr;
 using std::vector;
-
-#include "Token.h"
+using token::Token;
 
 // interface for lexical parsing
 class Lexer {
@@ -21,5 +26,7 @@ private:
   class LexerImp;
   unique_ptr<LexerImp> impl;
 };
+} // namespace compiling
+} // namespace clox
 
 #endif

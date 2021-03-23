@@ -5,9 +5,11 @@
 
 #include "LoxCallable.h"
 #include "LoxInstance.h"
-#include "main.h"
 using std::cout;
 
+namespace clox {
+namespace runtime {
+using namespace error;
 Interpreter::Interpreter()
     : globals(std::make_shared<Environment>(nullptr)), environment(globals) {
   environment->define("clock", std::make_shared<Clock>());
@@ -135,18 +137,9 @@ Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Binary> expr) {
   case PLUS:
     checkStringOrNumber(expr->op, left, right);
     //字符串可以跟其他类型+
-    //要么都是数字，要么左边是字符串，没有其他可能
+    //要么都是数字，要么左边是字符串，没有其他可能(nil也可能。。)
     if (is_string) {
-      if (auto temp_number = std::dynamic_pointer_cast<Number>(right))
-        result = std::make_shared<String>(
-            *std::dynamic_pointer_cast<String>(left) + *temp_number);
-      else if (auto temp_bool = std::dynamic_pointer_cast<Bool>(right))
-        result = std::make_shared<String>(
-            *std::dynamic_pointer_cast<String>(left) + *temp_bool);
-      else
-        result = std::make_shared<String>(
-            (string)*std::dynamic_pointer_cast<String>(left) +
-            (string)*std::dynamic_pointer_cast<String>(right));
+      result = value::StringAdd(std::dynamic_pointer_cast<String>(left), right);
     } else
       result =
           std::make_shared<Number>(*std::dynamic_pointer_cast<Number>(left) +
@@ -316,7 +309,7 @@ void Interpreter::visit(shared_ptr<Return> stmt) {
   if (stmt->value) {
     value = evaluate(stmt->value);
   }
-  throw Control(value, stmt->name->type);
+  throw Control(stmt->name->type, value);
 }
 void Interpreter::visit(shared_ptr<Class> stmt) {
   environment->define(stmt->name->lexeme, nullptr);
@@ -358,3 +351,5 @@ void Interpreter::chechNumber(shared_ptr<Token> op, shared_ptr<Object> l,
     return;
   throw RuntimeError(op, "operands should be numbers");
 }
+} // namespace runtime
+} // namespace clox

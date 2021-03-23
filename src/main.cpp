@@ -11,8 +11,6 @@
 *       This is interpretation.
 *
 ================================================================*/
-#include "main.h"
-
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -26,7 +24,10 @@
 
 using std::cin;
 using std::cout;
+using std::endl;
 using std::ifstream;
+
+namespace clox {
 
 // Compilation Error
 bool hadError = false; // has error ?
@@ -39,15 +40,21 @@ enum ERROR_CODE {
   COMPILATION_ERROR = 65,
   RUNTIME_ERROR = 70
 };
+} // namespace clox
 
-static void runFile(const char *path);
-static void runPrompt();
-static void run(const string &source);
+namespace {
+using namespace clox;
+void runFile(const char *path);
+void runPrompt();
+void run(const string &source);
+
+} // namespace
+using namespace clox;
 
 int main(int argc, char *argv[]) {
   if (argc > 2) {
     cout << "Usage: jlox [script]" << endl;
-    return ARGUMENT_TOO_LESS;
+    return clox::ARGUMENT_TOO_LESS;
   } else if (argc == 2) {
     runFile(argv[1]);
   } else {
@@ -57,7 +64,10 @@ int main(int argc, char *argv[]) {
   return 0;
 }
 
-static void runFile(const char *path) {
+namespace {
+using namespace clox;
+
+void runFile(const char *path) {
   string source, temp;
   ifstream is(path);
   while (getline(is, temp)) {
@@ -66,29 +76,28 @@ static void runFile(const char *path) {
   run(source);
   // in c++, there is no need to do this ... disgusting thing at all.
   // is.close();
-  if (hadError)
-    exit(COMPILATION_ERROR);
-  if (hadRuntimeError)
-    exit(RUNTIME_ERROR);
+  if (clox::hadError)
+    exit(clox::COMPILATION_ERROR);
+  if (clox::hadRuntimeError)
+    exit(clox::RUNTIME_ERROR);
 }
-
-static void runPrompt() {
+void runPrompt() {
   string cmd;
   do {
     cout << "> ";
     if (cin.good() && getline(cin, cmd))
       run(cmd);
-    hadError = false;
+    clox::hadError = false;
   } while (cin.good());
 }
 
-static void run(const string &source) {
+void run(const string &source) {
   // interpreter has some information to preserve.
-  static Interpreter interpreter;
+  static clox::runtime::Interpreter interpreter;
 
   // 1.词法
-  Lexer lexer(source);
-  const vector<shared_ptr<Token>> tokens = lexer.scanTokens();
+  clox::compiling::Lexer lexer(source);
+  const vector<shared_ptr<token::Token>> tokens = lexer.scanTokens();
 #ifdef DEBUG
   for (auto p : tokens) {
     cout << (string)*p << endl;
@@ -96,11 +105,11 @@ static void run(const string &source) {
 #endif
 
   // 2.句法or语法
-  Parser parser(tokens);
-  vector<shared_ptr<Stmt>> statements = parser.parse();
+  compiling::Parser parser(tokens);
+  vector<shared_ptr<compiling::Stmt>> statements = parser.parse();
 
   if (!hadError) {
-    Resolver resolver(interpreter);
+    clox::compiling::Resolver resolver(interpreter);
     resolver.resolve(statements);
   }
   if (!hadError) {
@@ -109,3 +118,4 @@ static void run(const string &source) {
     // delete astP;
   }
 }
+} // namespace

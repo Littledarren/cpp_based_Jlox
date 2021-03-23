@@ -16,6 +16,9 @@ using std::vector;
 
 #include "Expr.h"
 
+namespace clox {
+namespace compiling {
+
 enum class FunctionType { NONE, FUNCTION, METHOD, INITIALIZER, STATIC_METHOD };
 
 struct Expression;
@@ -134,5 +137,7 @@ struct Class : ENABLED(Stmt, Class) {
   shared_ptr<Token> name;
   vector<shared_ptr<Function>> methods;
 };
+} // namespace compiling
+} // namespace clox
 
 #endif

@@ -12,8 +12,14 @@
 #include <map>
 #include <sstream>
 
+#include "ErrorReporting.h"
 #include "Value.h"
-#include "main.h"
+
+namespace clox {
+namespace compiling {
+using namespace token;
+using namespace value;
+using error::error;
 
 class Lexer::LexerImp {
 public:
@@ -48,11 +54,12 @@ private:
 };
 
 std::map<string, TokenType> Lexer::LexerImp::keywords = {
-    {"and", AND},   {"class", CLASS}, {"else", ELSE},     {"false", FALSE},
-    {"for", FOR},   {"fun", FUN},     {"if", IF},         {"nil", NIL},
-    {"or", OR},     {"print", PRINT}, {"return", RETURN}, {"super", SUPER},
-    {"this", THIS}, {"true", TRUE},   {"var", VAR},       {"while", WHILE},
-};
+    {"and", AND},     {"class", CLASS},       {"else", ELSE},
+    {"false", FALSE}, {"for", FOR},           {"fun", FUN},
+    {"if", IF},       {"nil", NIL},           {"or", OR},
+    {"print", PRINT}, {"return", RETURN},     {"super", SUPER},
+    {"this", THIS},   {"true", TRUE},         {"var", VAR},
+    {"while", WHILE}, {"continue", CONTINUE}, {"break", BREAK}};
 
 vector<shared_ptr<Token>> Lexer::LexerImp::scanTokens() {
   while (!isAtEnd()) {
@@ -234,7 +241,13 @@ void Lexer::LexerImp::addToken(TokenType type, shared_ptr<Object> literal) {
   tokens_list.push_back(std::make_shared<Token>(type, text, literal, line));
 }
 
+////////////////////////////////////////////////////////////////////////
+//                                接口部分                            //
+////////////////////////////////////////////////////////////////////////
+
 vector<shared_ptr<Token>> Lexer::scanTokens() { return impl->scanTokens(); }
 
 Lexer::Lexer(const string &source) : impl(new LexerImp(source)) {}
 Lexer::~Lexer() = default;
+} // namespace compiling
+} // namespace clox
