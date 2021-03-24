@@ -27,7 +27,7 @@ using std::vector;
 namespace clox {
 namespace compiling {
 using runtime::Interpreter;
-enum class ClassType { NONE, CLASS };
+enum class ClassType { NONE, CLASS, SUBCLASS };
 
 // 本质上语法树已经给出来了，很多工作都可以基于AST做，所以Treewalker也好，
 // Resolver也好，都是一样的
@@ -54,6 +54,7 @@ public:
   virtual RETURN_TYPE visit(shared_ptr<Get> expr) override;
   virtual RETURN_TYPE visit(shared_ptr<Set> expr) override;
   virtual RETURN_TYPE visit(shared_ptr<This> expr) override;
+  virtual RETURN_TYPE visit(shared_ptr<Super> expr) override;
   // Stmt
   virtual void visit(shared_ptr<Expression> stmt) override;
   virtual void visit(shared_ptr<Print> stmt) override;

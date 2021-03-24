@@ -13,6 +13,7 @@ using namespace error;
 Interpreter::Interpreter()
     : globals(std::make_shared<Environment>(nullptr)), environment(globals) {
   environment->define("clock", std::make_shared<Clock>());
+  environment->define("input", std::make_shared<Input>());
 }
 
 void Interpreter::interprete(vector<StmtPtr> statements) {
@@ -253,6 +254,18 @@ Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Set> expr) {
 Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<This> expr) {
   return lookUpVariable(expr->keyword, expr);
 }
+Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Super> expr) {
+  int dis = locals.at(expr);
+  auto super_class =
+      std::dynamic_pointer_cast<LoxClass>(environment->getAt(dis, "super"));
+  auto instance = std::dynamic_pointer_cast<LoxInstance>(
+      environment->getAt(dis - 1, "this"));
+  auto method = super_class->findMethod(expr->method->lexeme);
+  if (!method)
+    throw RuntimeError(expr->method,
+                       "Undefined property '" + expr->method->lexeme + "'");
+  return method->bind(instance);
+}
 void Interpreter::visit(shared_ptr<Expression> stmt) { evaluate(stmt->expr); }
 void Interpreter::visit(shared_ptr<Print> stmt) {
   RETURN_TYPE value = evaluate(stmt->expr);
@@ -317,12 +330,17 @@ void Interpreter::visit(shared_ptr<Class> stmt) {
     super_class =
         std::dynamic_pointer_cast<LoxClass>(evaluate(stmt->super_class));
     if (!super_class) {
-      throw new RuntimeError(stmt->super_class->name,
-                             "Super class must be a class.");
+      throw RuntimeError(stmt->super_class->name,
+                         "Super class must be a class.");
     }
   }
 
   environment->define(stmt->name->lexeme, nullptr);
+
+  if (super_class) {
+    environment = std::make_shared<Environment>(environment);
+    environment->define("super", super_class);
+  }
   std::map<string, shared_ptr<LoxFunction>> methods;
   for (auto &method : stmt->methods) {
     methods[method->name->lexeme] = std::make_shared<LoxFunction>(
@@ -331,6 +349,9 @@ void Interpreter::visit(shared_ptr<Class> stmt) {
 
   auto kclass =
       std::make_shared<LoxClass>(stmt->name->lexeme, super_class, methods);
+  if (super_class) {
+    environment = environment->enclosing;
+  }
   environment->assign(stmt->name, kclass);
 }
 Interpreter::RETURN_TYPE Interpreter::lookUpVariable(shared_ptr<Token> name,

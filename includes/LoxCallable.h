@@ -61,6 +61,16 @@ struct Clock : public NativeFunction {
     return std::make_shared<value::Number>((double)time(0));
   }
 };
+
+struct Input : public NativeFunction {
+  virtual int arity() override { return 0; }
+  virtual shared_ptr<Object> call(Interpreter &,
+                                  const vector<shared_ptr<Object>> &) override {
+    string temp;
+    std::getline(std::cin, temp);
+    return std::make_shared<value::String>(temp);
+  }
+};
 ////////////////////////////////////////////////////////////////////////
 //                              Function                              //
 ////////////////////////////////////////////////////////////////////////

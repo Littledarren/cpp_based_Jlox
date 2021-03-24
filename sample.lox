@@ -104,10 +104,35 @@ class BostonCream < Doughnut {}
 
 BostonCream().cook();
 
+print "===================TEST===================";
 
+class A {
+    method() {
+        print "A method";
+    }
+    pp() {
+        print "inherit";
+    }
+}
 
+class B < A{
+    method() {
+        print "B method";
+    }
+    test() {
+        super.method();
+    }
+}
 
+class C < B {}
 
+C().method();
+C().pp();
+C().test();
+
+print "input something and will echo ";
+var str = input();
+print str;
 
 
 

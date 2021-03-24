@@ -55,6 +55,7 @@ public:
   virtual RETURN_TYPE visit(shared_ptr<Get> expr) override;
   virtual RETURN_TYPE visit(shared_ptr<Set> expr) override;
   virtual RETURN_TYPE visit(shared_ptr<This> expr) override;
+  virtual RETURN_TYPE visit(shared_ptr<Super> expr) override;
   // Stmt
   virtual void visit(shared_ptr<Expression> stmt) override;
   virtual void visit(shared_ptr<Print> stmt) override;

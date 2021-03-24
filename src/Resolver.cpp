@@ -97,6 +97,21 @@ Resolver::RETURN_TYPE Resolver::visit(shared_ptr<This> expr) {
   resolveLocal(expr, expr->keyword);
   return nullptr;
 }
+Resolver::RETURN_TYPE Resolver::visit(shared_ptr<Super> expr) {
+  switch (currentClass) {
+  case ClassType::NONE:
+    error::error(*expr->keyword, "Can't use 'super' outside of a class");
+    break;
+  case ClassType::CLASS:
+    error::error(*expr->keyword,
+                 "Can't use 'super' in a class with no super class");
+    break;
+  default:
+    break;
+  }
+  resolveLocal(expr, expr->keyword);
+  return nullptr;
+}
 // Stmt
 void Resolver::visit(shared_ptr<Expression> stmt) { resolve(stmt->expr); }
 void Resolver::visit(shared_ptr<Print> stmt) { resolve(stmt->expr); }
@@ -149,7 +164,13 @@ void Resolver::visit(shared_ptr<Class> stmt) {
     error::error(*stmt->super_class->name, "A class can't inherit from itself");
   }
   if (stmt->super_class) {
+    currentClass = ClassType::SUBCLASS;
     resolve(stmt->super_class);
+  }
+
+  if (stmt->super_class) {
+    beginScope();
+    scopes.back()["super"] = true;
   }
 
   beginScope();
@@ -160,6 +181,9 @@ void Resolver::visit(shared_ptr<Class> stmt) {
     resolveLambda(method->lambda, method->type);
   }
   endScope();
+  if (stmt->super_class) {
+    endScope();
+  }
   currentClass = enclosingClass;
 }
 } // namespace compiling

@@ -63,6 +63,7 @@ struct Lambda;
 struct Get;
 struct Set;
 struct This;
+struct Super;
 
 struct Expr {
   using RETURN_TYPE = shared_ptr<Object>;
@@ -80,6 +81,7 @@ struct Expr {
     virtual RETURN_TYPE visit(shared_ptr<Get> expr) = 0;
     virtual RETURN_TYPE visit(shared_ptr<Set> expr) = 0;
     virtual RETURN_TYPE visit(shared_ptr<This> expr) = 0;
+    virtual RETURN_TYPE visit(shared_ptr<Super> expr) = 0;
   };
 
   virtual RETURN_TYPE accept(Visitor &visitor) = 0;
@@ -204,6 +206,14 @@ struct This : ENABLED(Expr, This) {
 
   EXPR_VISITABLE();
   shared_ptr<Token> keyword;
+};
+struct Super : ENABLED(Expr, Super) {
+  Super(shared_ptr<Token> keyword, shared_ptr<Token> method)
+      : keyword(keyword), method(method) {}
+
+  EXPR_VISITABLE();
+  shared_ptr<Token> keyword;
+  shared_ptr<Token> method;
 };
 } // namespace compiling
 } // namespace clox

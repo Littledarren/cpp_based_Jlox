@@ -371,6 +371,13 @@ shared_ptr<Expr> Parser::RecursiveDescentParser::primary() {
   if (match({THIS})) {
     return std::make_shared<This>(previous());
   }
+  if (match({SUPER})) {
+    auto keyword = previous();
+    auto dot = consume(DOT, "Expect '.' after 'super'");
+    auto method = consume(IDENTIFIER, "expect super class method name");
+
+    return std::make_shared<Super>(keyword, method);
+  }
   throw error(peek(), "Expect expression.");
 }
 shared_ptr<Token>
