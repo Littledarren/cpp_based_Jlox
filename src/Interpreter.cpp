@@ -312,6 +312,16 @@ void Interpreter::visit(shared_ptr<Return> stmt) {
   throw Control(stmt->name->type, value);
 }
 void Interpreter::visit(shared_ptr<Class> stmt) {
+  shared_ptr<LoxClass> super_class;
+  if (stmt->super_class) {
+    super_class =
+        std::dynamic_pointer_cast<LoxClass>(evaluate(stmt->super_class));
+    if (!super_class) {
+      throw new RuntimeError(stmt->super_class->name,
+                             "Super class must be a class.");
+    }
+  }
+
   environment->define(stmt->name->lexeme, nullptr);
   std::map<string, shared_ptr<LoxFunction>> methods;
   for (auto &method : stmt->methods) {
@@ -319,7 +329,8 @@ void Interpreter::visit(shared_ptr<Class> stmt) {
         method, environment, method->name->lexeme == "init");
   }
 
-  auto kclass = std::make_shared<LoxClass>(stmt->name->lexeme, methods);
+  auto kclass =
+      std::make_shared<LoxClass>(stmt->name->lexeme, super_class, methods);
   environment->assign(stmt->name, kclass);
 }
 Interpreter::RETURN_TYPE Interpreter::lookUpVariable(shared_ptr<Token> name,

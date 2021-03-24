@@ -40,6 +40,11 @@ shared_ptr<Stmt> Parser::RecursiveDescentParser::varDeclaration() {
 }
 shared_ptr<Class> Parser::RecursiveDescentParser::clsDeclaration() {
   auto name = consume(IDENTIFIER, "Expect class name");
+  shared_ptr<Variable> super_class = nullptr;
+  if (match({LESS})) {
+    super_class = std::make_shared<Variable>(
+        consume(IDENTIFIER, "Expect super class name"));
+  }
   consume(LEFT_BRACE, "Expect '{' after class name");
   vector<shared_ptr<Function>> methods;
   while (!check(RIGHT_BRACE) && !isAtEnd()) {
@@ -52,7 +57,7 @@ shared_ptr<Class> Parser::RecursiveDescentParser::clsDeclaration() {
   }
   consume(RIGHT_BRACE, "Expect '}' after class name");
 
-  return std::make_shared<Class>(name, methods);
+  return std::make_shared<Class>(name, super_class, methods);
 }
 shared_ptr<Function>
 Parser::RecursiveDescentParser::funDeclaration(const string &des,

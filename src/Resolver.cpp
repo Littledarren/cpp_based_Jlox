@@ -144,6 +144,13 @@ void Resolver::visit(shared_ptr<Class> stmt) {
   currentClass = ClassType::CLASS;
   declare(stmt->name);
   define(stmt->name);
+  if (stmt->super_class &&
+      stmt->super_class->name->lexeme == stmt->name->lexeme) {
+    error::error(*stmt->super_class->name, "A class can't inherit from itself");
+  }
+  if (stmt->super_class) {
+    resolve(stmt->super_class);
+  }
 
   beginScope();
   //解析类的方法

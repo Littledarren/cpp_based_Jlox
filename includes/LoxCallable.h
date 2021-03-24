@@ -10,7 +10,7 @@
 #ifndef _LOXCALLABLE_H_
 #define _LOXCALLABLE_H_
 
-
+#include "ErrorReporting.h"
 #include "LoxInstance.h"
 #include "Stmt.h"
 #include "Value.h"
@@ -100,9 +100,10 @@ using std::map;
 struct LoxClass : public Callable, public LoxInstance {
   using FIELD_TYPE = shared_ptr<Object>;
 
-  LoxClass(const string &name,
+  LoxClass(const string &name, shared_ptr<LoxClass> super_class,
            const map<string, shared_ptr<LoxFunction>> &methods)
-      : LoxInstance(this), name(name), methods(methods) {}
+      : LoxInstance(this), name(name), super_class(super_class),
+        methods(methods) {}
 
   virtual ~LoxClass() = default;
   virtual shared_ptr<Object>
@@ -112,11 +113,16 @@ struct LoxClass : public Callable, public LoxInstance {
   virtual string toString() const override { return name; }
 
   shared_ptr<LoxFunction> findMethod(string methodName) {
-    return methods[methodName];
+    if (methods.find(methodName) != methods.end())
+      return methods[methodName];
+    else if (super_class)
+      return super_class->findMethod(methodName);
+    return nullptr;
   }
 
 public:
   string name;
+  shared_ptr<LoxClass> super_class;
   map<string, shared_ptr<LoxFunction>> methods;
 };
 } // namespace runtime

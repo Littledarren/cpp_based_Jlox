@@ -130,11 +130,13 @@ struct Return : ENABLED(Stmt, Return) {
 };
 
 struct Class : ENABLED(Stmt, Class) {
-  Class(shared_ptr<Token> name, const vector<shared_ptr<Function>> &methods)
-      : name(name), methods(methods) {}
+  Class(shared_ptr<Token> name, shared_ptr<Variable> super_class,
+        const vector<shared_ptr<Function>> &methods)
+      : name(name), super_class(super_class), methods(methods) {}
 
   STMT_VISITABLE();
   shared_ptr<Token> name;
+  shared_ptr<Variable> super_class;
   vector<shared_ptr<Function>> methods;
 };
 } // namespace compiling

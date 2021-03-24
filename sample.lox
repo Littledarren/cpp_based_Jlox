@@ -91,6 +91,25 @@ callback();
 
 cake = Cake();
 cake.taste();
-print "===================TEST===================";
 print +10;
+print "===================TEST===================";
+
+class Doughnut {
+    cook() {
+        print "Fry until golden brown.";
+    }
+}
+
+class BostonCream < Doughnut {}
+
+BostonCream().cook();
+
+
+
+
+
+
+
+
+
 /* vim: set filetype=javascript : */
