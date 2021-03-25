@@ -10,13 +10,13 @@ using std::cout;
 namespace clox {
 namespace runtime {
 using namespace error;
-Interpreter::Interpreter()
+Interpreter::Interpreter() noexcept
     : globals(std::make_shared<Environment>(nullptr)), environment(globals) {
   environment->define("clock", std::make_shared<Clock>());
   environment->define("input", std::make_shared<Input>());
 }
 
-void Interpreter::interprete(vector<StmtPtr> statements) {
+void Interpreter::interprete(vector<StmtPtr> statements) noexcept {
   try {
     for (auto p : statements) {
       execute(p);
@@ -26,7 +26,8 @@ void Interpreter::interprete(vector<StmtPtr> statements) {
   }
 }
 
-Interpreter::RETURN_TYPE Interpreter::interprete(shared_ptr<Expr> expr) {
+Interpreter::RETURN_TYPE
+Interpreter::interprete(shared_ptr<Expr> expr) noexcept {
   try {
     return evaluate(expr);
   } catch (const RuntimeError &e) {
@@ -40,16 +41,12 @@ Interpreter::RETURN_TYPE Interpreter::interprete(shared_ptr<Expr> expr) {
 Interpreter::RETURN_TYPE Interpreter::evaluate(shared_ptr<Expr> expr) {
   if (expr)
     return expr->accept(*this);
-  else
-    throw RuntimeError(std::make_shared<Token>(NUL, "", nullptr, -1),
-                       "expr is nullptr!!");
+  error::error(-1, "expr nullptr");
+  return nullptr;
 }
 void Interpreter::execute(shared_ptr<Stmt> stmt) {
   if (stmt)
     stmt->accept(*this);
-  else
-    throw RuntimeError(std::make_shared<Token>(NUL, "", nullptr, -1),
-                       "stmt is nullptr!!");
 }
 void Interpreter::executeBlock(vector<shared_ptr<Stmt>> stmts,
                                shared_ptr<Environment> environment) {

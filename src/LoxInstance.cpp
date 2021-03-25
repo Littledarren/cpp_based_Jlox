@@ -8,9 +8,12 @@ using namespace runtime;
 using namespace compiling;
 using namespace error;
 
-string LoxInstance::toString() const { return klass->name + "  instance"; }
+string LoxInstance::toString() const noexcept {
+  return klass->name + "  instance";
+}
 
-LoxInstance::FIELD_TYPE LoxInstance::get(shared_ptr<Token> token) {
+LoxInstance::FIELD_TYPE
+LoxInstance::get(shared_ptr<Token> token) noexcept(false) {
   // fields
   if (fields.find(token->lexeme) != fields.end())
     return fields.at(token->lexeme);

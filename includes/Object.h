@@ -21,11 +21,11 @@ namespace value {
 
 struct Object {
 
-  virtual bool operator==(const Object &o) const;
-  virtual string toString() const;
-  virtual shared_ptr<Object> clone() const;
-  virtual bool isTrue() const;
-  virtual ~Object() {}
+  virtual bool operator==(const Object &o) const noexcept;
+  virtual string toString() const noexcept;
+  virtual shared_ptr<Object> clone() const noexcept;
+  virtual bool isTrue() const noexcept;
+  virtual ~Object() noexcept {}
 };
 } // namespace value
 } // namespace clox

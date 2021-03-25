@@ -31,13 +31,13 @@ struct LoxInstance : public virtual Object,
 
 public:
   //可能会传入this指针。。所以不能是自身的引用？
-  LoxInstance(LoxClass *klass) : klass(klass) {}
+  LoxInstance(LoxClass *klass) noexcept : klass(klass) {}
 
-  virtual ~LoxInstance() = default;
-  virtual string toString() const override;
-  FIELD_TYPE get(shared_ptr<Token> token);
+  virtual ~LoxInstance() noexcept = default;
+  virtual string toString() const noexcept override;
+  FIELD_TYPE get(shared_ptr<Token> token) noexcept(false);
 
-  void set(shared_ptr<Token> token, FIELD_TYPE value) {
+  void set(shared_ptr<Token> token, FIELD_TYPE value) noexcept {
     fields[token->lexeme] = value;
   }
 

@@ -37,23 +37,23 @@ class Environment : public std::enable_shared_from_this<Environment> {
 
 public:
   //只容许使用make_shared构造
-  Environment(shared_ptr<Environment> enclosing = nullptr)
+  Environment(shared_ptr<Environment> enclosing = nullptr) noexcept
       : enclosing(enclosing) {}
 
-  void define(KEY_TYPE &key, VALUE_TYPE value);
+  void define(KEY_TYPE &key, VALUE_TYPE value) noexcept;
 
-  VALUE_TYPE get(shared_ptr<Token> name);
-  VALUE_TYPE getAt(int dis, KEY_TYPE &name);
-  void assign(shared_ptr<Token> name, VALUE_TYPE value);
-  void assignAt(int dis, shared_ptr<Token> name, VALUE_TYPE value);
+  VALUE_TYPE get(shared_ptr<Token> name) noexcept(false);
+  VALUE_TYPE getAt(int dis, KEY_TYPE &name) noexcept;
+  void assign(shared_ptr<Token> name, VALUE_TYPE value) noexcept(false);
+  void assignAt(int dis, shared_ptr<Token> name, VALUE_TYPE value) noexcept;
 
-  void print() const;
+  void print() const noexcept;
 
 public:
   shared_ptr<Environment> enclosing;
 
 private:
-  shared_ptr<Environment> ancestor(int dis) {
+  shared_ptr<Environment> ancestor(int dis) noexcept {
     auto environment = shared_from_this();
     while (dis--) {
       environment = environment->enclosing;

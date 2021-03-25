@@ -31,15 +31,17 @@ class Interpreter : public Expr::Visitor, public Stmt::Visitor {
   using RETURN_TYPE = Expr::RETURN_TYPE;
 
 public:
-  Interpreter();
-  void interprete(vector<StmtPtr> statements);
+  Interpreter() noexcept;
+  void interprete(vector<StmtPtr> statements) noexcept;
+  RETURN_TYPE interprete(shared_ptr<Expr> expr) noexcept;
 
-  RETURN_TYPE interprete(shared_ptr<Expr> expr);
   RETURN_TYPE evaluate(shared_ptr<Expr> expr);
   void execute(shared_ptr<Stmt> stmt);
   void executeBlock(vector<StmtPtr> stmts, shared_ptr<Environment> environment);
 
-  void resolve(shared_ptr<Expr> expr, int depth) { locals[expr] = depth; }
+  void resolve(shared_ptr<Expr> expr, int depth) noexcept {
+    locals[expr] = depth;
+  }
 
   // expr
   virtual RETURN_TYPE visit(shared_ptr<Assign> expr) override;

@@ -1,7 +1,6 @@
 #include "Value.h"
 
 #include <sstream>
-#include <stdexcept>
 
 namespace clox {
 namespace value {
@@ -9,15 +8,14 @@ namespace value {
 //                               Number                               //
 ////////////////////////////////////////////////////////////////////////
 
-using std::runtime_error;
-bool Number::operator==(const Object &r) const {
+bool Number::operator==(const Object &r) const noexcept {
   const Number *rp = dynamic_cast<const Number *>(&r);
-  if (rp == nullptr)
-    throw runtime_error("Number class should not be compared with nullptr");
+  if (!rp)
+    return false;
   return value == rp->value;
 }
 
-string Number::toString() const {
+string Number::toString() const noexcept {
   std::ostringstream oss;
   oss << value;
   return oss.str();
@@ -26,7 +24,7 @@ string Number::toString() const {
 //                                Bool                                //
 ////////////////////////////////////////////////////////////////////////
 
-bool Bool::operator==(const Object &r) const {
+bool Bool::operator==(const Object &r) const noexcept {
   const Bool *rp = dynamic_cast<const Bool *>(&r);
   if (rp == nullptr)
     return false;
@@ -36,19 +34,19 @@ bool Bool::operator==(const Object &r) const {
 //                              String                                //
 ////////////////////////////////////////////////////////////////////////
 
-bool String::operator==(const Object &r) const {
+bool String::operator==(const Object &r) const noexcept {
   const String *rp = dynamic_cast<const String *>(&r);
   if (rp == nullptr)
     return false;
   return value == rp->value;
 }
 
-String String::operator+(const Object &obj) const {
+String String::operator+(const Object &obj) const noexcept {
   return value + obj.toString();
 }
 
 shared_ptr<String> StringAdd(const shared_ptr<String> &str,
-                             const shared_ptr<Object> &obj) {
+                             const shared_ptr<Object> &obj) noexcept {
   if (obj)
     return std::make_shared<String>(*str + *obj);
   else

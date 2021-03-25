@@ -24,7 +24,7 @@ struct Bool;
 struct String;
 
 shared_ptr<String> StringAdd(const shared_ptr<String> &str,
-                             const shared_ptr<Object> &ob);
+                             const shared_ptr<Object> &ob) noexcept;
 // 没啥用，还麻烦，不好弄。。。
 // struct Nil;
 //
@@ -61,14 +61,14 @@ struct Number : public virtual Object {
   operator double() { return value; }
   operator double() const { return value; }
 
-  bool operator==(const Object &r) const override;
-  string toString() const override;
+  bool operator==(const Object &r) const noexcept override;
+  string toString() const noexcept override;
 
-  virtual shared_ptr<Object> clone() const override {
+  virtual shared_ptr<Object> clone() const noexcept override {
     return std::make_shared<Number>(value);
   }
 
-  virtual bool isTrue() const override { return value != 0; }
+  virtual bool isTrue() const noexcept override { return value != 0; }
 
 public:
   double value;
@@ -79,13 +79,13 @@ struct Bool : public virtual Object {
   operator bool() { return value; }
   operator bool() const { return value; }
 
-  bool operator==(const Object &r) const override;
+  bool operator==(const Object &r) const noexcept override;
 
-  string toString() const override { return value ? "True" : "False"; }
-  virtual shared_ptr<Object> clone() const override {
+  string toString() const noexcept override { return value ? "True" : "False"; }
+  virtual shared_ptr<Object> clone() const noexcept override {
     return std::make_shared<Bool>(value);
   }
-  virtual bool isTrue() const override { return value; }
+  virtual bool isTrue() const noexcept override { return value; }
 
 public:
   bool value;
@@ -94,21 +94,21 @@ public:
 struct String : public virtual Object {
 
   friend shared_ptr<String> StringAdd(const shared_ptr<String> &str,
-                                      const shared_ptr<Object> &ob);
+                                      const shared_ptr<Object> &ob) noexcept;
   String(const char *value = "") : value(value) {}
   String(const string &value = "") : value(value) {}
   operator string() { return value; }
   operator string() const { return value; }
 
-  bool operator==(const Object &r) const override;
+  bool operator==(const Object &r) const noexcept override;
 
-  string toString() const override { return value; }
-  virtual shared_ptr<Object> clone() const override {
+  string toString() const noexcept override { return value; }
+  virtual shared_ptr<Object> clone() const noexcept override {
     return std::make_shared<String>(value);
   }
 
-  virtual bool isTrue() const override { return !value.empty(); }
-  String operator+(const Object &obj) const;
+  virtual bool isTrue() const noexcept override { return !value.empty(); }
+  String operator+(const Object &obj) const noexcept;
 
 public:
   string value;

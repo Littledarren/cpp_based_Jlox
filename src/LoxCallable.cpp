@@ -15,9 +15,11 @@
 namespace clox {
 namespace runtime {
 
-shared_ptr<Object>
-LoxFunction::call(Interpreter &interpreter,
-                  const vector<shared_ptr<Object>> &arguments) {
+shared_ptr<Object> LoxFunction::call(
+    Interpreter &interpreter,
+    const vector<shared_ptr<Object>>
+        &arguments) noexcept(noexcept(interpreter.executeBlock({nullptr},
+                                                               nullptr))) {
   shared_ptr<Environment> environment = std::make_shared<Environment>(closure);
   auto &params = declaration->lambda->params;
   for (auto i = 0; i < params.size(); ++i) {
@@ -30,8 +32,6 @@ LoxFunction::call(Interpreter &interpreter,
     interpreter.executeBlock(declaration->lambda->body, environment);
   } catch (const Control &e) {
     return_value = e.data;
-  } catch (const runtime_error &e) {
-    std::cerr << e.what() << std::endl;
   }
   //这里进行修正
   if (isInitializer)
@@ -53,7 +53,7 @@ shared_ptr<Object> LoxClass::call(Interpreter &interpreter,
   return instance;
 }
 
-int LoxClass::arity() {
+int LoxClass::arity() noexcept {
   shared_ptr<LoxFunction> initializer = findMethod("init");
   if (initializer) {
     return initializer->arity();
@@ -64,7 +64,8 @@ int LoxClass::arity() {
 //                            LoxFunction                             //
 ////////////////////////////////////////////////////////////////////////
 
-shared_ptr<LoxFunction> LoxFunction::bind(shared_ptr<LoxInstance> owner) {
+shared_ptr<LoxFunction>
+LoxFunction::bind(shared_ptr<LoxInstance> owner) noexcept {
   shared_ptr<Environment> environment = std::make_shared<Environment>(closure);
   environment->define("this", owner);
   return std::make_shared<LoxFunction>(declaration, environment, isInitializer);
