@@ -1,6 +1,6 @@
 CC      = g++
 #clang++
-CFLAGS  = -O2 -std=c++11
+CFLAGS  = -O2 -g -std=c++11
 DEBUG_CFLAGS  = -Wall -O0 -pg -std=c++11
 INCLUDEFLAGS = -I ../includes/
 LDFLAGS =

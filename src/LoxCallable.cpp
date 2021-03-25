@@ -20,7 +20,8 @@ shared_ptr<Object> LoxFunction::call(
     const vector<shared_ptr<Object>>
         &arguments) noexcept(noexcept(interpreter.executeBlock({nullptr},
                                                                nullptr))) {
-  shared_ptr<Environment> environment = std::make_shared<Environment>(closure);
+  shared_ptr<Environment> environment =
+      std::make_shared<Environment>(closure.lock());
   auto &params = declaration->lambda->params;
   for (auto i = 0; i < params.size(); ++i) {
     environment->define(params.at(i)->lexeme, arguments.at(i));
@@ -35,7 +36,7 @@ shared_ptr<Object> LoxFunction::call(
   }
   //这里进行修正
   if (isInitializer)
-    return closure->getAt(0, "this");
+    return closure.lock()->getAt(0, "this");
   return return_value;
 }
 
@@ -66,7 +67,8 @@ int LoxClass::arity() noexcept {
 
 shared_ptr<LoxFunction>
 LoxFunction::bind(shared_ptr<LoxInstance> owner) noexcept {
-  shared_ptr<Environment> environment = std::make_shared<Environment>(closure);
+  shared_ptr<Environment> environment =
+      std::make_shared<Environment>(closure.lock());
   environment->define("this", owner);
   return std::make_shared<LoxFunction>(declaration, environment, isInitializer);
 }

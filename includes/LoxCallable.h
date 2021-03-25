@@ -103,7 +103,8 @@ public:
   shared_ptr<Function> declaration;
 
 private:
-  shared_ptr<Environment> closure;
+  // !!!!! 任何值类型不能保留Environment的强引用
+  std::weak_ptr<Environment> closure;
   //应该没有必要了。必要的信息应该保存在编译时中
   bool isInitializer;
 };
