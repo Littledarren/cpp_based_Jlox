@@ -15,13 +15,42 @@
 namespace clox {
 namespace runtime {
 
-shared_ptr<Object> LoxFunction::call(
-    Interpreter &interpreter,
-    const vector<shared_ptr<Object>>
-        &arguments) noexcept(noexcept(interpreter.executeBlock({nullptr},
-                                                               nullptr))) {
+////////////////////////////////////////////////////////////////////////
+//                              LoxClass                              //
+////////////////////////////////////////////////////////////////////////
+
+shared_ptr<Object> LoxClass::call(Interpreter &interpreter,
+                                  const vector<shared_ptr<Object>> &arguments) {
+  auto initializer = findMethod("init");
+  auto instance = std::make_shared<LoxInstance>(
+      std::enable_shared_from_this<LoxClass>::shared_from_this());
+  if (initializer) {
+    initializer->bind(instance)->call(interpreter, arguments);
+  }
+  return instance;
+}
+
+int LoxClass::arity() noexcept {
+  shared_ptr<LoxFunction> initializer = findMethod("init");
+  if (initializer) {
+    return initializer->arity();
+  }
+  return 0;
+}
+////////////////////////////////////////////////////////////////////////
+//                            LoxFunction                             //
+////////////////////////////////////////////////////////////////////////
+
+shared_ptr<Object>
+LoxFunction::call(Interpreter &interpreter,
+                  const vector<shared_ptr<Object>> &arguments) noexcept(false) {
+  //闭包必须强引用定义它的那个环境
+  //所以会产生循环依赖
+  //通过hold_closure保证生命周期，只通过weak_ptr访问
+  //只有return的时候，才会hold住闭包
   shared_ptr<Environment> environment =
       std::make_shared<Environment>(closure.lock());
+
   auto &params = declaration->lambda->params;
   for (auto i = 0; i < params.size(); ++i) {
     environment->define(params.at(i)->lexeme, arguments.at(i));
@@ -40,37 +69,16 @@ shared_ptr<Object> LoxFunction::call(
   return return_value;
 }
 
-////////////////////////////////////////////////////////////////////////
-//                              LoxClass                              //
-////////////////////////////////////////////////////////////////////////
-
-shared_ptr<Object> LoxClass::call(Interpreter &interpreter,
-                                  const vector<shared_ptr<Object>> &arguments) {
-  auto initializer = findMethod("init");
-  auto instance = std::make_shared<LoxInstance>(this);
-  if (initializer) {
-    initializer->bind(instance)->call(interpreter, arguments);
-  }
-  return instance;
-}
-
-int LoxClass::arity() noexcept {
-  shared_ptr<LoxFunction> initializer = findMethod("init");
-  if (initializer) {
-    return initializer->arity();
-  }
-  return 0;
-}
-////////////////////////////////////////////////////////////////////////
-//                            LoxFunction                             //
-////////////////////////////////////////////////////////////////////////
-
 shared_ptr<LoxFunction>
 LoxFunction::bind(shared_ptr<LoxInstance> owner) noexcept {
   shared_ptr<Environment> environment =
       std::make_shared<Environment>(closure.lock());
   environment->define("this", owner);
-  return std::make_shared<LoxFunction>(declaration, environment, isInitializer);
+  //这里。需要保存一个对象的闭包
+  auto instance_func =
+      std::make_shared<LoxFunction>(declaration, environment, isInitializer);
+  instance_func->hold();
+  return instance_func;
 }
 } // namespace runtime
 } // namespace clox

@@ -50,7 +50,7 @@ public:
 ////////////////////////////////////////////////////////////////////////
 
 inline void report(int line, const string &where, const string &message) {
-  cerr << "[line " << line << "] Error " << where << " : " << message << endl;
+  cerr << "[" << line << "] Error " << where << " : " << message << endl;
   hadError = true;
 }
 inline void error(int line, const string &message) {

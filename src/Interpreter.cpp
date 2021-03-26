@@ -228,7 +228,7 @@ Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Lambda> expr) {
   return std::make_shared<LoxFunction>(
       std::make_shared<Function>(nullptr, expr->shared_from_this(),
                                  FunctionType::FUNCTION),
-      environment, false);
+      environment);
 }
 Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Get> expr) {
   shared_ptr<LoxInstance> obj =
@@ -269,7 +269,7 @@ void Interpreter::visit(shared_ptr<Print> stmt) {
   if (value)
     std::cout << (value)->toString() << endl;
   else
-    std::cout << "Nil" << endl;
+    std::cout << "nil" << endl;
 }
 
 void Interpreter::visit(shared_ptr<Var> stmt) {
@@ -309,9 +309,9 @@ void Interpreter::visit(shared_ptr<While> stmt) {
   }
 }
 void Interpreter::visit(shared_ptr<Function> func) {
-  environment->define(func->name->lexeme,
-                      std::make_shared<LoxFunction>(func->shared_from_this(),
-                                                    this->environment, false));
+  environment->define(
+      func->name->lexeme,
+      std::make_shared<LoxFunction>(func->shared_from_this(), environment));
 }
 
 void Interpreter::visit(shared_ptr<Return> stmt) {
@@ -319,10 +319,15 @@ void Interpreter::visit(shared_ptr<Return> stmt) {
   if (stmt->value) {
     value = evaluate(stmt->value);
   }
+  //如果返回函数，需要hold Environment
+  if (auto func = std::dynamic_pointer_cast<LoxFunction>(value)) {
+    func->hold();
+  }
   throw Control(stmt->name->type, value);
 }
 void Interpreter::visit(shared_ptr<Class> stmt) {
   shared_ptr<LoxClass> super_class;
+
   if (stmt->super_class) {
     super_class =
         std::dynamic_pointer_cast<LoxClass>(evaluate(stmt->super_class));
@@ -340,8 +345,8 @@ void Interpreter::visit(shared_ptr<Class> stmt) {
   }
   std::map<string, shared_ptr<LoxFunction>> methods;
   for (auto &method : stmt->methods) {
-    methods[method->name->lexeme] = std::make_shared<LoxFunction>(
-        method, environment, method->name->lexeme == "init");
+    auto mm = std::make_shared<LoxFunction>(method, environment);
+    methods[method->name->lexeme] = mm;
   }
 
   auto kclass =

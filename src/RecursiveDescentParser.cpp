@@ -319,7 +319,7 @@ shared_ptr<Expr> Parser::RecursiveDescentParser::call() {
 }
 shared_ptr<Lambda> Parser::RecursiveDescentParser::lambdaFunc() {
   // parameters
-  consume(LEFT_PAREN, "Expect '(' after Function declaration");
+  consume(LEFT_PAREN, "Expect '(' after Function/lambda declaration");
 
   vector<decltype(consume(IDENTIFIER, "Expect parameter name"))> params;
   if (!check(RIGHT_PAREN)) {

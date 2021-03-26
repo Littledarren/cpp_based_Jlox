@@ -76,9 +76,8 @@ struct Input : public NativeFunction {
 ////////////////////////////////////////////////////////////////////////
 
 struct LoxFunction : public Callable {
-  LoxFunction(shared_ptr<Function> func, shared_ptr<Environment> closure,
-              bool isInitializer)
-      : declaration(func), closure(closure), isInitializer(isInitializer) {}
+  LoxFunction(shared_ptr<Function> func, shared_ptr<Environment> closure)
+      : declaration(func), closure(closure), hold_closure(nullptr) {}
 
   virtual shared_ptr<Object>
   call(Interpreter &interpreter,
@@ -97,6 +96,12 @@ struct LoxFunction : public Callable {
 
   shared_ptr<LoxFunction> bind(shared_ptr<LoxInstance> owner) noexcept;
 
+  shared_ptr<LoxFunction> hold() noexcept {
+    auto closure_func = std::make_shared<LoxFunction>(declaration, closure);
+    closure_func->hold_closure = closure.lock();
+    return closure_func;
+  }
+
   virtual ~LoxFunction() = default;
 
 public:
@@ -104,19 +109,25 @@ public:
 
 private:
   // !!!!! 任何值类型不能保留Environment的强引用
+  // std::weak_ptr<Environment> closure;
+  // 2021-03-26
+  // 没办法。。。必须要有强引用，闭包需要
   std::weak_ptr<Environment> closure;
+  shared_ptr<Environment> hold_closure;
   //应该没有必要了。必要的信息应该保存在编译时中
   bool isInitializer;
 };
 
 using std::map;
-struct LoxClass : public Callable, public LoxInstance {
+struct LoxClass : public Callable,
+                  public LoxInstance,
+                  public std::enable_shared_from_this<LoxClass> {
   using FIELD_TYPE = shared_ptr<Object>;
 
   LoxClass(const string &name, shared_ptr<LoxClass> super_class,
            const map<string, shared_ptr<LoxFunction>> &methods) noexcept
-      : LoxInstance(this), name(name), super_class(super_class),
-        methods(methods) {}
+      : LoxInstance(enable_shared_from_this<LoxClass>::shared_from_this(), 1),
+        name(name), super_class(super_class), methods(methods) {}
 
   virtual ~LoxClass() noexcept = default;
   virtual shared_ptr<Object>

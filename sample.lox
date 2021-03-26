@@ -9,7 +9,7 @@
  * comment test
  *
  */
-
+/*
 print "===================TEST===================";
 fun fib(n) {
     if (n <= 1) return n;
@@ -21,7 +21,6 @@ print fib(10);
 var after = clock();
 print (after - before);
 
-/*
 
 var makeCounter = fun () {
     var i = 0;
@@ -33,14 +32,13 @@ var makeCounter = fun () {
 };
 
 print makeCounter;
-print fib;
 
 var counter = makeCounter();
 counter();
 counter();
+
 print "native func clock:" + clock();
 print "===================TEST===================";
-
 class Devonshirecream {
     serveOn() {
         print this.x+this.x;
@@ -53,13 +51,15 @@ print "===================TEST===================";
 var x = Devonshirecream();
 x.x = 9;
 print x.x;
+
 print x.serveOn();
+*/
 print "===================TEST===================";
 
 class Cake {
     class class_method() {
         print "class method";
-        this;
+        //this;
     }
 
     init() {
@@ -135,7 +135,6 @@ C().test();
 print "input something and will echo ";
 var str = input();
 print str;
-*/
 
 
 

@@ -30,8 +30,8 @@ struct LoxInstance : public virtual Object,
   using FIELD_TYPE = shared_ptr<Object>;
 
 public:
-  //可能会传入this指针。。所以不能是自身的引用？
-  LoxInstance(LoxClass *klass) noexcept : klass(klass) {}
+  LoxInstance(const shared_ptr<LoxClass> &klass, int) noexcept : self(klass) {}
+  LoxInstance(const shared_ptr<LoxClass> &klass) noexcept : klass(klass) {}
 
   virtual ~LoxInstance() noexcept = default;
   virtual string toString() const noexcept override;
@@ -41,9 +41,17 @@ public:
     fields[token->lexeme] = value;
   }
 
+  shared_ptr<LoxClass> getClass() const {
+    if (klass)
+      return klass;
+    return self.lock();
+  }
+
 private:
   // 如果持有共享指针，会导致循环引用！
-  LoxClass *klass;
+  // 但是不持有共享指针，超出类的作用域就over
+  std::weak_ptr<LoxClass> self;
+  shared_ptr<LoxClass> klass{nullptr};
   std::map<string, FIELD_TYPE> fields;
 };
 

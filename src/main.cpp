@@ -52,11 +52,12 @@ void run(const string &source);
 using namespace clox;
 
 int main(int argc, char *argv[]) {
-  if (argc > 2) {
+  if (argc > 5) {
+    cout << "=======HELP=========" << endl;
     cout << "Usage: jlox [script]" << endl;
     return clox::ARGUMENT_TOO_LESS;
-  } else if (argc == 2) {
-    runFile(argv[1]);
+  } else if (argc >= 2) {
+    runFile(argv[argc - 1]);
   } else {
     runPrompt();
   }
