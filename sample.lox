@@ -9,7 +9,6 @@
  * comment test
  *
  */
-/*
 print "===================TEST===================";
 fun fib(n) {
     if (n <= 1) return n;
@@ -53,7 +52,7 @@ x.x = 9;
 print x.x;
 
 print x.serveOn();
-*/
+
 print "===================TEST===================";
 
 class Cake {

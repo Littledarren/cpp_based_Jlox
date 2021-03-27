@@ -97,7 +97,8 @@ struct LoxFunction : public Callable {
   shared_ptr<LoxFunction> bind(shared_ptr<LoxInstance> owner) noexcept;
 
   shared_ptr<LoxFunction> hold() noexcept {
-    auto closure_func = std::make_shared<LoxFunction>(declaration, closure);
+    auto closure_func =
+        std::make_shared<LoxFunction>(declaration, closure.lock());
     closure_func->hold_closure = closure.lock();
     return closure_func;
   }
@@ -114,20 +115,15 @@ private:
   // 没办法。。。必须要有强引用，闭包需要
   std::weak_ptr<Environment> closure;
   shared_ptr<Environment> hold_closure;
-  //应该没有必要了。必要的信息应该保存在编译时中
-  bool isInitializer;
 };
 
 using std::map;
-struct LoxClass : public Callable,
-                  public LoxInstance,
-                  public std::enable_shared_from_this<LoxClass> {
+struct LoxClass : public Callable, public LoxInstance {
   using FIELD_TYPE = shared_ptr<Object>;
 
   LoxClass(const string &name, shared_ptr<LoxClass> super_class,
            const map<string, shared_ptr<LoxFunction>> &methods) noexcept
-      : LoxInstance(enable_shared_from_this<LoxClass>::shared_from_this(), 1),
-        name(name), super_class(super_class), methods(methods) {}
+      : LoxInstance(), name(name), super_class(super_class), methods(methods) {}
 
   virtual ~LoxClass() noexcept = default;
   virtual shared_ptr<Object>

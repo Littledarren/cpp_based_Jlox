@@ -321,7 +321,7 @@ void Interpreter::visit(shared_ptr<Return> stmt) {
   }
   //如果返回函数，需要hold Environment
   if (auto func = std::dynamic_pointer_cast<LoxFunction>(value)) {
-    func->hold();
+    value = func->hold();
   }
   throw Control(stmt->name->type, value);
 }
@@ -346,7 +346,7 @@ void Interpreter::visit(shared_ptr<Class> stmt) {
   std::map<string, shared_ptr<LoxFunction>> methods;
   for (auto &method : stmt->methods) {
     auto mm = std::make_shared<LoxFunction>(method, environment);
-    methods[method->name->lexeme] = mm;
+    methods[method->name->lexeme] = mm->hold();
   }
 
   auto kclass =

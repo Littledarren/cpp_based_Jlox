@@ -9,7 +9,7 @@ using namespace compiling;
 using namespace error;
 
 string LoxInstance::toString() const noexcept {
-  return getClass()->name + "  instance";
+  return const_cast<LoxInstance *>(this)->getClass()->name + "  instance";
 }
 
 LoxInstance::FIELD_TYPE
@@ -32,6 +32,12 @@ LoxInstance::get(shared_ptr<Token> token) noexcept(false) {
   }
 
   throw RuntimeError(token, "Undefined property '" + token->lexeme + "'");
+}
+
+shared_ptr<LoxClass> LoxInstance::getClass() {
+  if (klass)
+    return klass;
+  return std::dynamic_pointer_cast<LoxClass>(shared_from_this());
 }
 } // namespace value
 } // namespace clox

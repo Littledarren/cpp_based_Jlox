@@ -23,7 +23,7 @@ shared_ptr<Object> LoxClass::call(Interpreter &interpreter,
                                   const vector<shared_ptr<Object>> &arguments) {
   auto initializer = findMethod("init");
   auto instance = std::make_shared<LoxInstance>(
-      std::enable_shared_from_this<LoxClass>::shared_from_this());
+      std::dynamic_pointer_cast<LoxClass>(shared_from_this()));
   if (initializer) {
     initializer->bind(instance)->call(interpreter, arguments);
   }
@@ -64,7 +64,7 @@ LoxFunction::call(Interpreter &interpreter,
     return_value = e.data;
   }
   //这里进行修正
-  if (isInitializer)
+  if (declaration->type == FunctionType::INITIALIZER)
     return closure.lock()->getAt(0, "this");
   return return_value;
 }
@@ -75,10 +75,8 @@ LoxFunction::bind(shared_ptr<LoxInstance> owner) noexcept {
       std::make_shared<Environment>(closure.lock());
   environment->define("this", owner);
   //这里。需要保存一个对象的闭包
-  auto instance_func =
-      std::make_shared<LoxFunction>(declaration, environment, isInitializer);
-  instance_func->hold();
-  return instance_func;
+  auto instance_func = std::make_shared<LoxFunction>(declaration, environment);
+  return instance_func->hold();
 }
 } // namespace runtime
 } // namespace clox
