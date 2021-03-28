@@ -20,7 +20,6 @@ print fib(10);
 var after = clock();
 print (after - before);
 
-
 var makeCounter = fun () {
     var i = 0;
     fun count() {
@@ -32,10 +31,10 @@ var makeCounter = fun () {
 
 print makeCounter;
 
+
 var counter = makeCounter();
 counter();
 counter();
-
 print "native func clock:" + clock();
 print "===================TEST===================";
 class Devonshirecream {
@@ -131,10 +130,9 @@ C().method();
 C().pp();
 C().test();
 
-print "input something and will echo ";
-var str = input();
-print str;
-
+//print "input something and will echo ";
+//var str = input();
+//print str;
 
 
 /* vim: set filetype=javascript : */

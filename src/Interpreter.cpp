@@ -71,7 +71,9 @@ Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Assign> expr) {
   RETURN_TYPE value = evaluate(expr->value);
 
   auto iter = locals.find(expr);
-  if (iter == locals.end())
+  auto is_global = iter == locals.end();
+
+  if (is_global)
     globals->assign(expr->name, value);
   else
     environment->assignAt(iter->second, expr->name, value);

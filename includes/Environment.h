@@ -49,6 +49,9 @@ public:
 
   void print() const noexcept;
 
+  //动态查找一个名字
+  int dynamic_resolve(KEY_TYPE &name) noexcept;
+
 public:
   shared_ptr<Environment> enclosing;
 

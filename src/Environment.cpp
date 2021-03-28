@@ -51,6 +51,15 @@ void Environment::assignAt(int dis, shared_ptr<Token> name,
   ancestor(dis)->values.at(name->lexeme) = value;
 }
 
+int Environment::dynamic_resolve(KEY_TYPE &name) noexcept {
+  int layer = 0;
+  if (values.count(name) != 0) {
+    return layer;
+  }
+  if (enclosing)
+    return enclosing->dynamic_resolve(name) + 1;
+  return -1;
+}
 void Environment::print() const noexcept {
   for (auto &kv : values) {
     cout << kv.first << "\t:\t" << (kv.second ? (kv.second)->toString() : "Nil")
