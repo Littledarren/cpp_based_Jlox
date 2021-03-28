@@ -115,8 +115,7 @@ struct LoxClass : public Callable, public LoxInstance {
 
   LoxClass(const string &name, shared_ptr<LoxClass> super_class,
            const map<string, shared_ptr<LoxFunction>> &methods) noexcept
-      : LoxInstance(this), name(name), super_class(super_class),
-        methods(methods) {}
+      : LoxInstance(), name(name), super_class(super_class), methods(methods) {}
 
   virtual ~LoxClass() noexcept = default;
   virtual shared_ptr<Object>

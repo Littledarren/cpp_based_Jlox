@@ -286,7 +286,7 @@ shared_ptr<Expr> Parser::RecursiveDescentParser::addition() {
 }
 shared_ptr<Expr> Parser::RecursiveDescentParser::multiplication() {
   shared_ptr<Expr> expr = unary();
-  while (match({STAR, SLASH, PLUS})) {
+  while (match({STAR, SLASH})) {
     shared_ptr<Token> op = previous();
     shared_ptr<Expr> right = unary();
     expr = std::make_shared<Binary>(expr, op, right);
@@ -345,7 +345,12 @@ Parser::RecursiveDescentParser::finishCall(shared_ptr<Expr> callee) {
       if (arguments.size() >= 255) {
         error(peek(), "can not have more than 255 arguments");
       }
-      arguments.push_back(expression());
+      if (match({FUN}))
+        arguments.push_back(lambdaFunc());
+      else
+        arguments.push_back(assignment());
+      // conflict with commaExpression
+      // arguments.push_back(expression());
     } while (match({COMMA}));
   }
   shared_ptr<Token> paren = consume(RIGHT_PAREN, "Expect ')' after arguments");

@@ -47,7 +47,7 @@ shared_ptr<Object> LoxFunction::call(
 shared_ptr<Object> LoxClass::call(Interpreter &interpreter,
                                   const vector<shared_ptr<Object>> &arguments) {
   auto initializer = findMethod("init");
-  auto instance = std::make_shared<LoxInstance>(this);
+  auto instance = std::make_shared<LoxInstance>(getClass());
   if (initializer) {
     initializer->bind(instance)->call(interpreter, arguments);
   }

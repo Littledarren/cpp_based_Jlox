@@ -50,7 +50,7 @@ shared_ptr<String> StringAdd(const shared_ptr<String> &str,
   if (obj)
     return std::make_shared<String>(*str + *obj);
   else
-    return std::make_shared<String>(*str + String("Nil"));
+    return std::make_shared<String>(*str + String("nil"));
 }
 } // namespace value
 } // namespace clox

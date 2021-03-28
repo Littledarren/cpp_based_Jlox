@@ -94,7 +94,7 @@ Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Call> expr) {
   RETURN_TYPE callee = (evaluate(expr->callee));
 
   vector<RETURN_TYPE> arguments;
-  for (auto p : expr->arguments) {
+  for (auto &p : expr->arguments) {
     arguments.push_back(evaluate(p));
   }
 
@@ -104,7 +104,7 @@ Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Call> expr) {
   }
   if (arguments.size() != function->arity()) {
     ostringstream oss;
-    oss << "Expected " << function->arity() << "arguments but got"
+    oss << "Expected " << function->arity() << " arguments but got "
         << arguments.size() << ".";
     throw RuntimeError(expr->paren, oss.str());
   }
@@ -185,10 +185,12 @@ Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Binary> expr) {
                                     *std::dynamic_pointer_cast<Number>(right));
     break;
   case EQUAL_EQUAL:
-    result = std::make_shared<Bool>(*left == *right);
+    result = std::make_shared<Bool>(left == right ||
+                                    (left && right && *left == *right));
     break;
   case BANG_EQUAL:
-    result = std::make_shared<Bool>(!(*left == *right));
+    result = std::make_shared<Bool>(
+        !(left == right || (left && right && *left == *right)));
     break;
   default:
     throw string("ERROR UNKONE OP") + expr->op->lexeme;
@@ -204,7 +206,7 @@ Interpreter::RETURN_TYPE Interpreter::visit(shared_ptr<Unary> expr) {
         std::make_shared<Number>(-*std::dynamic_pointer_cast<Number>(temp));
     break;
   case BANG:
-    result = std::make_shared<Bool>(!*std::dynamic_pointer_cast<Bool>(temp));
+    result = std::make_shared<Bool>(temp == nullptr ? true : !(temp->isTrue()));
     break;
   case PLUS:
     result = std::make_shared<Number>(*std::dynamic_pointer_cast<Number>(temp));
@@ -269,7 +271,7 @@ void Interpreter::visit(shared_ptr<Print> stmt) {
   if (value)
     std::cout << (value)->toString() << endl;
   else
-    std::cout << "Nil" << endl;
+    std::cout << "nil" << endl;
 }
 
 void Interpreter::visit(shared_ptr<Var> stmt) {
