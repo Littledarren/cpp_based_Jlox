@@ -17,11 +17,10 @@ fun fib(n) {
 }
 
 var before = clock();
-print fib(30);
+print fib(10);
 var after = clock();
 print (after - before);
 
-/*
 
 var makeCounter = fun () {
     var i = 0;
@@ -135,7 +134,6 @@ C().test();
 print "input something and will echo ";
 var str = input();
 print str;
-*/
 
 
 
